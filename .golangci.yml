@@ -1,0 +1,51 @@
+***REMOVED*** golangci-lint configuration for eBPF Agent
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+  skip-dirs:
+    - internal/bpf/.*_bpfe[lb]\.go  ***REMOVED*** Skip generated BPF files
+
+linters:
+  enable:
+    - gofmt
+    - goimports
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - typecheck
+    - unused
+    - gosimple
+    - errcheck
+
+  disable:
+    - gosec  ***REMOVED*** Too many false positives for system programming
+    - exhaustive  ***REMOVED*** Not needed for this project
+    - gocyclo  ***REMOVED*** Complexity can be high in BPF loaders
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/kubeadapt/ebpf-agent
+  govet:
+    check-shadowing: true
+  staticcheck:
+    go: "1.23"
+
+issues:
+  exclude-rules:
+    ***REMOVED*** Exclude generated files
+    - path: "_bpfe[lb]\\.go"
+      linters:
+        - all
+    ***REMOVED*** Allow unsafe in BPF-related code
+    - path: "internal/bpf/"
+      linters:
+        - gosec
+    ***REMOVED*** Test files can have longer functions
+    - path: "_test\\.go"
+      linters:
+        - funlen
+        - dupl

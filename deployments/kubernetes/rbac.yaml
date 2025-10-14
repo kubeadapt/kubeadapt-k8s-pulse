@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeadapt-ebpf-agent
+  namespace: kubeadapt-system
+  labels:
+    app: kubeadapt-ebpf-agent
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubeadapt-ebpf-agent
+  labels:
+    app: kubeadapt-ebpf-agent
+rules:
+***REMOVED*** Read pods for container discovery
+- apiGroups: [""]
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+***REMOVED*** Read pod metrics if available
+- apiGroups: ["metrics.k8s.io"]
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadapt-ebpf-agent
+  labels:
+    app: kubeadapt-ebpf-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubeadapt-ebpf-agent
+subjects:
+- kind: ServiceAccount
+  name: kubeadapt-ebpf-agent
+  namespace: kubeadapt-system
+---
+***REMOVED*** SecurityContextConstraints for OpenShift (optional)
+apiVersion: v1
+kind: SecurityContextConstraints
+metadata:
+  name: kubeadapt-ebpf-agent
+  labels:
+    app: kubeadapt-ebpf-agent
+  annotations:
+    kubernetes.io/description: "Security context for eBPF agent requiring kernel access"
+***REMOVED*** Only include this if running on OpenShift
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+priority: 10
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+- MKNOD
+- SETUID
+- SETGID
+allowedCapabilities:
+- CAP_SYS_ADMIN
+- CAP_SYS_PTRACE
+- CAP_NET_ADMIN
+- CAP_NET_RAW
+- CAP_BPF
+- CAP_PERFMON
+allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: false
+allowPrivilegedContainer: false
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- hostPath
+- persistentVolumeClaim
+- projected
+- secret
+users:
+- system:serviceaccount:kubeadapt-system:kubeadapt-ebpf-agent

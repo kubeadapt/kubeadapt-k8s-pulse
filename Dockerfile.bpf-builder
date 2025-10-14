@@ -1,0 +1,30 @@
+***REMOVED*** BPF Builder image for compiling eBPF programs
+***REMOVED*** Used primarily on macOS where native BPF compilation is not possible
+
+FROM golang:1.23-bookworm
+
+***REMOVED*** Install BPF compilation dependencies
+RUN apt-get update && apt-get install -y \
+    clang-14 \
+    llvm-14 \
+    libbpf-dev \
+    linux-libc-dev \
+    make \
+    gcc \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+***REMOVED*** Fix asm/types.h not found issue on ARM64
+***REMOVED*** Debian/Ubuntu stores architecture-specific headers in /usr/include/ARCH-linux-gnu/
+***REMOVED*** Create symlinks so clang can find them
+RUN ln -sf /usr/include/$(uname -m)-linux-gnu/asm /usr/include/asm && \
+    ln -sf /usr/include/$(uname -m)-linux-gnu/asm-generic /usr/include/asm-generic
+
+***REMOVED*** Install bpf2go for generating Go bindings
+RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0
+
+WORKDIR /workspace
+
+***REMOVED*** Default command
+CMD ["bash", "-c", "echo 'BPF builder ready. Use this container to compile BPF programs.'"]

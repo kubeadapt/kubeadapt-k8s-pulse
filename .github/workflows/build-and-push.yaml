@@ -1,0 +1,31 @@
+name: Build and Push eBPF Agent
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-ebpf-agent:
+    uses: kubeadapt/actions/.github/workflows/aws-ecr-golang-build-and-push.yml@main
+    with:
+      docker_file_path: './Dockerfile'
+      go_version: '1.23.x'
+      ecr_repository_name: 'w3l5x6r6/kubeadapt/app/kubeadapt-ebpf-agent'
+      platforms: 'linux/amd64,linux/arm64'
+      run_tests: false  ***REMOVED*** Tests need BPF setup, handled in Docker build
+    secrets:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      PLATFORM_ASSISTANT_GH_APP_ID: ${{ secrets.PLATFORM_ASSISTANT_GH_APP_ID }}
+      PLATFORM_ASSISTANT_GH_APP_PRIVATE_KEY: ${{ secrets.PLATFORM_ASSISTANT_GH_APP_PRIVATE_KEY }}

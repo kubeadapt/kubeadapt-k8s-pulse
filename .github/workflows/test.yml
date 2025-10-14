@@ -1,0 +1,83 @@
+name: Test eBPF Agent
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.go'
+      - '**.c'
+      - '**.h'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/test.yml'
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: true
+
+      - name: Install BPF dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libbpf-dev linux-headers-$(uname -r)
+          go install github.com/cilium/ebpf/cmd/bpf2go@v0.11.0
+
+      - name: Generate BPF bindings
+        run: |
+          cd internal/bpf && go generate ./...
+
+      - name: Run unit tests
+        run: |
+          ***REMOVED*** Run non-BPF unit tests (these don't need root)
+          go test -v -race ./internal/network/... ./internal/k8s/... ./internal/container/...
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: true
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./... --timeout=5m
+
+  ***REMOVED*** Integration tests in Docker (for BPF)
+  integration-tests:
+    name: Integration Tests (BPF)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build test image
+        run: |
+          docker build -f Dockerfile -t ebpf-agent:test .
+
+      - name: Run BPF integration tests
+        run: |
+          ***REMOVED*** Run privileged container for BPF tests
+          docker run --rm --privileged \
+            -v /sys/kernel/debug:/sys/kernel/debug:rw \
+            ebpf-agent:test \
+            go test -v ./test/integration/...

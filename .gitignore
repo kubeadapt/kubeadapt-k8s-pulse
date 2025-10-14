@@ -1,0 +1,62 @@
+***REMOVED*** Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+ebpf-agent
+
+***REMOVED*** BPF compiled objects
+*.o
+*_bpfel.go
+*_bpfel.o
+*_bpfeb.go
+*_bpfeb.o
+bpf/output/
+
+***REMOVED*** Test binaries
+*.test
+
+***REMOVED*** Coverage files
+*.out
+coverage.html
+coverage.txt
+*.cov
+
+***REMOVED*** Dependency directories
+vendor/
+
+***REMOVED*** IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+***REMOVED*** Environment files
+.env
+.env.local
+.env.*.local
+
+***REMOVED*** Debug files
+*.log
+debug
+
+***REMOVED*** Temporary files
+tmp/
+temp/
+*.tmp
+
+***REMOVED*** Docker volumes
+prometheus-data/
+grafana-data/
+
+***REMOVED*** Generated files
+network_bpfel_x86.go
+network_bpfel_x86.o
+network_bpfeb.go
+network_bpfeb.o
+
+***REMOVED*** Air (live reload) temp files
+.air.toml.tmp
