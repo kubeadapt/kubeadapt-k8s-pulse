@@ -6,12 +6,10 @@ bin/
 *.dylib
 ebpf-agent
 
-***REMOVED*** BPF compiled objects
+***REMOVED*** BPF compiled objects (but keep generated Go files - they're committed like netobserv)
 *.o
-*_bpfel.go
-*_bpfel.o
-*_bpfeb.go
-*_bpfeb.o
+***REMOVED*** Exception: internal/bpf/*_bpfel.go and *_bpfeb.go ARE committed (pre-generated)
+***REMOVED*** Only ignore .o files from BPF compilation
 bpf/output/
 
 ***REMOVED*** Test binaries
@@ -24,7 +22,8 @@ coverage.txt
 *.cov
 
 ***REMOVED*** Dependency directories
-vendor/
+vendor/*
+!vendor/modules.txt
 
 ***REMOVED*** IDE directories
 .idea/
@@ -51,12 +50,6 @@ temp/
 ***REMOVED*** Docker volumes
 prometheus-data/
 grafana-data/
-
-***REMOVED*** Generated files
-network_bpfel_x86.go
-network_bpfel_x86.o
-network_bpfeb.go
-network_bpfeb.o
 
 ***REMOVED*** Air (live reload) temp files
 .air.toml.tmp

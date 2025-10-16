@@ -1,0 +1,27 @@
+***REMOVED*** Kind cluster configuration for multi-node testing
+***REMOVED*** This creates a 3-node cluster (1 control-plane + 2 workers) for cross-node traffic testing
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  ***REMOVED*** Control plane node
+  - role: control-plane
+    labels:
+      topology.kubernetes.io/zone: us-west-2a
+      topology.kubernetes.io/region: us-west-2
+
+  ***REMOVED*** Worker node 1 - Different zone from control plane
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: us-west-2b
+      topology.kubernetes.io/region: us-west-2
+
+  ***REMOVED*** Worker node 2 - Same zone as worker 1
+  - role: worker
+    labels:
+      topology.kubernetes.io/zone: us-west-2b
+      topology.kubernetes.io/region: us-west-2
+
+***REMOVED*** Enable pod networking
+networking:
+  disableDefaultCNI: false
+  podSubnet: "10.244.0.0/16"

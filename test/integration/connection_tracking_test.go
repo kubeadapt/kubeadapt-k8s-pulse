@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -13,8 +14,6 @@ import (
 	"github.com/cilium/ebpf"
 	"github.com/kubeadapt/ebpf-agent/internal/bpf"
 	"github.com/kubeadapt/ebpf-agent/internal/collector"
-	"github.com/kubeadapt/ebpf-agent/internal/k8s"
-	"github.com/kubeadapt/ebpf-agent/internal/network"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -38,17 +37,12 @@ func TestConnectionTracking(t *testing.T) {
 	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
-	// Create zone mapper (will work without K8s in test)
-	zoneMapper, err := k8s.NewZoneMapper(logger)
-	require.NoError(t, err)
-
 	// Create metrics registry
 	registry := prometheus.NewRegistry()
 
 	// Create connection collector
 	connectionCollector := collector.NewConnectionCollector(
 		manager,
-		zoneMapper,
 		logger,
 		registry,
 	)
@@ -105,7 +99,6 @@ func TestConnectionTracking(t *testing.T) {
 	// Verify connection tracking metrics exist
 	expectedMetrics := []string{
 		"kubeadapt_connection_flow_bytes_total",
-		"kubeadapt_zone_traffic_bytes_total",
 		"kubeadapt_traffic_cost_estimate_dollars",
 		"kubeadapt_active_connections",
 		"kubeadapt_connection_tracking_info",
@@ -127,40 +120,6 @@ func TestConnectionTracking(t *testing.T) {
 	t.Logf("Collector stats: %+v", collectorStats)
 }
 
-// TestIPClassificationIntegration tests IP classification with real IPs
-func TestIPClassificationIntegration(t *testing.T) {
-	classifier := network.NewIPClassifier()
-
-	// Test with actual network interfaces
-	ifaces, err := net.Interfaces()
-	require.NoError(t, err)
-
-	for _, iface := range ifaces {
-		addrs, err := iface.Addrs()
-		if err != nil {
-			continue
-		}
-
-		for _, addr := range addrs {
-			ipNet, ok := addr.(*net.IPNet)
-			if !ok {
-				continue
-			}
-
-			ip := ipNet.IP
-			isPrivate := classifier.IsPrivateIP(ip)
-
-			t.Logf("Interface %s: IP %s is private: %v",
-				iface.Name, ip.String(), isPrivate)
-
-			// Verify localhost is detected as private
-			if ip.IsLoopback() {
-				assert.True(t, isPrivate, "Loopback should be private")
-			}
-		}
-	}
-}
-
 // TestConnectionCleanup tests the cleanup of stale connections
 func TestConnectionCleanup(t *testing.T) {
 	if os.Getuid() != 0 {
@@ -178,15 +137,10 @@ func TestConnectionCleanup(t *testing.T) {
 	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
-	// Create zone mapper
-	zoneMapper, err := k8s.NewZoneMapper(logger)
-	require.NoError(t, err)
-
 	// Create connection collector with short cleanup interval
 	registry := prometheus.NewRegistry()
 	connectionCollector := collector.NewConnectionCollector(
 		manager,
-		zoneMapper,
 		logger,
 		registry,
 	)
@@ -279,66 +233,6 @@ func TestHighVolumeConnections(t *testing.T) {
 
 	t.Logf("Tracked %d connections", connectionCount)
 	assert.Greater(t, connectionCount, 0, "Should have tracked multiple connections")
-}
-
-// TestCrossZoneDetection tests detection of cross-AZ traffic
-func TestCrossZoneDetection(t *testing.T) {
-	classifier := network.NewIPClassifier()
-
-	testCases := []struct {
-		name        string
-		srcIP       string
-		dstIP       string
-		srcZone     string
-		dstZone     string
-		expectedType network.TrafficType
-		expectedCost float64 // per GB
-	}{
-		{
-			name:        "Same zone traffic",
-			srcIP:       "10.0.1.1",
-			dstIP:       "10.0.1.2",
-			srcZone:     "us-east-1a",
-			dstZone:     "us-east-1a",
-			expectedType: network.TrafficTypeInternal,
-			expectedCost: 0.0,
-		},
-		{
-			name:        "Cross-AZ traffic",
-			srcIP:       "10.0.1.1",
-			dstIP:       "10.0.2.1",
-			srcZone:     "us-east-1a",
-			dstZone:     "us-east-1b",
-			expectedType: network.TrafficTypeCrossAZ,
-			expectedCost: 0.01,
-		},
-		{
-			name:        "External egress",
-			srcIP:       "10.0.1.1",
-			dstIP:       "8.8.8.8",
-			srcZone:     "us-east-1a",
-			dstZone:     "external",
-			expectedType: network.TrafficTypeExternal,
-			expectedCost: 0.09,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			trafficType := classifier.ClassifyTrafficByStrings(
-				tc.srcIP, tc.dstIP, tc.srcZone, tc.dstZone,
-			)
-
-			assert.Equal(t, tc.expectedType, trafficType)
-
-			// Test cost calculation
-			bytesTransferred := uint64(1024 * 1024 * 1024) // 1GB
-			cost := network.CalculateTrafficCost(trafficType, bytesTransferred)
-			assert.InDelta(t, tc.expectedCost, cost, 0.0001)
-
-			t.Logf("Traffic type: %s, Cost for 1GB: $%.4f", trafficType, cost)
-		})
-	}
 }
 
 // Helper functions

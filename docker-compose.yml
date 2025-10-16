@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   ***REMOVED*** BPF Builder service - for compiling BPF programs on macOS
   bpf-builder:
@@ -35,7 +33,7 @@ services:
       dockerfile: Dockerfile
       args:
         VERSION: ${VERSION:-dev}
-        BUILD_TIME: ${BUILD_TIME}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
     container_name: kubeadapt-ebpf-agent
     privileged: true  ***REMOVED*** Required for eBPF
     network_mode: host  ***REMOVED*** Required to monitor host network
@@ -79,7 +77,6 @@ services:
 
   ***REMOVED*** eBPF Agent Development service - with hot reload
   ebpf-dev:
-    image: kubeadapt/ebpf-dev:latest
     build:
       context: .
       dockerfile: Dockerfile.dev

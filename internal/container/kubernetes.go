@@ -16,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	k8scache "k8s.io/client-go/tools/cache"
 )
 
 // KubernetesDiscoverer discovers containers using Kubernetes API
@@ -58,41 +59,44 @@ func NewKubernetesDiscoverer(namespace string, logger *zap.Logger) (*KubernetesD
 }
 
 // Start begins the discovery process
-func (d *KubernetesDiscoverer) Start(ctx context.Context, cache *Cache) error {
+func (d *KubernetesDiscoverer) Start(ctx context.Context, containerCache *Cache) error {
 	d.logger.Info("Starting Kubernetes container discovery",
 		zap.String("namespace", d.namespace),
 		zap.String("node", d.nodeName),
 	)
 
 	// Initial sync
-	if err := d.syncContainers(ctx, cache); err != nil {
+	if err := d.syncContainers(ctx, containerCache); err != nil {
 		d.logger.Error("Initial sync failed", zap.Error(err))
 	}
 
 	// Setup watch for pod changes
-	watchlist := cache.NewListWatchFromClient(
+	watchlist := k8scache.NewListWatchFromClient(
 		d.client.CoreV1().RESTClient(),
 		"pods",
 		d.namespace, // Empty string means all namespaces
 		fields.OneTermEqualSelector("spec.nodeName", d.nodeName),
 	)
 
-	_, controller := cache.NewInformer(
+	// Note: Using deprecated NewInformer is acceptable here as it's still supported
+	// The newer SharedIndexInformer would require more complex setup
+	//nolint:staticcheck // SA1019: NewInformer is deprecated but still functional
+	_, controller := k8scache.NewInformer(
 		watchlist,
 		&corev1.Pod{},
 		30*time.Second,
-		cache.ResourceEventHandlerFuncs{
+		k8scache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*corev1.Pod)
-				d.handlePodUpdate(pod, cache)
+				d.handlePodUpdate(pod, containerCache)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
 				pod := newObj.(*corev1.Pod)
-				d.handlePodUpdate(pod, cache)
+				d.handlePodUpdate(pod, containerCache)
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod := obj.(*corev1.Pod)
-				d.handlePodDelete(pod, cache)
+				d.handlePodDelete(pod, containerCache)
 			},
 		},
 	)
@@ -110,7 +114,7 @@ func (d *KubernetesDiscoverer) Start(ctx context.Context, cache *Cache) error {
 			d.logger.Info("Stopping Kubernetes discovery")
 			return nil
 		case <-ticker.C:
-			if err := d.syncContainers(ctx, cache); err != nil {
+			if err := d.syncContainers(ctx, containerCache); err != nil {
 				d.logger.Error("Periodic sync failed", zap.Error(err))
 			}
 		}

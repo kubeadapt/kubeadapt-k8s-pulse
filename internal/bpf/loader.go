@@ -1,11 +1,14 @@
 package bpf
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
+	"unsafe"
 
 	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
+	"github.com/cilium/ebpf/ringbuf"
 	"github.com/cilium/ebpf/rlimit"
 	"go.uber.org/zap"
 )
@@ -19,10 +22,11 @@ type Manager struct {
 	logger     *zap.Logger
 
 	// Maps for easy access
-	containerStats       *ebpf.Map
+	// NOTE: container_stats (non-per-CPU) has been removed - only using per-CPU version
 	containerStatsPerCPU *ebpf.Map
 	socketToCgroup       *ebpf.Map
 	connectionFlows      *ebpf.Map // Connection tracking map
+	overflowRingbuf      *ebpf.Map // Overflow ringbuffer for flow records
 }
 
 // NewManager creates a new BPF manager
@@ -55,7 +59,7 @@ func (m *Manager) LoadAndAttach() error {
 	// Create collection from spec
 	coll, err := ebpf.NewCollectionWithOptions(spec, ebpf.CollectionOptions{
 		Programs: ebpf.ProgramOptions{
-			LogLevel: 2, // LogLevelInfo equivalent
+			LogLevel: 2,         // LogLevelInfo equivalent
 			LogSize:  64 * 1024, // Default verifier log size
 		},
 	})
@@ -65,10 +69,11 @@ func (m *Manager) LoadAndAttach() error {
 	m.collection = coll
 
 	// Store map references
-	m.containerStats = coll.Maps["container_stats"]
+	// NOTE: "container_stats" (non-per-CPU) has been removed - only using per-CPU version
 	m.containerStatsPerCPU = coll.Maps["container_stats_percpu"]
 	m.socketToCgroup = coll.Maps["socket_to_cgroup"]
 	m.connectionFlows = coll.Maps["connection_flows"] // Connection tracking map
+	m.overflowRingbuf = coll.Maps["overflow_flows"]   // Overflow ringbuffer
 
 	// Attach kprobes for TCP
 	if err := m.attachTCPProbes(coll); err != nil {
@@ -196,14 +201,33 @@ func (m *Manager) attachConnectionProbes(coll *ebpf.Collection) error {
 		return fmt.Errorf("attaching inet_csk_accept kprobe: %w", err)
 	}
 	m.links = append(m.links, l)
-	m.logger.Debug("Attached connection tracking probes")
+
+	// TCP close - deletes connection entry immediately on close
+	// This prevents frozen zombie entries from accumulating and causing undercount bugs
+	prog = coll.Programs["trace_tcp_close"]
+	if prog == nil {
+		return fmt.Errorf("trace_tcp_close program not found")
+	}
+	l, err = link.Kprobe("tcp_close", prog, nil)
+	if err != nil {
+		return fmt.Errorf("attaching tcp_close kprobe: %w", err)
+	}
+	m.links = append(m.links, l)
+
+	// UDP destroy - deletes UDP "connection" entry on socket destruction
+	prog = coll.Programs["trace_udp_destroy_sock"]
+	if prog == nil {
+		return fmt.Errorf("trace_udp_destroy_sock program not found")
+	}
+	l, err = link.Kprobe("udp_destroy_sock", prog, nil)
+	if err != nil {
+		return fmt.Errorf("attaching udp_destroy_sock kprobe: %w", err)
+	}
+	m.links = append(m.links, l)
+
+	m.logger.Debug("Attached connection tracking probes (including close/destroy handlers)")
 
 	return nil
-}
-
-// GetContainerStats returns the container stats map
-func (m *Manager) GetContainerStats() *ebpf.Map {
-	return m.containerStats
 }
 
 // GetContainerStatsPerCPU returns the per-CPU container stats map
@@ -221,30 +245,72 @@ func (m *Manager) GetConnectionMap() *ebpf.Map {
 	return m.connectionFlows
 }
 
+// GetOverflowRingbuf returns the overflow ringbuffer
+func (m *Manager) GetOverflowRingbuf() *ebpf.Map {
+	return m.overflowRingbuf
+}
+
+// StartRingbufReader starts reading overflow flow records from the ringbuffer
+// The handler callback is called for each flow record read from the ringbuffer
+func (m *Manager) StartRingbufReader(ctx context.Context, handler func(*FlowRecord)) error {
+	if m.overflowRingbuf == nil {
+		return fmt.Errorf("overflow ringbuffer not initialized")
+	}
+
+	// Create ringbuffer reader using ringbuf package
+	reader, err := ringbuf.NewReader(m.overflowRingbuf)
+	if err != nil {
+		return fmt.Errorf("creating ringbuffer reader: %w", err)
+	}
+	defer func() {
+		// Always close reader on function exit
+		if err := reader.Close(); err != nil {
+			m.logger.Error("Error closing ringbuffer reader", zap.Error(err))
+		}
+	}()
+
+	m.logger.Info("Starting overflow ringbuffer reader")
+
+	// Read loop
+	for {
+		select {
+		case <-ctx.Done():
+			m.logger.Info("Stopping overflow ringbuffer reader")
+			return nil
+		default:
+			// Read next record from ringbuffer (blocks until data available)
+			record, err := reader.Read()
+			if err != nil {
+				m.logger.Error("Error reading from ringbuffer", zap.Error(err))
+				continue
+			}
+
+			// Parse flow record from raw bytes
+			if len(record.RawSample) < int(unsafe.Sizeof(FlowRecord{})) {
+				m.logger.Warn("Invalid flow record size",
+					zap.Int("got", len(record.RawSample)),
+					zap.Int("expected", int(unsafe.Sizeof(FlowRecord{}))))
+				continue
+			}
+
+			// Cast bytes to FlowRecord struct
+			flowRecord := (*FlowRecord)(unsafe.Pointer(&record.RawSample[0]))
+
+			// Call handler with the flow record
+			handler(flowRecord)
+		}
+	}
+}
+
 // DumpMaps dumps all BPF maps for debugging
 func (m *Manager) DumpMaps() (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 
-	// Dump container stats
-	if m.containerStats != nil {
-		stats := make(map[uint64]ContainerNetStats)
-		iter := m.containerStats.Iterate()
-		var key uint64
-		var value ContainerNetStats
-		for iter.Next(&key, &value) {
-			stats[key] = value
-		}
-		if err := iter.Err(); err != nil {
-			m.logger.Warn("Error iterating container_stats", zap.Error(err))
-		}
-		result["container_stats"] = stats
-	}
-
-	// Get map info
-	if m.containerStats != nil {
-		info, _ := m.containerStats.Info()
+	// Get map info for per-CPU stats
+	if m.containerStatsPerCPU != nil {
+		info, _ := m.containerStatsPerCPU.Info()
 		if info != nil {
-			result["container_stats_info"] = map[string]interface{}{
+			result["container_stats_percpu_info"] = map[string]interface{}{
 				"type":        info.Type.String(),
 				"max_entries": info.MaxEntries,
 				"key_size":    info.KeySize,
@@ -280,11 +346,11 @@ func (m *Manager) Close() error {
 
 // ContainerNetStats matches the C struct
 type ContainerNetStats struct {
-	RxBytes     uint64
-	TxBytes     uint64
-	RxPackets   uint64
-	TxPackets   uint64
-	LastSeenNs  uint64
+	RxBytes    uint64
+	TxBytes    uint64
+	RxPackets  uint64
+	TxPackets  uint64
+	LastSeenNs uint64
 }
 
 // ConnectionInfo matches the C struct
@@ -320,3 +386,19 @@ type ConnectionStats struct {
 	LastSeenNs      uint64 // Last activity timestamp
 	CgroupID        uint64 // Container cgroup ID
 }
+
+// FlowRecord represents an overflow flow record from the ringbuffer (matches the C struct)
+type FlowRecord struct {
+	Key         ConnectionKey   // Connection 5-tuple
+	Stats       ConnectionStats // Connection statistics
+	TimestampNs uint64          // Timestamp when overflow occurred
+	Reason      uint8           // 0=map_full, 1=eviction, 2=explicit
+	Padding     [7]byte         // Padding for alignment
+}
+
+// Overflow reason constants (match BPF definitions)
+const (
+	OverflowReasonMapFull  = 0
+	OverflowReasonEviction = 1
+	OverflowReasonExplicit = 2
+)

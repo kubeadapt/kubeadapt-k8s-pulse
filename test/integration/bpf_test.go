@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/kubeadapt/ebpf-agent/internal/bpf"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 )
 

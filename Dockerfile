@@ -2,7 +2,7 @@
 ***REMOVED*** Supports multi-arch: linux/amd64, linux/arm64
 
 ***REMOVED*** Build stage - use native platform for faster compilation
-FROM --platform=$BUILDPLATFORM golang:1.23-bookworm AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25-bookworm AS builder
 
 ***REMOVED*** Declare buildx automatic platform variables
 ARG TARGETOS
@@ -21,6 +21,10 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+***REMOVED*** Create symlinks for asm headers to fix cross-compilation
+RUN ln -sf /usr/include/$(uname -m)-linux-gnu/asm /usr/include/asm && \
+    ln -sf /usr/include/$(uname -m)-linux-gnu/asm-generic /usr/include/asm-generic
+
 WORKDIR /build
 
 ***REMOVED*** Download Go dependencies first (better caching)
@@ -30,20 +34,9 @@ RUN go mod download
 ***REMOVED*** Copy source code
 COPY . .
 
-***REMOVED*** Install bpf2go for generating Go bindings
-RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0
-
-***REMOVED*** Generate Go bindings from BPF C code
-***REMOVED*** bpf2go automatically handles architecture-specific compilation
-RUN cd internal/bpf && \
-    GOARCH=${TARGETARCH} bpf2go \
-        -go-package bpf \
-        -cc clang-14 \
-        -cflags "-O2 -g -Wall -Werror" \
-        -target ${TARGETARCH} \
-        -type container_net_stats -type connection_key -type connection_stats \
-        network \
-        ../../bpf/network_monitor.c
+***REMOVED*** Note: BPF bindings are pre-generated in internal/bpf/ directory
+***REMOVED*** They include network_x86_bpfel.go, network_arm64_bpfel.go and .o files
+***REMOVED*** To regenerate, run: make generate on the host
 
 ***REMOVED*** Build the Go binary for target platform
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \

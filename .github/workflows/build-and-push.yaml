@@ -19,7 +19,7 @@ jobs:
     uses: kubeadapt/actions/.github/workflows/aws-ecr-golang-build-and-push.yml@main
     with:
       docker_file_path: './Dockerfile'
-      go_version: '1.23.x'
+      go_version: '1.25.x'
       ecr_repository_name: 'w3l5x6r6/kubeadapt/app/kubeadapt-ebpf-agent'
       platforms: 'linux/amd64,linux/arm64'
       run_tests: false  ***REMOVED*** Tests need BPF setup, handled in Docker build

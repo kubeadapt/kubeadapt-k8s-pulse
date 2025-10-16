@@ -1,15 +1,18 @@
 ***REMOVED*** Air configuration for hot reload during development
+***REMOVED*** NOTE: BPF files are pre-generated and committed. Only regenerate when changing bpf/*.c files.
+***REMOVED*** To regenerate BPF: run `make generate` (on macOS) or `make generate-native` (on Linux)
 root = "."
 testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  ***REMOVED*** Just plain old shell command. You could use `make` as well.
-  cmd = "make build"
+  ***REMOVED*** Build Go binary directly (BPF files already generated)
+  ***REMOVED*** Skips generate+lint for faster hot reload
+  cmd = "mkdir -p bin && CGO_ENABLED=0 go build -v -o bin/ebpf-agent ./cmd/agent"
   ***REMOVED*** Binary file yields from `cmd`.
   bin = "bin/ebpf-agent"
-  ***REMOVED*** Customize binary.
-  full_bin = "sudo bin/ebpf-agent"
+  ***REMOVED*** No sudo needed - container is already privileged
+  full_bin = "bin/ebpf-agent"
   ***REMOVED*** Watch these filename extensions.
   include_ext = ["go", "tpl", "tmpl", "html", "c", "h"]
   ***REMOVED*** Ignore these filename extensions or directories.

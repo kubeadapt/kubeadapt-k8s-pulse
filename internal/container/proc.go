@@ -14,6 +14,11 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	// Container runtime type constants
+	runtimeTypeDocker = "docker"
+)
+
 // ProcDiscoverer discovers containers by scanning /proc
 type ProcDiscoverer struct {
 	procPath string
@@ -155,7 +160,7 @@ func (d *ProcDiscoverer) getContainerInfo(pid int) *Info {
 		if strings.Contains(path, "containerd") {
 			// Extract container ID from containerd path
 			parts := strings.Split(path, "/")
-			for i, part := range parts {
+			for _, part := range parts {
 				if strings.HasPrefix(part, "cri-containerd-") {
 					containerID = strings.TrimPrefix(part, "cri-containerd-")
 					containerID = strings.TrimSuffix(containerID, ".scope")
@@ -190,8 +195,7 @@ func (d *ProcDiscoverer) getContainerInfo(pid int) *Info {
 	for _, env := range environ {
 		if strings.HasPrefix(env, "CONTAINER_NAME=") {
 			containerName = strings.TrimPrefix(env, "CONTAINER_NAME=")
-		} else if strings.HasPrefix(env, "K8S_POD_NAME=") {
-			// Kubernetes pod name
+			// Note: we could also extract K8S_POD_NAME if needed in the future
 		}
 	}
 
@@ -281,8 +285,8 @@ func (d *ProcDiscoverer) getBootTime() time.Time {
 
 // detectRuntimeType detects the container runtime type
 func (d *ProcDiscoverer) detectRuntimeType(containerID, cmdline string) string {
-	if strings.Contains(cmdline, "docker") {
-		return "docker"
+	if strings.Contains(cmdline, runtimeTypeDocker) {
+		return runtimeTypeDocker
 	}
 	if strings.Contains(cmdline, "containerd") {
 		return "containerd"
@@ -294,7 +298,7 @@ func (d *ProcDiscoverer) detectRuntimeType(containerID, cmdline string) string {
 	// Check by container ID pattern
 	if len(containerID) == 12 {
 		// Docker typically uses 12-char IDs
-		return "docker"
+		return runtimeTypeDocker
 	}
 
 	return "unknown"

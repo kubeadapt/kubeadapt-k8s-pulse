@@ -1,7 +1,7 @@
 ***REMOVED*** BPF Builder image for compiling eBPF programs
 ***REMOVED*** Used primarily on macOS where native BPF compilation is not possible
 
-FROM golang:1.23-bookworm
+FROM golang:1.25-bookworm
 
 ***REMOVED*** Install BPF compilation dependencies
 RUN apt-get update && apt-get install -y \

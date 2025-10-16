@@ -12,6 +12,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	// Boolean string representations
+	boolStringTrue = "true"
+	boolStringOne  = "1"
+)
+
 // Config holds the application configuration
 type Config struct {
 	// Metrics server configuration
@@ -32,12 +38,14 @@ type Config struct {
 	BPFMapMaxEntries int  `yaml:"bpf_map_max_entries" env:"EBPF_BPF_MAP_MAX_ENTRIES" default:"10240"`
 	BPFPerCPUMaps    bool `yaml:"bpf_per_cpu_maps" env:"EBPF_BPF_PER_CPU_MAPS" default:"true"`
 
-	// Connection tracking configuration
+	// Connection tracking configuration (LRU auto-eviction only, no manual cleanup)
 	ConnectionTracking            bool          `yaml:"connection_tracking" env:"EBPF_CONNECTION_TRACKING" default:"true"`
 	TopFlowsLimit                 int           `yaml:"top_flows_limit" env:"EBPF_TOP_FLOWS_LIMIT" default:"1000"`
-	ConnectionCleanupInterval     time.Duration `yaml:"connection_cleanup_interval" env:"EBPF_CONNECTION_CLEANUP_INTERVAL" default:"5m"`
 	ConnectionAggregationInterval time.Duration `yaml:"connection_aggregation_interval" env:"EBPF_CONNECTION_AGGREGATION_INTERVAL" default:"30s"`
-	ZoneRefreshInterval           time.Duration `yaml:"zone_refresh_interval" env:"EBPF_ZONE_REFRESH_INTERVAL" default:"5m"`
+
+	// Metric cardinality control
+	EnableServiceMetrics bool `yaml:"enable_service_metrics" env:"EBPF_ENABLE_SERVICE_METRICS" default:"true"`
+	ServiceMetricsTopK   int  `yaml:"service_metrics_top_k" env:"EBPF_SERVICE_METRICS_TOP_K" default:"100"` // Number of top service pairs to track in detail
 
 	// Logging configuration
 	LogLevel  string `yaml:"log_level" env:"EBPF_LOG_LEVEL" default:"info"`
@@ -47,11 +55,11 @@ type Config struct {
 	NodeName string `yaml:"node_name" env:"NODE_NAME" default:""`
 
 	// Debug options
-	Debug              bool `yaml:"debug" env:"EBPF_DEBUG" default:"false"`
-	EnableProfiling    bool `yaml:"enable_profiling" env:"EBPF_ENABLE_PROFILING" default:"false"`
-	ProfilingPort      int  `yaml:"profiling_port" env:"EBPF_PROFILING_PORT" default:"6060"`
-	DumpBPFMaps        bool `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
-	DumpMapInterval    time.Duration `yaml:"dump_map_interval" env:"EBPF_DUMP_MAP_INTERVAL" default:"60s"`
+	Debug           bool          `yaml:"debug" env:"EBPF_DEBUG" default:"false"`
+	EnableProfiling bool          `yaml:"enable_profiling" env:"EBPF_ENABLE_PROFILING" default:"false"`
+	ProfilingPort   int           `yaml:"profiling_port" env:"EBPF_PROFILING_PORT" default:"6060"`
+	DumpBPFMaps     bool          `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
+	DumpMapInterval time.Duration `yaml:"dump_map_interval" env:"EBPF_DUMP_MAP_INTERVAL" default:"60s"`
 }
 
 // Load loads configuration from file and environment
@@ -91,9 +99,9 @@ func (c *Config) setDefaults() {
 	c.BPFPerCPUMaps = true
 	c.ConnectionTracking = true
 	c.TopFlowsLimit = 1000
-	c.ConnectionCleanupInterval = 5 * time.Minute
 	c.ConnectionAggregationInterval = 30 * time.Second
-	c.ZoneRefreshInterval = 5 * time.Minute
+	c.EnableServiceMetrics = true
+	c.ServiceMetricsTopK = 100
 	c.LogLevel = "info"
 	c.LogFormat = "json"
 	c.ProfilingPort = 6060
@@ -161,21 +169,16 @@ func (c *Config) loadFromEnv() {
 		}
 	}
 	if v := os.Getenv("EBPF_BPF_PER_CPU_MAPS"); v != "" {
-		c.BPFPerCPUMaps = v == "true" || v == "1"
+		c.BPFPerCPUMaps = v == boolStringTrue || v == boolStringOne
 	}
 
 	// Connection tracking configuration
 	if v := os.Getenv("EBPF_CONNECTION_TRACKING"); v != "" {
-		c.ConnectionTracking = v == "true" || v == "1"
+		c.ConnectionTracking = v == boolStringTrue || v == boolStringOne
 	}
 	if v := os.Getenv("EBPF_TOP_FLOWS_LIMIT"); v != "" {
 		if limit, err := strconv.Atoi(v); err == nil {
 			c.TopFlowsLimit = limit
-		}
-	}
-	if v := os.Getenv("EBPF_CONNECTION_CLEANUP_INTERVAL"); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			c.ConnectionCleanupInterval = d
 		}
 	}
 	if v := os.Getenv("EBPF_CONNECTION_AGGREGATION_INTERVAL"); v != "" {
@@ -183,9 +186,14 @@ func (c *Config) loadFromEnv() {
 			c.ConnectionAggregationInterval = d
 		}
 	}
-	if v := os.Getenv("EBPF_ZONE_REFRESH_INTERVAL"); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			c.ZoneRefreshInterval = d
+
+	// Metric cardinality control
+	if v := os.Getenv("EBPF_ENABLE_SERVICE_METRICS"); v != "" {
+		c.EnableServiceMetrics = v == boolStringTrue || v == boolStringOne
+	}
+	if v := os.Getenv("EBPF_SERVICE_METRICS_TOP_K"); v != "" {
+		if topK, err := strconv.Atoi(v); err == nil {
+			c.ServiceMetricsTopK = topK
 		}
 	}
 
@@ -204,10 +212,10 @@ func (c *Config) loadFromEnv() {
 
 	// Debug options
 	if v := os.Getenv("EBPF_DEBUG"); v != "" {
-		c.Debug = v == "true" || v == "1"
+		c.Debug = v == boolStringTrue || v == boolStringOne
 	}
 	if v := os.Getenv("EBPF_ENABLE_PROFILING"); v != "" {
-		c.EnableProfiling = v == "true" || v == "1"
+		c.EnableProfiling = v == boolStringTrue || v == boolStringOne
 	}
 	if v := os.Getenv("EBPF_PROFILING_PORT"); v != "" {
 		if port, err := strconv.Atoi(v); err == nil {
@@ -215,7 +223,7 @@ func (c *Config) loadFromEnv() {
 		}
 	}
 	if v := os.Getenv("EBPF_DUMP_BPF_MAPS"); v != "" {
-		c.DumpBPFMaps = v == "true" || v == "1"
+		c.DumpBPFMaps = v == boolStringTrue || v == boolStringOne
 	}
 	if v := os.Getenv("EBPF_DUMP_MAP_INTERVAL"); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {

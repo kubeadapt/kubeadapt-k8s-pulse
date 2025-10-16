@@ -1,21 +1,20 @@
-name: Test eBPF Agent
+name: Pull Request Checks
 
 on:
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ '*' ]
     paths:
       - '**.go'
       - '**.c'
       - '**.h'
       - 'go.mod'
       - 'go.sum'
+      - 'Makefile'
       - '.github/workflows/test.yml'
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  test:
+    name: Test and Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,60 +23,82 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23.x'
-          cache: true
+          go-version: '1.25'
 
-      - name: Install BPF dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang llvm libbpf-dev linux-headers-$(uname -r)
-          go install github.com/cilium/ebpf/cmd/bpf2go@v0.11.0
+      - name: Install make
+        run: sudo apt-get install -y make
 
-      - name: Generate BPF bindings
-        run: |
-          cd internal/bpf && go generate ./...
+      - name: Run verification and tests
+        run: make lint test test-coverage
 
-      - name: Run unit tests
-        run: |
-          ***REMOVED*** Run non-BPF unit tests (these don't need root)
-          go test -v -race ./internal/network/... ./internal/k8s/... ./internal/container/...
+      - name: Check clean generate
+        run: make generate && git add -A && git diff HEAD --exit-code
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Report coverage
+        uses: codecov/codecov-action@v4
         with:
-          go-version: '1.23.x'
-          cache: true
+          files: ./coverage.out
+          flags: unittests
+          fail_ci_if_error: false
+          verbose: true
+        continue-on-error: true
 
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
-
-      - name: Run golangci-lint
-        run: golangci-lint run ./... --timeout=5m
-
-  ***REMOVED*** Integration tests in Docker (for BPF)
   integration-tests:
-    name: Integration Tests (BPF)
+    name: Integration Tests (Docker)
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Install make
+        run: sudo apt-get install -y make
+
+      - name: Run integration tests in Docker
+        run: make test-docker
+
+  security-scan:
+    name: Security Scanning
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build test image
-        run: |
-          docker build -f Dockerfile -t ebpf-agent:test .
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
 
-      - name: Run BPF integration tests
-        run: |
-          ***REMOVED*** Run privileged container for BPF tests
-          docker run --rm --privileged \
-            -v /sys/kernel/debug:/sys/kernel/debug:rw \
-            ebpf-agent:test \
-            go test -v ./test/integration/...
+      - name: Run gosec security scanner
+        uses: securego/gosec@master
+        with:
+          args: '-fmt json -out gosec-report.json ./...'
+        continue-on-error: true
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gosec-report
+          path: gosec-report.json
+          retention-days: 7
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

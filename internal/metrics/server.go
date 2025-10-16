@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
@@ -19,9 +20,9 @@ type Server struct {
 	logger   *zap.Logger
 
 	// Health check state
-	isReady  bool
-	isLive   bool
-	readyAt  time.Time
+	isReady   bool
+	isLive    bool
+	readyAt   time.Time
 	startedAt time.Time
 }
 
@@ -33,9 +34,9 @@ func NewServer(port int, logger *zap.Logger) *Server {
 
 	registry := prometheus.NewRegistry()
 
-	// Register standard Go metrics
-	registry.MustRegister(prometheus.NewGoCollector())
-	registry.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
+	// Register standard Go metrics using collectors package
+	registry.MustRegister(collectors.NewGoCollector())
+	registry.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 
 	return &Server{
 		port:      port,
@@ -125,7 +126,7 @@ func (s *Server) SetReady(ready bool) {
 // handleRoot handles the root endpoint
 func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, `<!DOCTYPE html>
+	_, _ = fmt.Fprintf(w, `<!DOCTYPE html>
 <html>
 <head>
     <title>KubeAdapt eBPF Agent</title>
@@ -193,10 +194,10 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleLiveness(w http.ResponseWriter, r *http.Request) {
 	if s.isLive {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "OK\n")
+		_, _ = fmt.Fprintf(w, "OK\n")
 	} else {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		fmt.Fprintf(w, "Not Live\n")
+		_, _ = fmt.Fprintf(w, "Not Live\n")
 	}
 }
 
@@ -204,10 +205,10 @@ func (s *Server) handleLiveness(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleReadiness(w http.ResponseWriter, r *http.Request) {
 	if s.isReady {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "OK\n")
+		_, _ = fmt.Fprintf(w, "OK\n")
 	} else {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		fmt.Fprintf(w, "Not Ready\n")
+		_, _ = fmt.Fprintf(w, "Not Ready\n")
 	}
 }
 
@@ -224,7 +225,7 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(statusCode)
-	fmt.Fprintf(w, `{
+	_, _ = fmt.Fprintf(w, `{
   "status": "%s",
   "live": %t,
   "ready": %t,

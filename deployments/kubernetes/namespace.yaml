@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeadapt-system
+  labels:
+    app: kubeadapt-ebpf-agent
+    name: kubeadapt-system

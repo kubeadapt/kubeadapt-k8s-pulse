@@ -1,6 +1,7 @@
 package container
 
 import (
+	"context"
 	"sync"
 	"time"
 )
@@ -37,9 +38,9 @@ type Cache struct {
 	mu sync.RWMutex
 
 	// Maps for different lookups
-	byID       map[string]*Info      // containerID -> Info
-	byCgroup   map[uint64]*Info      // cgroupID -> Info
-	byPod      map[string][]*Info    // podName -> []Info
+	byID     map[string]*Info   // containerID -> Info
+	byCgroup map[uint64]*Info   // cgroupID -> Info
+	byPod    map[string][]*Info // podName -> []Info
 
 	// Metrics
 	lastUpdate time.Time

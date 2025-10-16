@@ -1,0 +1,121 @@
+***REMOVED*** Test pods for E2E testing
+***REMOVED*** These pods will generate cross-node traffic for validation
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+---
+***REMOVED*** Test Pod A - Will be scheduled on zone us-west-2a
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-a
+  namespace: test
+  labels:
+    app: test-pod-a
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2a
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      ***REMOVED*** Add curl for making requests
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl &&
+          nginx -g 'daemon off;'
+---
+***REMOVED*** Service for Pod A
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service-a
+  namespace: test
+spec:
+  selector:
+    app: test-pod-a
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http
+---
+***REMOVED*** Test Pod B - Will be scheduled on zone us-west-2b (different from A)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-b
+  namespace: test
+  labels:
+    app: test-pod-b
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2b
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl &&
+          nginx -g 'daemon off;'
+---
+***REMOVED*** Service for Pod B
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service-b
+  namespace: test
+spec:
+  selector:
+    app: test-pod-b
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http
+---
+***REMOVED*** Test Pod C - Will be scheduled on same zone as Pod B (us-west-2b)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod-c
+  namespace: test
+  labels:
+    app: test-pod-c
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2b
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl &&
+          nginx -g 'daemon off;'
+---
+***REMOVED*** Service for Pod C
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service-c
+  namespace: test
+spec:
+  selector:
+    app: test-pod-c
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http

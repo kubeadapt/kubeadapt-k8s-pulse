@@ -1,0 +1,55 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ 'main', 'develop' ]
+  pull_request:
+    branches: [ 'main', 'develop' ]
+    paths:
+      - '**.go'
+      - '**.c'
+      - '**.h'
+      - 'go.mod'
+      - 'go.sum'
+      - 'test/e2e/**'
+      - 'deployments/**'
+      - 'Makefile'
+      - 'Dockerfile'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Install make
+        run: sudo apt-get install -y make
+
+      - name: Run E2E tests
+        run: make test-e2e
+
+      - name: Upload E2E test logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-logs
+          path: e2e-logs
+          retention-days: 7
+
+      - name: Cleanup Kind clusters
+        if: always()
+        run: |
+          for cluster in $(kind get clusters 2>/dev/null | grep kubeadapt-e2e || true); do
+            echo "Deleting cluster: $cluster"
+            kind delete cluster --name "$cluster" || true
+          done

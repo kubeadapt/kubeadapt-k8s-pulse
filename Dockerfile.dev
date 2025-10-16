@@ -1,7 +1,7 @@
 ***REMOVED*** Development image with hot reload support
 ***REMOVED*** Based on the builder stage with added development tools
 
-FROM golang:1.23-bookworm
+FROM golang:1.25-bookworm
 
 ***REMOVED*** Install BPF compilation and development dependencies
 RUN apt-get update && apt-get install -y \
@@ -18,18 +18,23 @@ RUN apt-get update && apt-get install -y \
     vim \
     htop \
     bpftool \
+    ***REMOVED*** Additional debugging tools for local testing and troubleshooting
+    tcpdump \
+    net-tools \
+    strace \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 ***REMOVED*** Install Go development tools
-RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.11.0 && \
-    go install github.com/cosmtrek/air@latest && \
+RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0 && \
+    go install github.com/air-verse/air@latest && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install golang.org/x/tools/cmd/goimports@latest && \
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 WORKDIR /workspace
 
-***REMOVED*** Create air configuration if it doesn't exist
+***REMOVED*** Create air configuration if it doesn't exist (fallback - workspace .air.toml preferred)
 RUN cat > /tmp/.air.toml <<'EOF'
 root = "."
 testdata_dir = "testdata"
@@ -44,7 +49,7 @@ tmp_dir = "tmp"
   exclude_regex = ["_test.go", "_bpfel.go", "_bpfeb.go"]
   exclude_unchanged = false
   follow_symlink = false
-  full_bin = "sudo ./tmp/main"
+  full_bin = "./tmp/main"
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html", "c", "h"]
   kill_delay = "0s"

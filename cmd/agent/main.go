@@ -12,8 +12,6 @@ import (
 	"github.com/kubeadapt/ebpf-agent/internal/bpf"
 	"github.com/kubeadapt/ebpf-agent/internal/collector"
 	"github.com/kubeadapt/ebpf-agent/internal/config"
-	"github.com/kubeadapt/ebpf-agent/internal/container"
-	"github.com/kubeadapt/ebpf-agent/internal/k8s"
 	"github.com/kubeadapt/ebpf-agent/internal/metrics"
 	"go.uber.org/zap"
 )
@@ -51,7 +49,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to build logger: %v\n", err)
 		os.Exit(1)
 	}
-	defer logger.Sync()
+	defer func() {
+		// Ignore errors from Sync during shutdown
+		_ = logger.Sync()
+	}()
 
 	logger.Info("Starting KubeAdapt eBPF Agent",
 		zap.String("version", Version),
@@ -91,28 +92,9 @@ func main() {
 	}
 	logger.Info("BPF programs loaded and attached successfully")
 
-	// Initialize container discovery
-	logger.Info("Initializing container discovery...")
-	var discoverer container.Discoverer
-	switch cfg.ContainerDiscovery {
-	case "kubernetes":
-		discoverer, err = container.NewKubernetesDiscoverer(cfg.KubernetesNamespace, logger)
-	case "proc":
-		discoverer, err = container.NewProcDiscoverer("/host/proc", logger)
-	default:
-		err = fmt.Errorf("unknown container discovery method: %s", cfg.ContainerDiscovery)
-	}
-	if err != nil {
-		logger.Fatal("Failed to initialize container discovery", zap.Error(err))
-	}
-
-	// Start container discovery
-	containerCache := container.NewCache()
-	go func() {
-		if err := discoverer.Start(ctx, containerCache); err != nil {
-			logger.Error("Container discovery error", zap.Error(err))
-		}
-	}()
+	// NOTE: Container discovery and cache removed
+	// Pod-level metrics are sufficient since K8s pods share network namespace
+	// Backend handles all metadata enrichment (pod names, namespaces, services)
 
 	// Initialize metrics server
 	logger.Info("Starting metrics server", zap.Int("port", cfg.MetricsPort))
@@ -123,49 +105,26 @@ func main() {
 		}
 	}()
 
-	// Initialize zone mapper for Kubernetes topology
-	// No caching - queries K8s API in real-time for autoscaling clusters
-	logger.Info("Initializing Kubernetes zone mapper (real-time queries, no caching)...")
-	zoneMapper, err := k8s.NewZoneMapper(logger)
-	if err != nil {
-		logger.Warn("Failed to initialize zone mapper, continuing without zone information", zap.Error(err))
-		// Create a minimal zone mapper that returns "unknown" for all IPs
-		zoneMapper = &k8s.ZoneMapper{}
-	}
+	// NOTE: Container-level metrics collector removed
+	// Raw IP-based connection metrics are sufficient (pod-level, no container granularity)
+	// Backend handles all metadata enrichment
 
-	// Initialize container metrics collector
-	logger.Info("Starting metrics collector...")
-	metricsCollector := collector.New(
-		bpfManager,
-		containerCache,
-		metricsServer.Registry(),
-		collector.Options{
-			CollectionInterval: cfg.CollectionInterval,
-			BatchSize:         cfg.BatchSize,
-		},
-		logger,
-	)
+	// NOTE: ALL K8s-based aggregation removed (service, namespace, zone, region)
+	// Agent exports ONLY raw connection-level metrics (pod IP → pod IP)
+	// Backend handles ALL aggregation (service, namespace, zone, region, workload)
 
-	// Start container metrics collection loop
-	go metricsCollector.Start(ctx)
-
-	// Initialize connection collector for network traffic tracking
+	// Initialize connection collector for map utilization tracking
+	// This collector NO LONGER exports high-cardinality IP-level metrics
+	// It only tracks connection counts and BPF map utilization
 	if cfg.ConnectionTracking {
-		logger.Info("Starting connection collector...")
+		logger.Info("Starting connection collector (map utilization tracking only)...")
 		connectionCollector := collector.NewConnectionCollector(
 			bpfManager,
-			zoneMapper,
 			logger,
 			metricsServer.Registry(),
 		)
 
 		// Configure connection collector
-		if cfg.TopFlowsLimit > 0 {
-			connectionCollector.SetTopFlowsLimit(cfg.TopFlowsLimit)
-		}
-		if cfg.ConnectionCleanupInterval > 0 {
-			connectionCollector.SetCleanupInterval(cfg.ConnectionCleanupInterval)
-		}
 		if cfg.ConnectionAggregationInterval > 0 {
 			connectionCollector.SetAggregationInterval(cfg.ConnectionAggregationInterval)
 		}
@@ -173,9 +132,12 @@ func main() {
 		// Start connection collection loop
 		go connectionCollector.Start(ctx)
 
-		logger.Info("Connection tracking enabled",
-			zap.Int("top_flows_limit", cfg.TopFlowsLimit),
-			zap.Duration("cleanup_interval", cfg.ConnectionCleanupInterval),
+		// Start overflow handler for ringbuffer monitoring
+		if err := connectionCollector.StartOverflowHandler(ctx); err != nil {
+			logger.Warn("Failed to start overflow handler", zap.Error(err))
+		}
+
+		logger.Info("Connection tracking enabled (LRU auto-eviction only, no manual cleanup)",
 			zap.Duration("aggregation_interval", cfg.ConnectionAggregationInterval))
 	} else {
 		logger.Info("Connection tracking disabled")
@@ -208,25 +170,14 @@ func main() {
 
 // checkKernelCompatibility verifies the kernel supports required eBPF features
 func checkKernelCompatibility() error {
-	// Read kernel version
-	var uname syscall.Utsname
-	if err := syscall.Uname(&uname); err != nil {
-		return fmt.Errorf("failed to get kernel version: %w", err)
+	// Simple kernel version check by reading /proc/version
+	versionData, err := os.ReadFile("/proc/version")
+	if err != nil {
+		// Not a fatal error - might be running on non-Linux or in container without /proc
+		fmt.Println("Warning: Could not read kernel version from /proc/version")
+	} else {
+		fmt.Printf("Kernel version: %s\n", string(versionData))
 	}
-
-	// Convert kernel release to string (null-terminated)
-	releaseBytes := uname.Release[:]
-	releaseLen := 0
-	for i, b := range releaseBytes {
-		if b == 0 {
-			releaseLen = i
-			break
-		}
-	}
-	release := string(releaseBytes[:releaseLen])
-
-	// Log kernel version using fmt.Printf since we don't have logger here
-	fmt.Printf("Kernel version: %s\n", release)
 
 	// Check for BPF filesystem
 	if _, err := os.Stat("/sys/fs/bpf"); os.IsNotExist(err) {

@@ -1,0 +1,71 @@
+name: Release eBPF Agent
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF***REMOVED***refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build binaries
+        run: |
+          ***REMOVED*** Build for multiple platforms
+          GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=${{ steps.version.outputs.VERSION }}" -o ebpf-agent-linux-amd64 ./cmd/agent
+          GOOS=linux GOARCH=arm64 go build -ldflags "-X main.Version=${{ steps.version.outputs.VERSION }}" -o ebpf-agent-linux-arm64 ./cmd/agent
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-rc') || contains(steps.version.outputs.VERSION, '-beta') }}
+          files: |
+            ebpf-agent-linux-amd64
+            ebpf-agent-linux-arm64
+          body: |
+            ***REMOVED******REMOVED*** KubeAdapt eBPF Agent ${{ steps.version.outputs.VERSION }}
+
+            ***REMOVED******REMOVED******REMOVED*** What's Changed
+            - See commit history for detailed changes
+
+            ***REMOVED******REMOVED******REMOVED*** Container Images
+            - `kubeadapt/ebpf-agent:${{ steps.version.outputs.VERSION }}`
+            - `kubeadapt/ebpf-agent:latest` (updated)
+
+            ***REMOVED******REMOVED******REMOVED*** Compatibility
+            - Kubernetes: 1.24+
+            - Kernel: 4.18+ (5.8+ recommended for full features)
+            - Architectures: amd64, arm64
+
+  ***REMOVED*** Trigger the main build workflow to push container images
+  trigger-build:
+    name: Trigger Container Build
+    needs: release
+    uses: ./.github/workflows/build-and-push.yaml
+    with:
+      docker_file_path: './Dockerfile'
+      go_version: '1.25.x'
+      ecr_repository_name: 'w3l5x6r6/kubeadapt/app/kubeadapt-ebpf-agent'
+      platforms: 'linux/amd64,linux/arm64'
+      run_tests: false
+    secrets: inherit
