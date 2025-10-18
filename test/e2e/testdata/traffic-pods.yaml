@@ -21,6 +21,11 @@ metadata:
 spec:
   nodeSelector:
     topology.kubernetes.io/zone: us-west-2a
+  tolerations:
+    ***REMOVED*** Allow scheduling on control-plane node
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
   containers:
     - name: generator
       image: nginx:alpine
@@ -29,11 +34,11 @@ spec:
           name: http
       resources:
         requests:
-          memory: "32Mi"
-          cpu: "50m"
-        limits:
           memory: "64Mi"
-          cpu: "100m"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
       ***REMOVED*** Install curl and other tools for traffic generation
       command: ["/bin/sh"]
       args:
@@ -94,11 +99,11 @@ spec:
           name: http
       resources:
         requests:
-          memory: "32Mi"
-          cpu: "50m"
-        limits:
           memory: "64Mi"
-          cpu: "100m"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
       command: ["/bin/sh"]
       args:
         - "-c"
@@ -158,11 +163,11 @@ spec:
           name: http
       resources:
         requests:
-          memory: "32Mi"
-          cpu: "50m"
-        limits:
           memory: "64Mi"
-          cpu: "100m"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
       command: ["/bin/sh"]
       args:
         - "-c"
@@ -200,8 +205,8 @@ spec:
       name: http
   type: ClusterIP
 ---
-***REMOVED*** Traffic Generator Pod D - Zone us-west-2c (different zone for additional testing)
-***REMOVED*** Used as additional source/destination for multi-zone testing
+***REMOVED*** Traffic Generator Pod D - Zone us-west-2b (same zone as B and C for same-AZ testing)
+***REMOVED*** Used as additional source/destination for same-zone traffic testing
 apiVersion: v1
 kind: Pod
 metadata:
@@ -209,11 +214,11 @@ metadata:
   namespace: traffic-test
   labels:
     app: traffic-gen-d
-    zone: us-west-2c
+    zone: us-west-2b
     traffic-role: destination
 spec:
   nodeSelector:
-    topology.kubernetes.io/zone: us-west-2c
+    topology.kubernetes.io/zone: us-west-2b
   containers:
     - name: generator
       image: nginx:alpine
@@ -222,11 +227,11 @@ spec:
           name: http
       resources:
         requests:
-          memory: "32Mi"
-          cpu: "50m"
-        limits:
           memory: "64Mi"
-          cpu: "100m"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
       command: ["/bin/sh"]
       args:
         - "-c"

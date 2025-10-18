@@ -52,9 +52,13 @@ type ConnectionCollector struct {
 	mapUtilization         *prometheus.GaugeVec
 	overflowFlowsTotal     prometheus.Counter // Overflow ringbuffer flow count
 
+	// Batch size monitoring (single time series - NO overhead!)
+	// Tracks number of unique IP pairs processed in current collection batch
+	// This is NOT cumulative - just the size of each 25-second collection cycle
+	ipPairsBatchSize prometheus.Gauge
+
 	// Configuration
 	aggregationInterval time.Duration
-	topFlowsLimit       int
 
 	// State tracking
 	mu                    sync.RWMutex
@@ -71,8 +75,7 @@ func NewConnectionCollector(
 	c := &ConnectionCollector{
 		bpfManager:          bpfManager,
 		logger:              logger,
-		aggregationInterval: 10 * time.Second, // Reduced from 30s for better accuracy (netobserv uses 10-15s)
-		topFlowsLimit:       1000,
+		aggregationInterval: 25 * time.Second,
 	}
 
 	// Initialize metrics
@@ -148,6 +151,16 @@ func (c *ConnectionCollector) initMetrics(registry *prometheus.Registry) {
 		},
 	)
 
+	// Batch size monitoring - single Gauge (NOT GaugeVec!)
+	// This creates only ONE time series, not one per IP pair
+	// Zero Prometheus overhead - tracks instantaneous batch size per collection cycle
+	c.ipPairsBatchSize = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "kubeadapt_ip_pairs_batch_size",
+			Help: "Number of unique IP pairs processed in current collection batch (instantaneous, not cumulative)",
+		},
+	)
+
 	// Register metrics
 	registry.MustRegister(c.connectionTrafficBytes)
 	registry.MustRegister(c.connectionTrafficPackets)
@@ -155,6 +168,7 @@ func (c *ConnectionCollector) initMetrics(registry *prometheus.Registry) {
 	registry.MustRegister(c.connectionTrackingInfo)
 	registry.MustRegister(c.mapUtilization)
 	registry.MustRegister(c.overflowFlowsTotal)
+	registry.MustRegister(c.ipPairsBatchSize)
 }
 
 // Start begins the collection loop
@@ -163,13 +177,11 @@ func (c *ConnectionCollector) Start(ctx context.Context) {
 	kernelVersion, err := system.GetKernelVersion()
 	if err != nil {
 		c.logger.Warn("Failed to detect kernel version", zap.Error(err))
-		c.logger.Info("Starting connection collector (LRU eviction only, no manual cleanup)",
-			zap.Duration("aggregation_interval", c.aggregationInterval),
-			zap.Int("top_flows_limit", c.topFlowsLimit))
+		c.logger.Info("Starting connection collector (read-then-delete pattern)",
+			zap.Duration("aggregation_interval", c.aggregationInterval))
 	} else {
-		c.logger.Info("Starting connection collector (LRU eviction only, no manual cleanup)",
+		c.logger.Info("Starting connection collector (read-then-delete pattern)",
 			zap.Duration("aggregation_interval", c.aggregationInterval),
-			zap.Int("top_flows_limit", c.topFlowsLimit),
 			zap.String("kernel_version", kernelVersion.String()))
 	}
 
@@ -227,10 +239,16 @@ func (c *ConnectionCollector) collect() {
 	// Map to aggregate multiple connections (same IPs, different ports)
 	aggregated := make(map[AggKey]AggStats)
 
+	// Update map utilization BEFORE deletion (captures actual map state before collection)
+	// This ensures the metric reflects real map usage when Prometheus scrapes /metrics
+	c.updateMapUtilization()
+
 	// STEP 1: Iterate BPF map and aggregate by (src_ip, dst_ip, protocol)
 	iter := connectionMap.Iterate()
 	var key bpf.ConnectionKey
 	var stats bpf.ConnectionStats
+
+	deletedCount := 0
 
 	for iter.Next(&key, &stats) {
 		// Extract IPs from connection key
@@ -257,13 +275,55 @@ func (c *ConnectionCollector) collect() {
 		// Count individual connections by protocol (for internal tracking)
 		protocolCounts[protocol]++
 		flowCount++
+
+		// Delete immediately after reading to prevent data loss
+		// for short-lived connections (map cleared every 10s)
+		if err := connectionMap.Delete(&key); err != nil {
+			c.logger.Debug("Failed to delete entry after read",
+				zap.Error(err))
+		} else {
+			deletedCount++
+		}
 	}
 
 	if err := iter.Err(); err != nil {
 		c.logger.Error("Error iterating connection map", zap.Error(err))
 	}
 
-	// STEP 2: Export cumulative snapshots (netobserv pattern)
+	// STEP 2: Batch size monitoring (single metric value - NO overhead!)
+	// This measures the instantaneous batch size, NOT cumulative cardinality
+	batchSize := len(aggregated)
+	c.ipPairsBatchSize.Set(float64(batchSize))
+
+	// Log warnings if batch size is large (indicates high per-cycle load)
+	// Thresholds based on production scenarios (see CARDINALITY_ANALYSIS.md):
+	// - 50K: Normal batch size for large clusters (100+ nodes)
+	// - 150K: High density batch (200 nodes, 200 pods/node)
+	// - 300K: Critical - single batch processing this many pairs needs major resources
+	const (
+		batchSizeInfoThreshold = 50_000
+		batchSizeWarnThreshold = 150_000
+		batchSizeCritThreshold = 300_000
+	)
+
+	if batchSize > batchSizeCritThreshold {
+		c.logger.Error("CRITICAL: Very large collection batch - immediate action required",
+			zap.Int("ip_pairs_in_batch", batchSize),
+			zap.Int("critical_threshold", batchSizeCritThreshold),
+			zap.String("action", "Scale Prometheus (16GB+ RAM) OR enable sampling/aggregation"),
+			zap.String("note", "This is per-batch size, Prometheus cumulative cardinality will be much higher"))
+	} else if batchSize > batchSizeWarnThreshold {
+		c.logger.Warn("Large collection batch detected - monitor Prometheus resources",
+			zap.Int("ip_pairs_in_batch", batchSize),
+			zap.Int("warning_threshold", batchSizeWarnThreshold),
+			zap.String("impact", "High per-batch load increases Prometheus memory usage"))
+	} else if batchSize > batchSizeInfoThreshold {
+		c.logger.Info("Collection batch size normal for large clusters",
+			zap.Int("ip_pairs_in_batch", batchSize),
+			zap.Int("info_threshold", batchSizeInfoThreshold))
+	}
+
+	// STEP 3: Export cumulative snapshots (netobserv pattern)
 	// NOTE: We do NOT call Reset() - Gauges represent current cumulative state
 	// Prometheus calculates rates using rate(metric[1m])
 	for aggKey, totals := range aggregated {
@@ -297,9 +357,6 @@ func (c *ConnectionCollector) collect() {
 		c.activeConnections.WithLabelValues(protocol).Set(float64(count))
 	}
 
-	// Update map utilization (monitoring only - LRU handles eviction automatically)
-	c.updateMapUtilization()
-
 	// Update tracking info
 	c.connectionTrackingInfo.WithLabelValues("total_connections_seen").Set(float64(c.totalConnectionsSeen))
 	c.connectionTrackingInfo.WithLabelValues("active_connections").Set(float64(flowCount))
@@ -311,12 +368,13 @@ func (c *ConnectionCollector) collect() {
 	c.mu.Unlock()
 
 	c.logger.Debug("Connection collection completed",
-		zap.Int("flows", flowCount),
+		zap.Int("connections_read", flowCount),
+		zap.Int("connections_deleted", deletedCount),
 		zap.Duration("duration", time.Since(startTime)))
 }
 
 // updateMapUtilization calculates and reports BPF map utilization
-// Note: This is for monitoring only - kernel's LRU eviction handles capacity management automatically
+// Note: This is for monitoring only - overflow ringbuffer handles capacity management when map is full
 func (c *ConnectionCollector) updateMapUtilization() {
 	connectionMap := c.bpfManager.GetConnectionMap()
 	if connectionMap == nil {
@@ -346,7 +404,7 @@ func (c *ConnectionCollector) updateMapUtilization() {
 		utilization := float64(currentEntries) / float64(maxEntries) * 100.0
 		c.mapUtilization.WithLabelValues("connection_flows").Set(utilization)
 
-		c.logger.Debug("BPF map utilization (LRU auto-eviction active)",
+		c.logger.Debug("BPF map utilization (overflow ringbuffer handles capacity)",
 			zap.Uint32("current_entries", uint32(currentEntries)),
 			zap.Uint32("max_entries", maxEntries),
 			zap.Float64("utilization_percent", utilization))
@@ -361,13 +419,7 @@ func (c *ConnectionCollector) GetStats() map[string]interface{} {
 	return map[string]interface{}{
 		"active_connections":     c.activeConnectionCount,
 		"total_connections_seen": c.totalConnectionsSeen,
-		"top_flows_limit":        c.topFlowsLimit,
 	}
-}
-
-// SetTopFlowsLimit updates the limit for detailed flow metrics
-func (c *ConnectionCollector) SetTopFlowsLimit(limit int) {
-	c.topFlowsLimit = limit
 }
 
 // SetAggregationInterval updates the aggregation interval
@@ -418,24 +470,32 @@ func (c *ConnectionCollector) StartOverflowHandler(ctx context.Context) error {
 // Helper functions
 
 // uint32ToIPString converts a uint32 to an IP string
+// BPF MAP BYTE ORDER FIX:
+// - BPF stores IPv4 addresses in network byte order (big endian) in kernel structures
+// - cilium/ebpf reads the BPF map and converts to Go's native types using host byte order
+// - On little-endian machines (x86/ARM), this means the bytes are already reversed
+// - We must use LittleEndian to correctly interpret the host-order uint32 back to IP bytes
 func uint32ToIPString(ip uint32) string {
 	bytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(bytes, ip)
+	binary.LittleEndian.PutUint32(bytes, ip) // ✅ Host byte order (little-endian on x86/ARM)
 	return net.IP(bytes).String()
 }
 
 // IPv6ToIPString converts IPv6 address from 4 uint32s to string
-// NOTE: The BPF kernel code reads IPv6 addresses using bpf_probe_read_kernel which
-// preserves the network byte order (big endian) from kernel structures.
-// We must use BigEndian here to correctly interpret the data.
+// BPF MAP BYTE ORDER FIX:
+// - BPF reads IPv6 addresses using bpf_probe_read_kernel from kernel structures (network order)
+// - The raw bytes are stored in the BPF map in network byte order (big endian)
+// - cilium/ebpf reads each uint32 and interprets using host byte order (little-endian on x86/ARM)
+// - We must use LittleEndian to convert each uint32 back to bytes in correct order
+// - This works for both IPv4-mapped IPv6 (::ffff:x.x.x.x) and native IPv6 addresses
 func IPv6ToIPString(ipv6 [4]uint32) string {
 	// Create 16-byte array for IPv6
 	bytes := make([]byte, 16)
 
-	// Convert each uint32 to bytes using BigEndian (network byte order)
-	// This matches the byte order used by the kernel for IPv6 addresses
+	// Convert each uint32 to bytes using LittleEndian (host byte order)
+	// This correctly handles both IPv4-mapped and native IPv6 addresses
 	for i := 0; i < 4; i++ {
-		binary.BigEndian.PutUint32(bytes[i*4:], ipv6[i])
+		binary.LittleEndian.PutUint32(bytes[i*4:], ipv6[i]) // ✅ Host byte order
 	}
 
 	return net.IP(bytes).String()

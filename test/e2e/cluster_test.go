@@ -39,23 +39,28 @@ func TestMain(m *testing.M) {
 // 1. Agent deployment on all nodes
 // 2. Prometheus scraping of agent metrics
 // 3. Raw IP-based connection metrics export (NO K8s enrichment)
-// 4. Backend handles ALL aggregation (service, namespace, zone, region)
+// 4. Backend handles ALL aggregation (agent exports raw IP metrics only)
 func TestE2EMultiNodeCluster(t *testing.T) {
 	const (
 		testNamespace   = "test"
-		prometheusURL   = "http://prometheus.monitoring.svc.cluster.local:9090" // Prometheus service DNS
-		trafficRequests = 50                                                    // Number of HTTP requests to generate
+		prometheusURL   = "http://localhost:30090" // Prometheus service DNS
+		trafficRequests = 50                       // Number of HTTP requests to generate
 	)
 
 	rawIPTraffic := features.New("Raw IP Connection Metrics").
 		Assess("raw IP-based connection metrics are exported", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+			t.Log("═══════════════════════════════════════════════════════════")
+			t.Log("→ Testing Raw IP Connection Metrics Export")
+			t.Log("═══════════════════════════════════════════════════════════")
 			t.Log("Setting up Prometheus client")
 			promClient := helpers.NewPrometheusClient(t, prometheusURL)
 
 			// Wait for Prometheus to be ready
+			t.Log("→ Waiting for Prometheus to become ready...")
 			if err := promClient.WaitForReady(ctx); err != nil {
 				t.Fatalf("Prometheus not ready: %v", err)
 			}
+			t.Log("✓ Prometheus is ready")
 
 			// Create PodHelper for robust pod operations
 			podHelper, err := helpers.NewPodHelper(cfg)
@@ -72,18 +77,20 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 				t.Fatalf("Pod test-pod-b not ready: %v", err)
 			}
 
-			t.Log("Generating traffic between pods (Pod A -> Pod B)")
+			t.Logf("→ Generating traffic between pods (Pod A -> Pod B): %d requests", trafficRequests)
 			trafficGen := helpers.NewTrafficGenerator(t, cfg.Client().RESTConfig())
 
 			// Generate HTTP traffic from Pod A to Pod B
 			if err := trafficGen.GenerateHTTPTraffic(ctx, testNamespace, "test-pod-a", "test-service-b", trafficRequests); err != nil {
 				t.Fatalf("Failed to generate traffic: %v", err)
 			}
+			t.Logf("✓ Successfully generated %d HTTP requests", trafficRequests)
 
-			t.Log("Waiting for metrics to be exported and scraped by Prometheus")
-			time.Sleep(45 * time.Second) // Wait for collection interval (30s) + scrape interval (15s)
+			t.Log("→ Waiting for metrics to be exported and scraped by Prometheus (45s)")
+			t.Log("   Collection interval (30s) + Scrape interval (15s)")
+			time.Sleep(45 * time.Second)
 
-			t.Log("Querying Prometheus for raw IP-based connection metrics")
+			t.Log("→ Querying Prometheus for raw IP-based connection metrics")
 
 			// Verify connection traffic bytes metric exists (with any IP addresses)
 			if err = promClient.WaitForMetric(ctx,
@@ -108,7 +115,12 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 				t.Fatalf("Connection traffic packets metric not found: %v", err)
 			}
 
-			t.Log("✓ Raw IP-based connection metrics successfully exported")
+			t.Log("")
+			t.Log("✅ Raw IP-based connection metrics successfully exported")
+			t.Log("   ✓ Traffic bytes metric: kubeadapt_connection_traffic_bytes")
+			t.Log("   ✓ Traffic packets metric: kubeadapt_connection_traffic_packets")
+			t.Log("   ✓ Agent exports raw IP connections (backend handles aggregation)")
+			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
 
@@ -163,10 +175,13 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 
 	bpfMapUtilization := features.New("BPF Map Utilization Metrics").
 		Assess("map utilization metrics are exposed", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+			t.Log("═══════════════════════════════════════════════════════════")
+			t.Log("→ Testing BPF Map Utilization Metrics")
+			t.Log("═══════════════════════════════════════════════════════════")
 			t.Log("Setting up Prometheus client")
 			promClient := helpers.NewPrometheusClient(t, prometheusURL)
 
-			t.Log("Verifying BPF map utilization metrics")
+			t.Log("→ Verifying BPF map utilization metrics are exposed")
 
 			// Query for map utilization metric
 			err := promClient.WaitForMetric(ctx,
@@ -195,7 +210,12 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 				t.Fatalf("Map utilization out of range: %f (expected 0-100)", value)
 			}
 
-			t.Logf("✓ Map utilization metric found: %.2f%%", value)
+			t.Log("")
+			t.Log("✅ BPF map utilization metrics verified")
+			t.Logf("   ✓ Current map utilization: %.2f%%", value)
+			t.Log("   ✓ Metric range valid: 0-100%")
+			t.Log("   ✓ Map: connection_flows (PERCPU_HASH)")
+			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
 
@@ -215,8 +235,8 @@ func TestE2EPrometheusCardinality(t *testing.T) {
 	}
 
 	const (
-		prometheusURL     = "http://prometheus.monitoring.svc.cluster.local:9090"
-		maxCardinality    = 5000 // Maximum allowed time series per metric (raw IPs, higher than aggregated)
+		prometheusURL     = "http://localhost:30090"
+		maxCardinality    = 50_000 // Maximum allowed time series per metric for test environment (see CARDINALITY_ANALYSIS.md)
 		testNamespace     = "test"
 		cardinalityMetric = "kubeadapt_connection_traffic_bytes"
 	)

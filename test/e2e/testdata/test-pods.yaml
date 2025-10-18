@@ -5,7 +5,7 @@ kind: Namespace
 metadata:
   name: test
 ---
-***REMOVED*** Test Pod A - Will be scheduled on zone us-west-2a
+***REMOVED*** Test Pod A - Will be scheduled on zone us-west-2a (control-plane)
 apiVersion: v1
 kind: Pod
 metadata:
@@ -16,6 +16,11 @@ metadata:
 spec:
   nodeSelector:
     topology.kubernetes.io/zone: us-west-2a
+  tolerations:
+    ***REMOVED*** Allow scheduling on control-plane node
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
   containers:
     - name: nginx
       image: nginx:alpine

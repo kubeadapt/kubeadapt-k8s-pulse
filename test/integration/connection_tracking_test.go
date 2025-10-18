@@ -33,8 +33,8 @@ func TestConnectionTracking(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load and attach BPF programs
-	err = manager.LoadAndAttach()
+	// Load and attach BPF programs (use "disabled" mode for tests to track all traffic)
+	err = manager.LoadAndAttach("disabled")
 	require.NoError(t, err)
 
 	// Create metrics registry
@@ -133,8 +133,8 @@ func TestConnectionCleanup(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load BPF programs
-	err = manager.LoadAndAttach()
+	// Load BPF programs (use "disabled" mode for tests)
+	err = manager.LoadAndAttach("disabled")
 	require.NoError(t, err)
 
 	// Create connection collector with short cleanup interval
@@ -198,8 +198,8 @@ func TestHighVolumeConnections(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load BPF programs
-	err = manager.LoadAndAttach()
+	// Load BPF programs (use "disabled" mode for tests)
+	err = manager.LoadAndAttach("disabled")
 	require.NoError(t, err)
 
 	// Generate many connections

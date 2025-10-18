@@ -43,13 +43,15 @@ services:
       EBPF_METRICS_PORT: 9090
       EBPF_LOG_LEVEL: ${LOG_LEVEL:-info}
       EBPF_LOG_FORMAT: json
-      EBPF_COLLECTION_INTERVAL: 10s
-      EBPF_BATCH_SIZE: 100
-      EBPF_CONTAINER_DISCOVERY: proc
+      EBPF_COLLECTION_INTERVAL: 25s
       EBPF_PROC_PATH: /host/proc
-      EBPF_BPF_MAP_MAX_ENTRIES: 10240
       EBPF_DEBUG: ${DEBUG:-false}
       NODE_NAME: ${NODE_NAME:-local-dev}
+      ***REMOVED*** Optional debugging features
+      ***REMOVED*** EBPF_ENABLE_PROFILING: true
+      ***REMOVED*** EBPF_PROFILING_PORT: 6060
+      ***REMOVED*** EBPF_DUMP_BPF_MAPS: true
+      ***REMOVED*** EBPF_DUMP_MAP_INTERVAL: 60s
     volumes:
       ***REMOVED*** Mount host filesystem for container discovery
       - /proc:/host/proc:ro
@@ -82,16 +84,21 @@ services:
       dockerfile: Dockerfile.dev
     container_name: kubeadapt-ebpf-dev
     privileged: true
-    network_mode: host
+    ***REMOVED*** NOTE: NOT using network_mode: host for dev on macOS
+    ***REMOVED*** host mode doesn't expose ports to macOS host (only to Docker VM)
+    ***REMOVED*** For production/real monitoring, use ebpf-agent service with host mode
     pid: host
     environment:
       ***REMOVED*** Development configuration
       EBPF_METRICS_PORT: 9090
       EBPF_LOG_LEVEL: debug
       EBPF_LOG_FORMAT: text
-      EBPF_COLLECTION_INTERVAL: 5s
+      EBPF_COLLECTION_INTERVAL: 25s
       EBPF_DEBUG: true
       NODE_NAME: local-dev
+      ***REMOVED*** Network namespace filtering mode (configurable via env var)
+      ***REMOVED*** Options: "default" (track all K8s pods), "strict" (only non-hostNetwork pods), "disabled" (track everything)
+      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
     volumes:
       ***REMOVED*** Source code for hot reload
       - .:/workspace
@@ -106,6 +113,8 @@ services:
     command: air -c .air.toml
     ports:
       - "9090:9090"
+    networks:
+      - default
 
   ***REMOVED*** Prometheus for metrics collection
   prometheus:

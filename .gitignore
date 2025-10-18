@@ -5,6 +5,8 @@ bin/
 *.so
 *.dylib
 ebpf-agent
+agent
+ebpf-agent.tar
 
 ***REMOVED*** BPF compiled objects (but keep generated Go files - they're committed like netobserv)
 *.o

@@ -56,14 +56,65 @@ func (tg *TrafficGenerator) GenerateHTTPTraffic(ctx context.Context, namespace, 
 		requests, destService, namespace,
 	)
 
+	// Determine container name based on pod name
+	// Traffic generator pods use "generator", regular test pods use "nginx"
+	containerName := tg.getContainerName(sourcePod)
+
 	// Execute curl in the pod
-	stdout, stderr, err := tg.execInPod(ctx, namespace, sourcePod, "nginx", []string{"/bin/sh", "-c", curlCmd})
+	stdout, stderr, err := tg.execInPod(ctx, namespace, sourcePod, containerName, []string{"/bin/sh", "-c", curlCmd})
 	if err != nil {
 		tg.t.Logf("Traffic generation stderr: %s", stderr)
 		return fmt.Errorf("executing curl in pod: %w", err)
 	}
 
 	tg.t.Logf("Traffic generation completed. Stdout: %s", stdout)
+	return nil
+}
+
+// GenerateBurstHTTPTraffic generates HTTP traffic in BURST MODE (no delay between requests)
+// This is used for overflow testing where we need to fill the BPF map faster than
+// the collector can clear it (25-second collection interval).
+// Target: Generate all traffic within < 20 seconds to complete within one collection cycle.
+func (tg *TrafficGenerator) GenerateBurstHTTPTraffic(ctx context.Context, namespace, sourcePod, destService string, requests int) error {
+	tg.t.Logf("Generating %d HTTP requests in BURST MODE from %s/%s to %s", requests, namespace, sourcePod, destService)
+
+	// Wait for pod to be ready
+	if err := tg.waitForPodReady(ctx, namespace, sourcePod); err != nil {
+		return fmt.Errorf("waiting for pod ready: %w", err)
+	}
+
+	// Build curl command for BURST traffic generation
+	// Key differences from normal traffic:
+	// - NO SLEEP between requests (removed 'sleep 0.1')
+	// - Shorter timeout (1 second vs 2 seconds)
+	// - High concurrency via xargs parallel execution
+	//
+	// Parallelism tuning results (nginx alpine + curl architecture):
+	// - -P 10:   ~30 req/sec
+	// - -P 200:  424-580 req/sec ← OPTIMAL (best throughput)
+	// - -P 2000: 424-476 req/sec (worse due to context switching overhead)
+	//
+	// Conclusion: -P 200 is optimal. Architecture has hard limit ~600 req/sec.
+	curlCmd := fmt.Sprintf(
+		"seq 1 %d | xargs -I {} -P 200 curl -s -o /dev/null --max-time 1 http://%s.%s.svc.cluster.local 2>/dev/null || true",
+		requests, destService, namespace,
+	)
+
+	// Determine container name based on pod name
+	containerName := tg.getContainerName(sourcePod)
+
+	// Execute curl in the pod
+	start := time.Now()
+	stdout, stderr, err := tg.execInPod(ctx, namespace, sourcePod, containerName, []string{"/bin/sh", "-c", curlCmd})
+	duration := time.Since(start)
+
+	if err != nil {
+		tg.t.Logf("Burst traffic generation stderr: %s", stderr)
+		return fmt.Errorf("executing burst curl in pod: %w", err)
+	}
+
+	tg.t.Logf("✓ Burst traffic generation completed in %v (~%.0f req/sec)", duration, float64(requests)/duration.Seconds())
+	tg.t.Logf("  Stdout: %s", stdout)
 	return nil
 }
 
@@ -76,6 +127,9 @@ func (tg *TrafficGenerator) GenerateContinuousTraffic(ctx context.Context, names
 	if err := tg.waitForPodReady(ctx, namespace, sourcePod); err != nil {
 		return nil, fmt.Errorf("waiting for pod ready: %w", err)
 	}
+
+	// Determine container name based on pod name
+	containerName := tg.getContainerName(sourcePod)
 
 	// Create cancellable context
 	trafficCtx, cancel := context.WithCancel(ctx)
@@ -94,7 +148,7 @@ func (tg *TrafficGenerator) GenerateContinuousTraffic(ctx context.Context, names
 				curlCmd := fmt.Sprintf("curl -s -o /dev/null --max-time 1 http://%s.%s.svc.cluster.local || true",
 					destService, namespace)
 
-				_, _, _ = tg.execInPod(trafficCtx, namespace, sourcePod, "nginx", []string{"/bin/sh", "-c", curlCmd})
+				_, _, _ = tg.execInPod(trafficCtx, namespace, sourcePod, containerName, []string{"/bin/sh", "-c", curlCmd})
 			}
 		}
 	}()
@@ -153,8 +207,11 @@ func (tg *TrafficGenerator) GenerateUDPTraffic(ctx context.Context, namespace, s
 		namespace,
 	)
 
+	// Determine container name based on pod name
+	containerName := tg.getContainerName(sourcePod)
+
 	// Execute netcat in the pod
-	stdout, stderr, err := tg.execInPod(ctx, namespace, sourcePod, "nginx", []string{"/bin/sh", "-c", ncCmd})
+	stdout, stderr, err := tg.execInPod(ctx, namespace, sourcePod, containerName, []string{"/bin/sh", "-c", ncCmd})
 	if err != nil {
 		tg.t.Logf("UDP traffic generation stderr: %s", stderr)
 		return fmt.Errorf("executing netcat in pod: %w", err)
@@ -194,6 +251,16 @@ func generatePayload(size int) string {
 		payload += "X"
 	}
 	return payload
+}
+
+// getContainerName returns the appropriate container name for a given pod
+// Traffic generator pods (traffic-gen-*) use "generator" container
+// Regular test pods use "nginx" container
+func (tg *TrafficGenerator) getContainerName(podName string) string {
+	if len(podName) >= 11 && podName[:11] == "traffic-gen" {
+		return "generator"
+	}
+	return "nginx"
 }
 
 // waitForPodReady waits for a pod to be in Running state and all containers ready using test.Eventually

@@ -5,3 +5,8 @@ metadata:
   labels:
     app: kubeadapt-ebpf-agent
     name: kubeadapt-system
+    ***REMOVED*** Pod Security Standards (Kubernetes 1.23+)
+    ***REMOVED*** eBPF agent requires privileged access for kernel interactions
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

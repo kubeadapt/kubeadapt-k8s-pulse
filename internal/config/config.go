@@ -12,40 +12,43 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	// Boolean string representations
-	boolStringTrue = "true"
-	boolStringOne  = "1"
-)
+// Note: Constants moved to constants.go for better organization
 
 // Config holds the application configuration
 type Config struct {
 	// Metrics server configuration
-	MetricsPort int    `yaml:"metrics_port" env:"EBPF_METRICS_PORT" default:"9090"`
-	MetricsPath string `yaml:"metrics_path" env:"EBPF_METRICS_PATH" default:"/metrics"`
+	MetricsPort int `yaml:"metrics_port" env:"EBPF_METRICS_PORT" default:"9090"`
 
 	// Collection configuration
-	CollectionInterval time.Duration `yaml:"collection_interval" env:"EBPF_COLLECTION_INTERVAL" default:"10s"`
-	BatchSize          int           `yaml:"batch_size" env:"EBPF_BATCH_SIZE" default:"100"`
-	CleanupInterval    time.Duration `yaml:"cleanup_interval" env:"EBPF_CLEANUP_INTERVAL" default:"5m"`
+	// CRITICAL: CollectionInterval must be SHORTER than Prometheus scrape interval
+	// to ensure only ONE collection happens between scrapes (prevents data loss from gauge overwrites).
+	// Default 25s assumes 30s Prometheus scrape interval (leaving 5s safety buffer).
+	// If Prometheus scrapes at different interval, adjust this value accordingly:
+	//   - For 60s scrapes: use 55s collection interval
+	//   - For 15s scrapes: use 12s collection interval
+	// Rule: collection_interval = scrape_interval - 5s buffer
+	CollectionInterval time.Duration `yaml:"collection_interval" env:"EBPF_COLLECTION_INTERVAL" default:"25s"`
 
-	// Container discovery
-	ContainerDiscovery  string `yaml:"container_discovery" env:"EBPF_CONTAINER_DISCOVERY" default:"kubernetes"`
-	KubernetesNamespace string `yaml:"kubernetes_namespace" env:"EBPF_KUBERNETES_NAMESPACE" default:""`
-	ProcPath            string `yaml:"proc_path" env:"EBPF_PROC_PATH" default:"/host/proc"`
+	// ProcPath for container discovery (currently not used - kept for future use)
+	ProcPath string `yaml:"proc_path" env:"EBPF_PROC_PATH" default:"/host/proc"`
 
-	// BPF configuration
-	BPFMapMaxEntries int  `yaml:"bpf_map_max_entries" env:"EBPF_BPF_MAP_MAX_ENTRIES" default:"10240"`
-	BPFPerCPUMaps    bool `yaml:"bpf_per_cpu_maps" env:"EBPF_BPF_PER_CPU_MAPS" default:"true"`
+	// Network namespace filtering mode
+	// Controls which processes are tracked for network metrics
+	// EBPF_NETNS_FILTER_MODE: Network namespace filtering strategy
+	//   - "default": Track all Kubernetes pods (including hostNetwork:true like node-exporter)
+	//                Filter only host system processes (kubelet, containerd, sshd)
+	//                Uses simple cgroup check (cgroup_id != 1)
+	//                RECOMMENDED for most use cases
+	//   - "strict":  Track only pods with separate network namespaces (hostNetwork:false)
+	//                Filter host processes AND hostNetwork:true pods
+	//                Uses CO-RE network namespace inode comparison
+	//                Use when you want to exclude hostNetwork pods from tracking
+	//   - "disabled": Track everything (no filtering at all)
+	//                 Useful for debugging - shows all network activity including host processes
+	NetnsFilterMode string `yaml:"netns_filter_mode" env:"EBPF_NETNS_FILTER_MODE" default:"default"`
 
-	// Connection tracking configuration (LRU auto-eviction only, no manual cleanup)
-	ConnectionTracking            bool          `yaml:"connection_tracking" env:"EBPF_CONNECTION_TRACKING" default:"true"`
-	TopFlowsLimit                 int           `yaml:"top_flows_limit" env:"EBPF_TOP_FLOWS_LIMIT" default:"1000"`
-	ConnectionAggregationInterval time.Duration `yaml:"connection_aggregation_interval" env:"EBPF_CONNECTION_AGGREGATION_INTERVAL" default:"30s"`
-
-	// Metric cardinality control
-	EnableServiceMetrics bool `yaml:"enable_service_metrics" env:"EBPF_ENABLE_SERVICE_METRICS" default:"true"`
-	ServiceMetricsTopK   int  `yaml:"service_metrics_top_k" env:"EBPF_SERVICE_METRICS_TOP_K" default:"100"` // Number of top service pairs to track in detail
+	// Connection tracking configuration (read-then-delete pattern with overflow ringbuffer)
+	ConnectionTracking bool `yaml:"connection_tracking" env:"EBPF_CONNECTION_TRACKING" default:"true"`
 
 	// Logging configuration
 	LogLevel  string `yaml:"log_level" env:"EBPF_LOG_LEVEL" default:"info"`
@@ -55,11 +58,13 @@ type Config struct {
 	NodeName string `yaml:"node_name" env:"NODE_NAME" default:""`
 
 	// Debug options
-	Debug           bool          `yaml:"debug" env:"EBPF_DEBUG" default:"false"`
-	EnableProfiling bool          `yaml:"enable_profiling" env:"EBPF_ENABLE_PROFILING" default:"false"`
-	ProfilingPort   int           `yaml:"profiling_port" env:"EBPF_PROFILING_PORT" default:"6060"`
-	DumpBPFMaps     bool          `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
-	DumpMapInterval time.Duration `yaml:"dump_map_interval" env:"EBPF_DUMP_MAP_INTERVAL" default:"60s"`
+	Debug           bool `yaml:"debug" env:"EBPF_DEBUG" default:"false"`
+	EnableProfiling bool `yaml:"enable_profiling" env:"EBPF_ENABLE_PROFILING" default:"false"`
+	ProfilingPort   int  `yaml:"profiling_port" env:"EBPF_PROFILING_PORT" default:"6060"`
+	DumpBPFMaps     bool `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
+	// DumpMapInterval must be < CollectionInterval (25s) to see data before deletion
+	// 15s allows 1-2 dumps per collection cycle, showing live data
+	DumpMapInterval time.Duration `yaml:"dump_map_interval" env:"EBPF_DUMP_MAP_INTERVAL" default:"15s"`
 }
 
 // Load loads configuration from file and environment
@@ -89,23 +94,15 @@ func Load(configFile string) (*Config, error) {
 
 // setDefaults sets default values
 func (c *Config) setDefaults() {
-	c.MetricsPort = 9090
-	c.MetricsPath = "/metrics"
-	c.CollectionInterval = 10 * time.Second
-	c.BatchSize = 100
-	c.CleanupInterval = 5 * time.Minute
-	c.ContainerDiscovery = "kubernetes"
-	c.BPFMapMaxEntries = 10240
-	c.BPFPerCPUMaps = true
+	c.MetricsPort = DefaultMetricsPort
+	c.CollectionInterval = DefaultCollectionInterval
+	c.ProcPath = DefaultProcPath
+	c.NetnsFilterMode = NetnsFilterModeDefault
 	c.ConnectionTracking = true
-	c.TopFlowsLimit = 1000
-	c.ConnectionAggregationInterval = 30 * time.Second
-	c.EnableServiceMetrics = true
-	c.ServiceMetricsTopK = 100
 	c.LogLevel = "info"
-	c.LogFormat = "json"
-	c.ProfilingPort = 6060
-	c.DumpMapInterval = 60 * time.Second
+	c.LogFormat = LogFormatJSON
+	c.ProfilingPort = DefaultProfilingPort
+	c.DumpMapInterval = DefaultDumpMapInterval
 }
 
 // loadFromFile loads configuration from a YAML file
@@ -130,9 +127,6 @@ func (c *Config) loadFromEnv() {
 			c.MetricsPort = port
 		}
 	}
-	if v := os.Getenv("EBPF_METRICS_PATH"); v != "" {
-		c.MetricsPath = v
-	}
 
 	// Collection configuration
 	if v := os.Getenv("EBPF_COLLECTION_INTERVAL"); v != "" {
@@ -140,61 +134,20 @@ func (c *Config) loadFromEnv() {
 			c.CollectionInterval = d
 		}
 	}
-	if v := os.Getenv("EBPF_BATCH_SIZE"); v != "" {
-		if size, err := strconv.Atoi(v); err == nil {
-			c.BatchSize = size
-		}
-	}
-	if v := os.Getenv("EBPF_CLEANUP_INTERVAL"); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			c.CleanupInterval = d
-		}
-	}
 
-	// Container discovery
-	if v := os.Getenv("EBPF_CONTAINER_DISCOVERY"); v != "" {
-		c.ContainerDiscovery = v
-	}
-	if v := os.Getenv("EBPF_KUBERNETES_NAMESPACE"); v != "" {
-		c.KubernetesNamespace = v
-	}
+	// ProcPath configuration
 	if v := os.Getenv("EBPF_PROC_PATH"); v != "" {
 		c.ProcPath = v
 	}
 
-	// BPF configuration
-	if v := os.Getenv("EBPF_BPF_MAP_MAX_ENTRIES"); v != "" {
-		if entries, err := strconv.Atoi(v); err == nil {
-			c.BPFMapMaxEntries = entries
-		}
-	}
-	if v := os.Getenv("EBPF_BPF_PER_CPU_MAPS"); v != "" {
-		c.BPFPerCPUMaps = v == boolStringTrue || v == boolStringOne
+	// Network namespace filtering
+	if v := os.Getenv("EBPF_NETNS_FILTER_MODE"); v != "" {
+		c.NetnsFilterMode = v
 	}
 
 	// Connection tracking configuration
 	if v := os.Getenv("EBPF_CONNECTION_TRACKING"); v != "" {
-		c.ConnectionTracking = v == boolStringTrue || v == boolStringOne
-	}
-	if v := os.Getenv("EBPF_TOP_FLOWS_LIMIT"); v != "" {
-		if limit, err := strconv.Atoi(v); err == nil {
-			c.TopFlowsLimit = limit
-		}
-	}
-	if v := os.Getenv("EBPF_CONNECTION_AGGREGATION_INTERVAL"); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			c.ConnectionAggregationInterval = d
-		}
-	}
-
-	// Metric cardinality control
-	if v := os.Getenv("EBPF_ENABLE_SERVICE_METRICS"); v != "" {
-		c.EnableServiceMetrics = v == boolStringTrue || v == boolStringOne
-	}
-	if v := os.Getenv("EBPF_SERVICE_METRICS_TOP_K"); v != "" {
-		if topK, err := strconv.Atoi(v); err == nil {
-			c.ServiceMetricsTopK = topK
-		}
+		c.ConnectionTracking = v == BoolStringTrue || v == BoolStringOne
 	}
 
 	// Logging configuration
@@ -212,10 +165,10 @@ func (c *Config) loadFromEnv() {
 
 	// Debug options
 	if v := os.Getenv("EBPF_DEBUG"); v != "" {
-		c.Debug = v == boolStringTrue || v == boolStringOne
+		c.Debug = v == BoolStringTrue || v == BoolStringOne
 	}
 	if v := os.Getenv("EBPF_ENABLE_PROFILING"); v != "" {
-		c.EnableProfiling = v == boolStringTrue || v == boolStringOne
+		c.EnableProfiling = v == BoolStringTrue || v == BoolStringOne
 	}
 	if v := os.Getenv("EBPF_PROFILING_PORT"); v != "" {
 		if port, err := strconv.Atoi(v); err == nil {
@@ -223,7 +176,7 @@ func (c *Config) loadFromEnv() {
 		}
 	}
 	if v := os.Getenv("EBPF_DUMP_BPF_MAPS"); v != "" {
-		c.DumpBPFMaps = v == boolStringTrue || v == boolStringOne
+		c.DumpBPFMaps = v == BoolStringTrue || v == BoolStringOne
 	}
 	if v := os.Getenv("EBPF_DUMP_MAP_INTERVAL"); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
@@ -244,27 +197,32 @@ func (c *Config) validate() error {
 		return fmt.Errorf("collection interval too short: %s", c.CollectionInterval)
 	}
 
-	// Validate batch size
-	if c.BatchSize < 1 {
-		return fmt.Errorf("batch size must be positive: %d", c.BatchSize)
-	}
-
-	// Validate container discovery
-	switch c.ContainerDiscovery {
-	case "kubernetes", "proc", "none":
-		// Valid
-	default:
-		return fmt.Errorf("invalid container discovery method: %s", c.ContainerDiscovery)
-	}
-
 	// Validate log level
 	if _, err := zapcore.ParseLevel(c.LogLevel); err != nil {
 		return fmt.Errorf("invalid log level: %s", c.LogLevel)
 	}
 
-	// Validate BPF map size
-	if c.BPFMapMaxEntries < 100 {
-		return fmt.Errorf("BPF map max entries too small: %d", c.BPFMapMaxEntries)
+	// Validate network namespace filter mode
+	switch c.NetnsFilterMode {
+	case NetnsFilterModeDefault, NetnsFilterModeStrict, NetnsFilterModeDisabled:
+		// Valid modes
+	default:
+		return fmt.Errorf("invalid netns filter mode: %s (must be '%s', '%s', or '%s')",
+			c.NetnsFilterMode, NetnsFilterModeDefault, NetnsFilterModeStrict, NetnsFilterModeDisabled)
+	}
+
+	// Validate profiling port if profiling is enabled
+	if c.EnableProfiling {
+		if c.ProfilingPort < 1 || c.ProfilingPort > 65535 {
+			return fmt.Errorf("invalid profiling port: %d", c.ProfilingPort)
+		}
+	}
+
+	// Validate dump interval if map dumping is enabled
+	if c.DumpBPFMaps {
+		if c.DumpMapInterval < time.Second {
+			return fmt.Errorf("dump map interval too short: %s", c.DumpMapInterval)
+		}
 	}
 
 	return nil
@@ -275,7 +233,7 @@ func (c *Config) BuildLogger() (*zap.Logger, error) {
 	var cfg zap.Config
 
 	// Choose preset based on format
-	if c.LogFormat == "json" {
+	if c.LogFormat == LogFormatJSON {
 		cfg = zap.NewProductionConfig()
 	} else {
 		cfg = zap.NewDevelopmentConfig()
@@ -300,8 +258,25 @@ func (c *Config) BuildLogger() (*zap.Logger, error) {
 		cfg.Sampling = nil
 	}
 
-	// Build logger
-	logger, err := cfg.Build()
+	// Build logger with synchronized output to prevent log interleaving
+	// from multiple goroutines (overflow handler, collector, metrics server)
+	logger, err := cfg.Build(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		// Get the encoder from the existing core
+		encoder := zapcore.NewJSONEncoder(cfg.EncoderConfig)
+		if c.LogFormat != LogFormatJSON {
+			encoder = zapcore.NewConsoleEncoder(cfg.EncoderConfig)
+		}
+
+		// Wrap stdout with Lock() to ensure atomic writes
+		syncedWriter := zapcore.Lock(os.Stdout)
+
+		// Create new core with locked writer
+		return zapcore.NewCore(
+			encoder,
+			syncedWriter,
+			cfg.Level,
+		)
+	}))
 	if err != nil {
 		return nil, fmt.Errorf("building logger: %w", err)
 	}
@@ -318,12 +293,17 @@ func (c *Config) String() string {
 	sb.WriteString("Configuration:\n")
 	sb.WriteString(fmt.Sprintf("  Metrics Port: %d\n", c.MetricsPort))
 	sb.WriteString(fmt.Sprintf("  Collection Interval: %s\n", c.CollectionInterval))
-	sb.WriteString(fmt.Sprintf("  Container Discovery: %s\n", c.ContainerDiscovery))
-	sb.WriteString(fmt.Sprintf("  Kubernetes Namespace: %s\n", c.KubernetesNamespace))
-	sb.WriteString(fmt.Sprintf("  BPF Map Max Entries: %d\n", c.BPFMapMaxEntries))
+	sb.WriteString(fmt.Sprintf("  Network Namespace Filter Mode: %s\n", c.NetnsFilterMode))
+	sb.WriteString(fmt.Sprintf("  Connection Tracking: %t\n", c.ConnectionTracking))
 	sb.WriteString(fmt.Sprintf("  Log Level: %s\n", c.LogLevel))
 	sb.WriteString(fmt.Sprintf("  Log Format: %s\n", c.LogFormat))
 	sb.WriteString(fmt.Sprintf("  Node Name: %s\n", c.NodeName))
 	sb.WriteString(fmt.Sprintf("  Debug: %t\n", c.Debug))
+	if c.EnableProfiling {
+		sb.WriteString(fmt.Sprintf("  Profiling Enabled: true (port %d)\n", c.ProfilingPort))
+	}
+	if c.DumpBPFMaps {
+		sb.WriteString(fmt.Sprintf("  BPF Map Dumping: enabled (interval %s)\n", c.DumpMapInterval))
+	}
 	return sb.String()
 }

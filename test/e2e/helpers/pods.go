@@ -257,31 +257,6 @@ func (p *PodHelper) GetNode(ctx context.Context, namespace, name string) (string
 	return pod.Spec.NodeName, nil
 }
 
-// GetZone returns the availability zone of the node where the pod is scheduled
-// This queries the node's topology.kubernetes.io/zone label
-func (p *PodHelper) GetZone(ctx context.Context, namespace, name string) (string, error) {
-	nodeName, err := p.GetNode(ctx, namespace, name)
-	if err != nil {
-		return "", err
-	}
-
-	node, err := p.clientset.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
-	if err != nil {
-		return "", fmt.Errorf("getting node %s: %w", nodeName, err)
-	}
-
-	// Try new label first, then legacy
-	zone := node.Labels["topology.kubernetes.io/zone"]
-	if zone == "" {
-		zone = node.Labels["failure-domain.beta.kubernetes.io/zone"]
-	}
-	if zone == "" {
-		return "", fmt.Errorf("node %s has no zone label", nodeName)
-	}
-
-	return zone, nil
-}
-
 // WaitForDaemonSetReady is a convenience wrapper for DaemonSetReady with retry logic
 func (p *PodHelper) WaitForDaemonSetReady(ctx context.Context, t TestingT, namespace, name string, timeout time.Duration) error {
 	t.Helper()

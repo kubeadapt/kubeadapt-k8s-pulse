@@ -2,9 +2,11 @@
 package cluster
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"runtime"
 	"testing"
@@ -81,6 +83,11 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 			},
 			{
 				Order:        Preconditions,
+				ManifestFile: path.Join(testDataDir(), "monitoring-namespace.yaml"),
+				Ready:        nil, // Namespace is created synchronously
+			},
+			{
+				Order:        Preconditions,
 				ManifestFile: path.Join(baseDir, "deployments", "kubernetes", "rbac.yaml"),
 				Ready:        nil, // RBAC resources are created synchronously
 			},
@@ -95,10 +102,10 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 					Retry:       5 * time.Second,
 				},
 			},
-			// Agent: Deploy the eBPF agent DaemonSet
+			// Agent: Deploy the eBPF agent DaemonSet (E2E version with test image)
 			{
 				Order:        Agent,
-				ManifestFile: path.Join(baseDir, "deployments", "kubernetes", "daemonset.yaml"),
+				ManifestFile: path.Join(testDataDir(), "daemonset-e2e.yaml"),
 				Ready: &Readiness{
 					Function:    waitForDaemonSetWithAllPods("kubeadapt-system", "kubeadapt-ebpf-agent"),
 					Description: "Wait for eBPF agent DaemonSet to be ready (all pods running)",
@@ -106,11 +113,8 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 					Retry:       3 * time.Second,
 				},
 			},
-			{
-				Order:        Agent,
-				ManifestFile: path.Join(baseDir, "deployments", "kubernetes", "servicemonitor.yaml"),
-				Ready:        nil, // ServiceMonitor is a CRD, created synchronously
-			},
+			// Note: ServiceMonitor is not deployed in E2E tests as it requires Prometheus Operator CRD
+			// which is not installed in vanilla Kind clusters. Metrics are scraped directly via pod annotations.
 			// Test Workloads: Deploy test pods for E2E traffic generation
 			{
 				Order:        TestWorkloads,
@@ -181,6 +185,9 @@ func (c *Cluster) Run(m *testing.M) {
 		envFuncs = append(envFuncs, readyFuncs...)
 	}
 
+	// Note: Prometheus is now accessible via NodePort at http://localhost:30090
+	// No port-forward needed - Kind extraPortMappings expose the service directly
+
 	code := c.testEnv.Setup(envFuncs...).
 		Finish(
 			c.exportLogs(),
@@ -233,28 +240,53 @@ func orderName(order DeployOrder) string {
 }
 
 // loadLocalImage loads the agent Docker image into the cluster
-// Tries both loading from local registry and from tar archive
+// Prioritizes loading from local Docker registry (faster, no disk space)
+// If registry fails, creates tar archive on-demand and loads from it
 func (c *Cluster) loadLocalImage() env.Func {
 	return func(ctx context.Context, cfg *envconf.Config) (context.Context, error) {
 		fmt.Println("Loading agent Docker image into Kind cluster...")
 
-		// First, try loading from local Docker registry
+		// Primary method: Load from local Docker registry (recommended)
+		// Kind's 'load docker-image' command handles this efficiently
 		ctx, err := envfuncs.LoadDockerImageToCluster(c.clusterName, agentContainerName)(ctx, cfg)
 		if err == nil {
 			fmt.Println("✓ Successfully loaded image from local Docker registry")
 			return ctx, nil
 		}
 
-		// If that fails, try loading from tar archive
-		fmt.Printf("Failed to load from registry (%v), trying tar archive...\n", err)
+		// Fallback: Create tar archive and load from it
+		fmt.Printf("⚠️  Failed to load from registry (%v)\n", err)
+		fmt.Println("Creating tar archive as fallback...")
+
 		archivePath := path.Join(c.baseDir, localArchiveName)
+
+		// Create tar archive using docker save
+		saveCmd := fmt.Sprintf("docker save -o %s %s", archivePath, agentContainerName)
+		if err := os.RemoveAll(archivePath); err != nil && !os.IsNotExist(err) {
+			fmt.Printf("Warning: failed to remove old tar: %v\n", err)
+		}
+
+		saveOutput, err := exec.Command("sh", "-c", saveCmd).CombinedOutput()
+		if err != nil {
+			return ctx, fmt.Errorf("failed to create tar archive\n"+
+				"Registry error: %v\n"+
+				"Tar creation error: %w\n"+
+				"Output: %s", err, err, string(saveOutput))
+		}
+
+		fmt.Printf("✓ Created tar archive: %s\n", archivePath)
+		fmt.Println("Loading image from tar archive...")
+
+		// Load from the newly created tar
 		ctx, err = envfuncs.LoadImageArchiveToCluster(c.clusterName, archivePath)(ctx, cfg)
 		if err == nil {
 			fmt.Println("✓ Successfully loaded image from tar archive")
 			return ctx, nil
 		}
 
-		return ctx, fmt.Errorf("failed to load image: registry error and tar archive error: %w", err)
+		return ctx, fmt.Errorf("failed to load image from both registry and tar archive\n"+
+			"Registry error: %v\n"+
+			"Tar loading error: %w", err, err)
 	}
 }
 
@@ -280,17 +312,23 @@ func deployManifest(dep Deployment) env.Func {
 			return ctx, fmt.Errorf("creating resources client: %w", err)
 		}
 
-		// Decode and apply manifest file
-		err = decoder.DecodeEachFile(
+		// Read manifest file content
+		manifestData, err := os.ReadFile(dep.ManifestFile)
+		if err != nil {
+			return ctx, fmt.Errorf("reading manifest file %s: %w", dep.ManifestFile, err)
+		}
+
+		// Decode and apply manifest
+		err = decoder.DecodeEach(
 			ctx,
-			os.DirFS("/"),
-			dep.ManifestFile,
+			bytes.NewReader(manifestData),
 			decoder.CreateHandler(r),
 		)
 		if err != nil {
 			return ctx, fmt.Errorf("applying manifest %s: %w", dep.ManifestFile, err)
 		}
 
+		fmt.Printf("✓ Successfully deployed: %s\n", dep.ManifestFile)
 		return ctx, nil
 	}
 }
@@ -408,7 +446,7 @@ func waitForTestPods(namespace string) func(*envconf.Config) error {
 					namespace, podName, pod.Status.Phase, pod.Status.Message)
 			}
 
-			// Check if pod has IP assigned (needed for zone mapper)
+			// Check if pod has IP assigned (needed for network tracking)
 			if pod.Status.PodIP == "" {
 				return fmt.Errorf("pod %s/%s has no IP assigned", namespace, podName)
 			}
@@ -466,12 +504,12 @@ func waitForTrafficPods(namespace string) func(*envconf.Config) error {
 					namespace, podName, pod.Status.Phase, pod.Status.Message)
 			}
 
-			// Check if pod has IP assigned (critical for zone mapper)
+			// Check if pod has IP assigned (needed for network tracking)
 			if pod.Status.PodIP == "" {
-				return fmt.Errorf("pod %s/%s has no IP assigned (zone mapper needs this)", namespace, podName)
+				return fmt.Errorf("pod %s/%s has no IP assigned", namespace, podName)
 			}
 
-			// Check if pod is scheduled to a node with zone label
+			// Check if pod is scheduled to a node
 			if pod.Spec.NodeName == "" {
 				return fmt.Errorf("pod %s/%s not scheduled to any node", namespace, podName)
 			}

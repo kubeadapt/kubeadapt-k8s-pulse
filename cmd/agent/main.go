@@ -4,8 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof" // Import pprof for profiling endpoints
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -60,7 +63,7 @@ func main() {
 	)
 
 	// Check kernel compatibility
-	if err := checkKernelCompatibility(); err != nil {
+	if err := checkKernelCompatibility(logger); err != nil {
 		logger.Fatal("Kernel compatibility check failed", zap.Error(err))
 	}
 
@@ -72,11 +75,31 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
+	// ═══════════════════════════════════════════════════════════════
+	// CRITICAL: Start metrics server BEFORE BPF loading
+	// This ensures metrics are scrapable even if BPF load fails
+	// ═══════════════════════════════════════════════════════════════
+	logger.Info("Starting metrics server", zap.Int("port", cfg.MetricsPort))
+	metricsServer := metrics.NewServer(cfg.MetricsPort, logger)
+	go func() {
+		if err := metricsServer.Start(); err != nil {
+			logger.Error("Metrics server error", zap.Error(err))
+		}
+	}()
+
+	// Give metrics server a moment to start
+	time.Sleep(100 * time.Millisecond)
+
 	// Initialize BPF manager
 	logger.Info("Initializing BPF programs...")
 	bpfManager, err := bpf.NewManager(logger)
 	if err != nil {
-		logger.Fatal("Failed to initialize BPF manager", zap.Error(err))
+		// Don't use Fatal - keep metrics server alive for observability
+		logger.Error("Failed to initialize BPF manager", zap.Error(err))
+		metricsServer.ReportBPFLoadFailure(err, 0)
+		// Wait for signal to keep pod alive (easier debugging)
+		<-sigChan
+		return
 	}
 	defer func() {
 		logger.Info("Cleaning up BPF programs...")
@@ -85,25 +108,79 @@ func main() {
 		}
 	}()
 
-	// Load and attach BPF programs
-	logger.Info("Loading BPF programs...")
-	if err := bpfManager.LoadAndAttach(); err != nil {
-		logger.Fatal("Failed to load BPF programs", zap.Error(err))
+	// Load and attach BPF programs with timing
+	logger.Info("Loading BPF programs...",
+		zap.String("netns_filter_mode", cfg.NetnsFilterMode))
+	bpfLoadStart := time.Now()
+	if err := bpfManager.LoadAndAttach(cfg.NetnsFilterMode); err != nil {
+		bpfLoadDuration := time.Since(bpfLoadStart)
+		// Don't use Fatal - keep metrics server alive for observability
+		logger.Error("Failed to load BPF programs",
+			zap.Error(err),
+			zap.Duration("duration", bpfLoadDuration))
+		metricsServer.ReportBPFLoadFailure(err, bpfLoadDuration)
+		// Pod stays alive (not ready) for debugging. Metrics/health endpoints remain scrapable.
+		// To retry: delete the pod, DaemonSet will create a new one.
+		logger.Info("Pod will stay alive for debugging. Check /metrics and /health endpoints.")
+		<-sigChan
+		return
 	}
-	logger.Info("BPF programs loaded and attached successfully")
+	bpfLoadDuration := time.Since(bpfLoadStart)
+	metricsServer.ReportBPFLoadSuccess(bpfLoadDuration)
+	logger.Info("BPF programs loaded and attached successfully",
+		zap.String("netns_filter_mode", cfg.NetnsFilterMode),
+		zap.Duration("duration", bpfLoadDuration))
 
 	// NOTE: Container discovery and cache removed
 	// Pod-level metrics are sufficient since K8s pods share network namespace
 	// Backend handles all metadata enrichment (pod names, namespaces, services)
 
-	// Initialize metrics server
-	logger.Info("Starting metrics server", zap.Int("port", cfg.MetricsPort))
-	metricsServer := metrics.NewServer(cfg.MetricsPort, logger)
-	go func() {
-		if err := metricsServer.Start(); err != nil {
-			logger.Error("Metrics server error", zap.Error(err))
-		}
-	}()
+	// Initialize profiling server if enabled
+	if cfg.EnableProfiling {
+		logger.Info("Starting profiling server (pprof)",
+			zap.Int("port", cfg.ProfilingPort),
+			zap.String("endpoints", fmt.Sprintf("http://localhost:%d/debug/pprof/", cfg.ProfilingPort)))
+		go func() {
+			// Create a new HTTP server for pprof
+			pprofServer := &http.Server{
+				Addr:         fmt.Sprintf(":%d", cfg.ProfilingPort),
+				ReadTimeout:  30 * time.Second,
+				WriteTimeout: 30 * time.Second,
+			}
+			if err := pprofServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				logger.Error("Profiling server error", zap.Error(err))
+			}
+		}()
+	}
+
+	// Initialize BPF map dumping if enabled (debug mode)
+	if cfg.DumpBPFMaps {
+		logger.Info("Starting BPF map dumping",
+			zap.Duration("interval", cfg.DumpMapInterval))
+		go func() {
+			ticker := time.NewTicker(cfg.DumpMapInterval)
+			defer ticker.Stop()
+
+			for {
+				select {
+				case <-ctx.Done():
+					logger.Info("Stopping BPF map dumping")
+					return
+				case <-ticker.C:
+					// Dump all BPF maps for debugging
+					mapData, err := bpfManager.DumpMaps()
+					if err != nil {
+						logger.Error("Failed to dump BPF maps", zap.Error(err))
+						continue
+					}
+
+					// Log map data (structured logging)
+					logger.Info("BPF map dump",
+						zap.Any("maps", mapData))
+				}
+			}
+		}()
+	}
 
 	// NOTE: Container-level metrics collector removed
 	// Raw IP-based connection metrics are sufficient (pod-level, no container granularity)
@@ -125,8 +202,8 @@ func main() {
 		)
 
 		// Configure connection collector
-		if cfg.ConnectionAggregationInterval > 0 {
-			connectionCollector.SetAggregationInterval(cfg.ConnectionAggregationInterval)
+		if cfg.CollectionInterval > 0 {
+			connectionCollector.SetAggregationInterval(cfg.CollectionInterval)
 		}
 
 		// Start connection collection loop
@@ -137,8 +214,8 @@ func main() {
 			logger.Warn("Failed to start overflow handler", zap.Error(err))
 		}
 
-		logger.Info("Connection tracking enabled (LRU auto-eviction only, no manual cleanup)",
-			zap.Duration("aggregation_interval", cfg.ConnectionAggregationInterval))
+		logger.Info("Connection tracking enabled (read-then-delete pattern with overflow ringbuffer)",
+			zap.Duration("collection_interval", cfg.CollectionInterval))
 	} else {
 		logger.Info("Connection tracking disabled")
 	}
@@ -169,24 +246,31 @@ func main() {
 }
 
 // checkKernelCompatibility verifies the kernel supports required eBPF features
-func checkKernelCompatibility() error {
+func checkKernelCompatibility(logger *zap.Logger) error {
 	// Simple kernel version check by reading /proc/version
 	versionData, err := os.ReadFile("/proc/version")
 	if err != nil {
 		// Not a fatal error - might be running on non-Linux or in container without /proc
-		fmt.Println("Warning: Could not read kernel version from /proc/version")
+		logger.Warn("Could not read kernel version from /proc/version",
+			zap.Error(err))
 	} else {
-		fmt.Printf("Kernel version: %s\n", string(versionData))
+		// Log kernel version for debugging and support purposes
+		kernelVersion := strings.TrimSpace(string(versionData))
+		logger.Info("Detected kernel version", zap.String("version", kernelVersion))
 	}
 
 	// Check for BPF filesystem
 	if _, err := os.Stat("/sys/fs/bpf"); os.IsNotExist(err) {
 		return fmt.Errorf("BPF filesystem not mounted at /sys/fs/bpf")
 	}
+	logger.Debug("BPF filesystem available", zap.String("path", "/sys/fs/bpf"))
 
 	// Check for tracing
 	if _, err := os.Stat("/sys/kernel/debug/tracing"); os.IsNotExist(err) {
-		fmt.Println("Warning: Tracing not available at /sys/kernel/debug/tracing")
+		logger.Warn("Tracing not available at /sys/kernel/debug/tracing",
+			zap.String("note", "Some debugging features may not work"))
+	} else {
+		logger.Debug("Tracing filesystem available", zap.String("path", "/sys/kernel/debug/tracing"))
 	}
 
 	return nil

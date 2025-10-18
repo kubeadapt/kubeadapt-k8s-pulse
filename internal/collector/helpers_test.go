@@ -41,8 +41,8 @@ func TestConnectionKeyToIPs(t *testing.T) {
 		{
 			name: "IPv4 private addresses",
 			key: &bpf.ConnectionKey{
-				SrcAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("192.168.1.10").To4()), 0, 0, 0},
-				DstAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("10.0.2.20").To4()), 0, 0, 0},
+				SrcAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("192.168.1.10").To4()), 0, 0, 0},
+				DstAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("10.0.2.20").To4()), 0, 0, 0},
 				Family:  2, // AF_INET
 			},
 			wantSrc: "192.168.1.10",
@@ -51,8 +51,8 @@ func TestConnectionKeyToIPs(t *testing.T) {
 		{
 			name: "IPv4 public addresses",
 			key: &bpf.ConnectionKey{
-				SrcAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("8.8.8.8").To4()), 0, 0, 0},
-				DstAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("1.1.1.1").To4()), 0, 0, 0},
+				SrcAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("8.8.8.8").To4()), 0, 0, 0},
+				DstAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("1.1.1.1").To4()), 0, 0, 0},
 				Family:  2,
 			},
 			wantSrc: "8.8.8.8",
@@ -61,8 +61,11 @@ func TestConnectionKeyToIPs(t *testing.T) {
 		{
 			name: "IPv6 addresses",
 			key: &bpf.ConnectionKey{
-				SrcAddr: [4]uint32{0x20010db8, 0, 0, 1},
-				DstAddr: [4]uint32{0x20010db8, 0, 0, 2},
+				// IPv6 addresses as they would be read by cilium/ebpf from network-order bytes
+				// 2001:db8::1 in network order bytes [0x20,0x01,0x0d,0xb8,...,0x00,0x01]
+				// cilium/ebpf reads as little-endian uint32s: 0xb80d0120, 0, 0, 0x01000000
+				SrcAddr: [4]uint32{0xb80d0120, 0, 0, 0x01000000},
+				DstAddr: [4]uint32{0xb80d0120, 0, 0, 0x02000000},
 				Family:  10, // AF_INET6
 			},
 			wantSrc: "2001:db8::1",
@@ -71,8 +74,8 @@ func TestConnectionKeyToIPs(t *testing.T) {
 		{
 			name: "Unknown family with IPv4 data",
 			key: &bpf.ConnectionKey{
-				SrcAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("172.16.1.1").To4()), 0, 0, 0},
-				DstAddr: [4]uint32{binary.BigEndian.Uint32(net.ParseIP("172.16.1.2").To4()), 0, 0, 0},
+				SrcAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("172.16.1.1").To4()), 0, 0, 0},
+				DstAddr: [4]uint32{binary.LittleEndian.Uint32(net.ParseIP("172.16.1.2").To4()), 0, 0, 0},
 				Family:  0,
 			},
 			wantSrc: "172.16.1.1",
@@ -108,12 +111,15 @@ func TestIPv6ToIPString(t *testing.T) {
 	}{
 		{
 			name: "IPv6 localhost",
-			ipv6: [4]uint32{0, 0, 0, 1}, // ::1 in network byte order
+			// ::1 in network order [0x00,...,0x01], read as little-endian uint32s
+			ipv6: [4]uint32{0, 0, 0, 0x01000000},
 			want: "::1",
 		},
 		{
 			name: "IPv6 documentation prefix",
-			ipv6: [4]uint32{0x20010db8, 0, 0, 1},
+			// 2001:db8::1 in network order [0x20,0x01,0x0d,0xb8,...,0x01]
+			// read as little-endian uint32s: 0xb80d0120, 0, 0, 0x01000000
+			ipv6: [4]uint32{0xb80d0120, 0, 0, 0x01000000},
 			want: "2001:db8::1",
 		},
 		{
@@ -143,17 +149,17 @@ func TestUint32ToIPString(t *testing.T) {
 	}{
 		{
 			name: "Private IP 192.168.1.1",
-			ip:   binary.BigEndian.Uint32(net.ParseIP("192.168.1.1").To4()),
+			ip:   binary.LittleEndian.Uint32(net.ParseIP("192.168.1.1").To4()),
 			want: "192.168.1.1",
 		},
 		{
 			name: "Private IP 10.0.0.1",
-			ip:   binary.BigEndian.Uint32(net.ParseIP("10.0.0.1").To4()),
+			ip:   binary.LittleEndian.Uint32(net.ParseIP("10.0.0.1").To4()),
 			want: "10.0.0.1",
 		},
 		{
 			name: "Public IP 8.8.8.8",
-			ip:   binary.BigEndian.Uint32(net.ParseIP("8.8.8.8").To4()),
+			ip:   binary.LittleEndian.Uint32(net.ParseIP("8.8.8.8").To4()),
 			want: "8.8.8.8",
 		},
 		{

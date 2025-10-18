@@ -71,7 +71,9 @@ type networkProgramSpecs struct {
 // It can be passed ebpf.CollectionSpec.Assign.
 type networkMapSpecs struct {
 	ConnectionFlows *ebpf.MapSpec `ebpf:"connection_flows"`
+	FilterModeMap   *ebpf.MapSpec `ebpf:"filter_mode_map"`
 	HostNetnsMap    *ebpf.MapSpec `ebpf:"host_netns_map"`
+	OffsetConfig    *ebpf.MapSpec `ebpf:"offset_config"`
 	OverflowFlows   *ebpf.MapSpec `ebpf:"overflow_flows"`
 	TempStorageMap  *ebpf.MapSpec `ebpf:"temp_storage_map"`
 }
@@ -103,7 +105,9 @@ func (o *networkObjects) Close() error {
 // It can be passed to loadNetworkObjects or ebpf.CollectionSpec.LoadAndAssign.
 type networkMaps struct {
 	ConnectionFlows *ebpf.Map `ebpf:"connection_flows"`
+	FilterModeMap   *ebpf.Map `ebpf:"filter_mode_map"`
 	HostNetnsMap    *ebpf.Map `ebpf:"host_netns_map"`
+	OffsetConfig    *ebpf.Map `ebpf:"offset_config"`
 	OverflowFlows   *ebpf.Map `ebpf:"overflow_flows"`
 	TempStorageMap  *ebpf.Map `ebpf:"temp_storage_map"`
 }
@@ -111,7 +115,9 @@ type networkMaps struct {
 func (m *networkMaps) Close() error {
 	return _NetworkClose(
 		m.ConnectionFlows,
+		m.FilterModeMap,
 		m.HostNetnsMap,
+		m.OffsetConfig,
 		m.OverflowFlows,
 		m.TempStorageMap,
 	)

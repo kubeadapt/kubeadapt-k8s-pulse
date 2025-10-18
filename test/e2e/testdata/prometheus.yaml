@@ -1,10 +1,6 @@
 ***REMOVED*** Prometheus deployment for E2E testing
 ***REMOVED*** This is a minimal Prometheus setup that scrapes the eBPF agent DaemonSet
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: monitoring
----
+***REMOVED*** NOTE: The monitoring namespace is created separately in the Preconditions phase
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,8 +9,8 @@ metadata:
 data:
   prometheus.yml: |
     global:
-      scrape_interval: 15s
-      evaluation_interval: 15s
+      scrape_interval: 30s      ***REMOVED*** Must be > collection interval (25s) for proper metric aggregation
+      evaluation_interval: 30s
 
     scrape_configs:
       ***REMOVED*** Scrape eBPF agent pods
@@ -23,11 +19,11 @@ data:
           - role: pod
             namespaces:
               names:
-                - kube-system
+                - kubeadapt-system
         relabel_configs:
-          ***REMOVED*** Only scrape pods with app=ebpf-agent label
+          ***REMOVED*** Only scrape pods with app=kubeadapt-ebpf-agent label
           - source_labels: [__meta_kubernetes_pod_label_app]
-            regex: ebpf-agent
+            regex: kubeadapt-ebpf-agent
             action: keep
           ***REMOVED*** Use pod IP as target
           - source_labels: [__meta_kubernetes_pod_ip]
@@ -107,11 +103,16 @@ metadata:
   labels:
     app: prometheus
 spec:
-  type: ClusterIP
+  ***REMOVED*** NodePort for E2E test access via localhost:30090
+  ***REMOVED*** This follows NetObserv's pattern - no kubectl port-forward needed
+  ***REMOVED*** NOTE: Kind cluster extraPortMappings makes this accessible on host
+  type: NodePort
   ports:
     - port: 9090
       targetPort: 9090
+      nodePort: 30090  ***REMOVED*** Maps to host via Kind extraPortMappings
       name: http
+      protocol: TCP
   selector:
     app: prometheus
 ---

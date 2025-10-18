@@ -286,6 +286,16 @@ func (p *PrometheusClient) QueryCardinality(ctx context.Context, metricName stri
 	return 0, fmt.Errorf("invalid cardinality query result")
 }
 
+// GetMetricCardinality is a convenience wrapper for QueryCardinality that returns float64
+// This is used by filter mode comparison tests to measure and compare cardinality across modes
+func (p *PrometheusClient) GetMetricCardinality(ctx context.Context, metricName string) (float64, error) {
+	cardinality, err := p.QueryCardinality(ctx, metricName)
+	if err != nil {
+		return 0, err
+	}
+	return float64(cardinality), nil
+}
+
 // AssertCardinalityBelowLimit verifies that metric cardinality is below a threshold
 // This prevents metric explosions that can cause Prometheus performance issues
 func (p *PrometheusClient) AssertCardinalityBelowLimit(ctx context.Context, metricName string, maxCardinality int) error {

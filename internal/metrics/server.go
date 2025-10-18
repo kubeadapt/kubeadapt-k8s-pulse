@@ -24,6 +24,13 @@ type Server struct {
 	isLive    bool
 	readyAt   time.Time
 	startedAt time.Time
+
+	// BPF load status tracking
+	bpfLoadStatus     prometheus.Gauge
+	bpfLoadAttempts   prometheus.Counter
+	bpfLoadDuration   prometheus.Gauge
+	bpfLoadError      string
+	bpfLoadSuccessful bool
 }
 
 // NewServer creates a new metrics server
@@ -38,12 +45,46 @@ func NewServer(port int, logger *zap.Logger) *Server {
 	registry.MustRegister(collectors.NewGoCollector())
 	registry.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 
+	// Initialize BPF load status metrics
+	// Simple gauge: 1=success, 0=failed
+	// No error details in labels to avoid cardinality issues in DaemonSet deployments
+	// Full error available in /health endpoint and logs
+	bpfLoadStatus := prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "kubeadapt_bpf_load_status",
+			Help: "BPF program load status (1=success, 0=failed). Check /health endpoint or logs for error details.",
+		},
+	)
+
+	bpfLoadAttempts := prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "kubeadapt_bpf_load_attempts_total",
+			Help: "Total number of BPF program load attempts",
+		},
+	)
+
+	bpfLoadDuration := prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "kubeadapt_bpf_load_duration_seconds",
+			Help: "Time taken to load BPF programs (in seconds)",
+		},
+	)
+
+	registry.MustRegister(bpfLoadStatus)
+	registry.MustRegister(bpfLoadAttempts)
+	registry.MustRegister(bpfLoadDuration)
+
 	return &Server{
-		port:      port,
-		registry:  registry,
-		logger:    logger,
-		isLive:    true,
-		startedAt: time.Now(),
+		port:              port,
+		registry:          registry,
+		logger:            logger,
+		isLive:            true,
+		startedAt:         time.Now(),
+		bpfLoadStatus:     bpfLoadStatus,
+		bpfLoadAttempts:   bpfLoadAttempts,
+		bpfLoadDuration:   bpfLoadDuration,
+		bpfLoadError:      "not_attempted",
+		bpfLoadSuccessful: false,
 	}
 }
 
@@ -82,11 +123,10 @@ func (s *Server) Start() error {
 		zap.Int("port", s.port),
 	)
 
-	// Mark as ready after a brief delay
-	go func() {
-		time.Sleep(2 * time.Second)
-		s.SetReady(true)
-	}()
+	// NOTE: Do NOT auto-set ready state
+	// Ready state is controlled by BPF load status
+	// - Call ReportBPFLoadSuccess() to mark ready
+	// - Call ReportBPFLoadFailure() to keep not ready
 
 	err := s.server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
@@ -121,6 +161,38 @@ func (s *Server) SetReady(ready bool) {
 		s.readyAt = time.Now()
 		s.logger.Info("Metrics server marked as ready")
 	}
+}
+
+// ReportBPFLoadSuccess reports successful BPF program loading
+func (s *Server) ReportBPFLoadSuccess(duration time.Duration) {
+	s.bpfLoadAttempts.Inc()
+	s.bpfLoadDuration.Set(duration.Seconds())
+	s.bpfLoadStatus.Set(1)
+	s.bpfLoadError = "none"
+	s.bpfLoadSuccessful = true
+	s.SetReady(true) // Mark server as ready when BPF loads successfully
+	s.logger.Info("BPF load status reported as successful",
+		zap.Duration("duration", duration))
+}
+
+// ReportBPFLoadFailure reports failed BPF program loading
+func (s *Server) ReportBPFLoadFailure(err error, duration time.Duration) {
+	s.bpfLoadAttempts.Inc()
+	s.bpfLoadDuration.Set(duration.Seconds())
+	s.bpfLoadStatus.Set(0)
+
+	// Store full error message for /health endpoint and logs
+	fullErrorMsg := err.Error()
+	if len(fullErrorMsg) > 256 {
+		fullErrorMsg = fullErrorMsg[:253] + "..."
+	}
+
+	s.bpfLoadError = fullErrorMsg
+	s.bpfLoadSuccessful = false
+	s.SetReady(false) // Keep server NOT ready when BPF fails
+	s.logger.Error("BPF load status reported as failed",
+		zap.Error(err),
+		zap.Duration("duration", duration))
 }
 
 // handleRoot handles the root endpoint
@@ -230,9 +302,11 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
   "live": %t,
   "ready": %t,
   "uptime_seconds": %.0f,
-  "started_at": "%s"
+  "started_at": "%s",
+  "bpf_load_successful": %t,
+  "bpf_load_error": "%s"
 }
-`, status, s.isLive, s.isReady, time.Since(s.startedAt).Seconds(), s.startedAt.Format(time.RFC3339))
+`, status, s.isLive, s.isReady, time.Since(s.startedAt).Seconds(), s.startedAt.Format(time.RFC3339), s.bpfLoadSuccessful, s.bpfLoadError)
 }
 
 // getStatusClass returns CSS class for status
