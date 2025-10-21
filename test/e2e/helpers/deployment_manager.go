@@ -59,6 +59,7 @@ func (dm *DeploymentManager) DeployPrometheus(ctx context.Context) error {
 
 // DeployAgentWithFilterMode deploys Agent DaemonSet with specific EBPF_NETNS_FILTER_MODE
 // This patches the base daemonset-e2e.yaml to inject the filter mode environment variable
+// and optionally overrides the image tag (from IMAGE_TAG env var) to prevent Docker cache issues
 func (dm *DeploymentManager) DeployAgentWithFilterMode(ctx context.Context, filterMode string) error {
 	// Read daemonset-e2e.yaml
 	manifestPath := path.Join(testDataDir(), "daemonset-e2e.yaml")
@@ -73,12 +74,23 @@ func (dm *DeploymentManager) DeployAgentWithFilterMode(ctx context.Context, filt
 		return fmt.Errorf("decoding daemonset manifest: %w", err)
 	}
 
+	// Check if IMAGE_TAG env var is set (from Makefile)
+	// This allows test-e2e-fast and test-e2e-stress to use timestamped tags
+	imageTag := os.Getenv("IMAGE_TAG")
+	if imageTag == "" {
+		imageTag = "test" // Default fallback
+	}
+	imageRef := fmt.Sprintf("localhost/ebpf-agent:%s", imageTag)
+
 	// Find and patch the DaemonSet
 	for _, obj := range objs {
 		if ds, ok := obj.(*appsv1.DaemonSet); ok {
-			// Patch: Add EBPF_NETNS_FILTER_MODE env var
+			// Patch: Add EBPF_NETNS_FILTER_MODE env var and override image tag
 			for i := range ds.Spec.Template.Spec.Containers {
 				if ds.Spec.Template.Spec.Containers[i].Name == "ebpf-agent" {
+					// Override image tag (FIX: Docker caching issue)
+					ds.Spec.Template.Spec.Containers[i].Image = imageRef
+
 					// Add filter mode env var
 					ds.Spec.Template.Spec.Containers[i].Env = append(
 						ds.Spec.Template.Spec.Containers[i].Env,

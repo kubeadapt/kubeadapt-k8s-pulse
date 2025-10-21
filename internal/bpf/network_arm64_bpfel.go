@@ -54,16 +54,7 @@ type networkSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type networkProgramSpecs struct {
-	TraceAccept         *ebpf.ProgramSpec `ebpf:"trace_accept"`
-	TraceTcpClose       *ebpf.ProgramSpec `ebpf:"trace_tcp_close"`
-	TraceTcpConnect     *ebpf.ProgramSpec `ebpf:"trace_tcp_connect"`
-	TraceTcpRecvmsg     *ebpf.ProgramSpec `ebpf:"trace_tcp_recvmsg"`
-	TraceTcpRecvmsgRet  *ebpf.ProgramSpec `ebpf:"trace_tcp_recvmsg_ret"`
-	TraceTcpSendmsg     *ebpf.ProgramSpec `ebpf:"trace_tcp_sendmsg"`
-	TraceUdpDestroySock *ebpf.ProgramSpec `ebpf:"trace_udp_destroy_sock"`
-	TraceUdpRecvmsg     *ebpf.ProgramSpec `ebpf:"trace_udp_recvmsg"`
-	TraceUdpRecvmsgRet  *ebpf.ProgramSpec `ebpf:"trace_udp_recvmsg_ret"`
-	TraceUdpSendmsg     *ebpf.ProgramSpec `ebpf:"trace_udp_sendmsg"`
+	TcEgress *ebpf.ProgramSpec `ebpf:"tc_egress"`
 }
 
 // networkMapSpecs contains maps before they are loaded into the kernel.
@@ -72,10 +63,10 @@ type networkProgramSpecs struct {
 type networkMapSpecs struct {
 	ConnectionFlows *ebpf.MapSpec `ebpf:"connection_flows"`
 	FilterModeMap   *ebpf.MapSpec `ebpf:"filter_mode_map"`
+	GlobalCounters  *ebpf.MapSpec `ebpf:"global_counters"`
 	HostNetnsMap    *ebpf.MapSpec `ebpf:"host_netns_map"`
 	OffsetConfig    *ebpf.MapSpec `ebpf:"offset_config"`
-	OverflowFlows   *ebpf.MapSpec `ebpf:"overflow_flows"`
-	TempStorageMap  *ebpf.MapSpec `ebpf:"temp_storage_map"`
+	OverflowEvents  *ebpf.MapSpec `ebpf:"overflow_events"`
 }
 
 // networkVariableSpecs contains global variables before they are loaded into the kernel.
@@ -106,20 +97,20 @@ func (o *networkObjects) Close() error {
 type networkMaps struct {
 	ConnectionFlows *ebpf.Map `ebpf:"connection_flows"`
 	FilterModeMap   *ebpf.Map `ebpf:"filter_mode_map"`
+	GlobalCounters  *ebpf.Map `ebpf:"global_counters"`
 	HostNetnsMap    *ebpf.Map `ebpf:"host_netns_map"`
 	OffsetConfig    *ebpf.Map `ebpf:"offset_config"`
-	OverflowFlows   *ebpf.Map `ebpf:"overflow_flows"`
-	TempStorageMap  *ebpf.Map `ebpf:"temp_storage_map"`
+	OverflowEvents  *ebpf.Map `ebpf:"overflow_events"`
 }
 
 func (m *networkMaps) Close() error {
 	return _NetworkClose(
 		m.ConnectionFlows,
 		m.FilterModeMap,
+		m.GlobalCounters,
 		m.HostNetnsMap,
 		m.OffsetConfig,
-		m.OverflowFlows,
-		m.TempStorageMap,
+		m.OverflowEvents,
 	)
 }
 
@@ -133,30 +124,12 @@ type networkVariables struct {
 //
 // It can be passed to loadNetworkObjects or ebpf.CollectionSpec.LoadAndAssign.
 type networkPrograms struct {
-	TraceAccept         *ebpf.Program `ebpf:"trace_accept"`
-	TraceTcpClose       *ebpf.Program `ebpf:"trace_tcp_close"`
-	TraceTcpConnect     *ebpf.Program `ebpf:"trace_tcp_connect"`
-	TraceTcpRecvmsg     *ebpf.Program `ebpf:"trace_tcp_recvmsg"`
-	TraceTcpRecvmsgRet  *ebpf.Program `ebpf:"trace_tcp_recvmsg_ret"`
-	TraceTcpSendmsg     *ebpf.Program `ebpf:"trace_tcp_sendmsg"`
-	TraceUdpDestroySock *ebpf.Program `ebpf:"trace_udp_destroy_sock"`
-	TraceUdpRecvmsg     *ebpf.Program `ebpf:"trace_udp_recvmsg"`
-	TraceUdpRecvmsgRet  *ebpf.Program `ebpf:"trace_udp_recvmsg_ret"`
-	TraceUdpSendmsg     *ebpf.Program `ebpf:"trace_udp_sendmsg"`
+	TcEgress *ebpf.Program `ebpf:"tc_egress"`
 }
 
 func (p *networkPrograms) Close() error {
 	return _NetworkClose(
-		p.TraceAccept,
-		p.TraceTcpClose,
-		p.TraceTcpConnect,
-		p.TraceTcpRecvmsg,
-		p.TraceTcpRecvmsgRet,
-		p.TraceTcpSendmsg,
-		p.TraceUdpDestroySock,
-		p.TraceUdpRecvmsg,
-		p.TraceUdpRecvmsgRet,
-		p.TraceUdpSendmsg,
+		p.TcEgress,
 	)
 }
 

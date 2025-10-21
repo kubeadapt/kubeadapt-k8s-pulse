@@ -8,21 +8,25 @@ tmp_dir = "tmp"
 [build]
   ***REMOVED*** Build Go binary directly (BPF files already generated)
   ***REMOVED*** Skips generate+lint for faster hot reload
+  ***REMOVED*** IMPORTANT: Does NOT run go generate - BPF files are pre-compiled
   cmd = "mkdir -p bin && CGO_ENABLED=0 go build -v -o bin/ebpf-agent ./cmd/agent"
   ***REMOVED*** Binary file yields from `cmd`.
   bin = "bin/ebpf-agent"
   ***REMOVED*** No sudo needed - container is already privileged
   full_bin = "bin/ebpf-agent"
   ***REMOVED*** Watch these filename extensions.
-  include_ext = ["go", "tpl", "tmpl", "html", "c", "h"]
+  ***REMOVED*** NOTE: Excludes .c and .h files - BPF programs are pre-compiled
+  ***REMOVED*** If you change BPF C code, run `make generate` manually
+  include_ext = ["go", "tpl", "tmpl", "html"]
   ***REMOVED*** Ignore these filename extensions or directories.
-  exclude_dir = ["assets", "tmp", "vendor", "testdata", "docs", ".git", "bin", ".github", "deployments", "configs", "scripts"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "docs", ".git", "bin", ".github", "deployments", "configs", "scripts", "bpf"]
   ***REMOVED*** Watch these directories if you specified.
-  include_dir = ["cmd", "internal", "bpf"]
+  include_dir = ["cmd", "internal"]
   ***REMOVED*** Exclude files.
   exclude_file = []
   ***REMOVED*** Exclude specific regular expressions.
-  exclude_regex = ["_test\\.go", "_bpfel\\.go", "_bpfeb\\.go", "\\.o$"]
+  ***REMOVED*** Exclude generated BPF files and test files
+  exclude_regex = ["_test\\.go", "_bpfel\\.go", "_bpfeb\\.go", "\\.o$", "\\.c$", "\\.h$"]
   ***REMOVED*** Exclude unchanged files.
   exclude_unchanged = false
   ***REMOVED*** Follow symlinks

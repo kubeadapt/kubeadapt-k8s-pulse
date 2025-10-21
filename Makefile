@@ -33,6 +33,10 @@ INTERNAL_BPF_DIR := ./internal/bpf
 LDFLAGS := -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(shell date -u '+%Y-%m-%d_%H:%M:%S')"
 GO_BUILD_FLAGS := -v
 BPF_CFLAGS := -O2 -Wall -Werror
+***REMOVED*** Allow overriding BPF map size via environment variable (for overflow testing)
+ifdef BPF_MAP_SIZE
+BPF_CFLAGS += -DBPF_MAP_SIZE=$(BPF_MAP_SIZE)
+endif
 
 ***REMOVED*** Docker build container for macOS BPF compilation
 BPF_BUILDER_IMAGE := kubeadapt/bpf-builder:latest
@@ -44,7 +48,7 @@ YELLOW := \033[1;33m
 NC := \033[0m ***REMOVED*** No Color
 
 ***REMOVED*** Targets
-.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated test-docker test-e2e test-e2e-fast test-e2e-stress docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
+.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated test-integration-docker test-docker test-e2e docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
 
 ***REMOVED*** Default target
 all: build
@@ -69,10 +73,8 @@ help:
 	@echo "  $(GREEN)make dev$(NC)            - Run with live reload for development"
 	@echo "  $(GREEN)make test$(NC)           - Run unit tests"
 	@echo "  $(GREEN)make test-coverage$(NC)  - Generate test coverage report (excludes generated code)"
-	@echo "  $(GREEN)make test-docker$(NC)    - Run BPF integration tests in Docker"
+	@echo "  $(GREEN)make test-integration-docker$(NC) - Run BPF integration tests in Docker"
 	@echo "  $(GREEN)make test-e2e$(NC)       - Run E2E tests with Kind cluster (all tests)"
-	@echo "  $(GREEN)make test-e2e-fast$(NC)  - Fast overflow test with 5K map (~5 min, for CI/CD)"
-	@echo "  $(GREEN)make test-e2e-stress$(NC) - Stress overflow test with 100K map (~25 min, weekly)"
 	@echo "  $(GREEN)make lint$(NC)           - Run linters (Go + C code)"
 	@echo "  $(GREEN)make fmt$(NC)            - Format code (Go + C code with clang-format)"
 	@echo "  $(GREEN)make cov-exclude-generated$(NC) - Exclude generated code from coverage report"
@@ -164,6 +166,7 @@ build-bpf-builder:
 ***REMOVED*** NOTE: Generated BPF files are committed to the repo (following netobserv pattern)
 ***REMOVED*** Only run this when you modify bpf/*.c files - NOT for every build
 ***REMOVED*** For development: `make dev` uses pre-generated files for faster hot reload
+***REMOVED*** NOTE: Using TC (Traffic Control) hooks for accurate packet-level billing metrics
 generate:
 ifdef IS_MACOS
 	@echo "$(YELLOW)macOS detected - using Docker for BPF generation$(NC)"
@@ -174,28 +177,34 @@ else
 endif
 
 ***REMOVED*** Generate BPF code using Docker (for macOS)
+***REMOVED*** Uses TC (Traffic Control) hooks for accurate cloud billing metrics
 generate-docker: build-bpf-builder
-	@echo "$(GREEN)Generating BPF code in Docker container...$(NC)"
+	@echo "$(GREEN)Generating TC BPF code in Docker container...$(NC)"
+ifdef BPF_MAP_SIZE
+	@echo "$(YELLOW)Using custom BPF_MAP_SIZE=$(BPF_MAP_SIZE)$(NC)"
+endif
 	@$(DOCKER) run --rm \
 		-v $(shell pwd):/workspace \
 		-w /workspace \
+		-e BPF_MAP_SIZE=$(BPF_MAP_SIZE) \
 		$(BPF_BUILDER_IMAGE) \
 		bash -c "cd internal/bpf && \
 			bpf2go -go-package bpf -cc clang-14 \
-				-cflags '-O2 -Wall -Werror' \
+				-cflags '$(BPF_CFLAGS)' \
 				-target amd64,arm64 \
-				network ../../bpf/network_monitor.c"
-	@echo "$(GREEN)BPF code generation complete$(NC)"
+				network ../../bpf/network_monitor_tc.c"
+	@echo "$(GREEN)TC BPF code generation complete$(NC)"
 
 ***REMOVED*** Generate BPF code natively (for Linux)
+***REMOVED*** Uses TC (Traffic Control) hooks for accurate cloud billing metrics
 generate-native:
-	@echo "$(GREEN)Generating BPF code natively...$(NC)"
+	@echo "$(GREEN)Generating TC BPF code natively...$(NC)"
 	@cd $(INTERNAL_BPF_DIR) && \
 		bpf2go -go-package bpf -cc clang \
 			-cflags "$(BPF_CFLAGS)" \
 			-target amd64,arm64 \
-			network ../../bpf/network_monitor.c
-	@echo "$(GREEN)BPF code generation complete$(NC)"
+			network ../../bpf/network_monitor_tc.c
+	@echo "$(GREEN)TC BPF code generation complete$(NC)"
 
 ***REMOVED*** Build the binary
 ***REMOVED*** NOTE: Skips 'generate' - BPF files are pre-generated and committed
@@ -230,31 +239,59 @@ test-coverage: test cov-exclude-generated
 	@echo "$(YELLOW)Open with: open coverage.html (macOS) or xdg-open coverage.html (Linux)$(NC)"
 
 ***REMOVED*** Run BPF integration tests in Docker
-test-docker:
+test-integration-docker:
 	@echo "$(GREEN)Running BPF integration tests in Docker...$(NC)"
 	@$(DOCKER) run --rm \
 		--privileged \
 		-v $(shell pwd):/workspace \
 		-w /workspace \
 		$(BPF_BUILDER_IMAGE) \
-		bash -c "go test -v ./test/integration/..."
+		bash -c "go test -v -tags integration ./test/integration/..."
+
+***REMOVED*** Backward compatibility alias
+test-docker: test-integration-docker
 
 ***REMOVED*** Run integration tests (requires root on Linux)
 test-integration:
 ifdef IS_MACOS
 	@echo "$(YELLOW)Running integration tests in Docker (macOS)...$(NC)"
-	@$(MAKE) test-docker
+	@$(MAKE) test-integration-docker
 else
 	@echo "$(GREEN)Running integration tests (requires root)...$(NC)"
-	@sudo $(GO) test -v ./test/integration/...
+	@sudo $(GO) test -v -tags integration ./test/integration/...
 endif
+
+***REMOVED*** Run overflow integration tests with small BPF map (200 entries)
+***REMOVED*** This target recompiles BPF code with BPF_MAP_SIZE=200 and tests overflow handling
+test-integration-overflow:
+	@echo "$(YELLOW)Running overflow integration tests (BPF_MAP_SIZE=200)...$(NC)"
+	@echo "$(YELLOW)This will recompile BPF code with a small map size$(NC)"
+	@BPF_MAP_SIZE=200 $(MAKE) generate
+	@echo "$(GREEN)BPF code recompiled with BPF_MAP_SIZE=200$(NC)"
+ifdef IS_MACOS
+	@$(MAKE) test-integration-docker
+else
+	@sudo $(GO) test -v -tags integration -run TestMapOverflow ./test/integration/...
+endif
+	@echo "$(YELLOW)Restoring original BPF code...$(NC)"
+	@$(MAKE) generate
+	@echo "$(GREEN)Original BPF code restored (default configuration)$(NC)"
 
 ***REMOVED*** Build Docker image for E2E tests (native architecture for proper eBPF functionality)
 ***REMOVED*** NOTE: Builds for host architecture to avoid Rosetta emulation issues with perf_event_open syscalls
 ***REMOVED*** On M-series Macs, this builds arm64 which matches Kind nodes running on aarch64
 ***REMOVED*** NOTE: Tar creation removed - Kind loads directly from Docker registry (faster, no disk space waste)
 ***REMOVED*** If tar is needed (edge cases), run: docker save -o ebpf-agent.tar localhost/ebpf-agent:test
-build-for-e2e: generate lint
+***REMOVED***
+***REMOVED*** E2E TESTING OPTIMIZATION:
+***REMOVED*** - Uses BPF_MAP_SIZE=1000 (smaller than production 100K) to enable overflow testing
+***REMOVED*** - 1000-entry map allows overflow tests with reasonable traffic generation (~500 requests)
+***REMOVED*** - Tests the overflow mechanism without needing separate test-e2e-overflow command
+***REMOVED*** - Production still uses 100K default (see bpf/network_monitor_tc.c)
+build-for-e2e: lint
+	@echo "$(YELLOW)Generating BPF code for E2E tests (BPF_MAP_SIZE=1000)...$(NC)"
+	@BPF_MAP_SIZE=1000 $(MAKE) generate
+	@echo "$(GREEN)BPF code compiled with 1000-entry map for overflow testing$(NC)"
 	@echo "$(GREEN)Building E2E test binary...$(NC)"
 	@mkdir -p $(BUILD_DIR)
 	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
@@ -265,123 +302,18 @@ build-for-e2e: generate lint
 
 ***REMOVED*** Run E2E tests with Kind cluster
 ***REMOVED*** NOTE: Builds for native architecture to avoid Rosetta eBPF kprobe issues on M-series Macs
+***REMOVED*** NOTE: Uses BPF_MAP_SIZE=1000 for overflow testing (build-for-e2e compiles with this)
 .ONESHELL:
 test-e2e: build-for-e2e
-	@echo "$(GREEN)Running E2E tests with Kind cluster...$(NC)"
+	@echo "$(GREEN)Running E2E tests with Kind cluster (BPF_MAP_SIZE=1000)...$(NC)"
 	@$(GO) clean -testcache
 	@echo "$(GREEN)Running E2E tests (timeout: 60m)...$(NC)"
 	@$(GO) test -p 1 -timeout 60m -v ./test/e2e/...
 	@echo "$(GREEN)E2E tests complete$(NC)"
+	@echo "$(YELLOW)Restoring original BPF code (production config)...$(NC)"
+	@$(MAKE) generate
+	@echo "$(GREEN)Original BPF code restored (BPF_MAP_SIZE=100000)$(NC)"
 
-***REMOVED*** Fast E2E overflow test - 5K BPF map for CI/CD (~5 minutes)
-***REMOVED*** ────────────────────────────────────────────────────────────────────────
-***REMOVED*** This target compiles BPF code with a smaller map size (5,000 entries)
-***REMOVED*** and runs overflow tests with proportionally scaled connection counts.
-***REMOVED***
-***REMOVED*** Use case: Daily CI/CD pipeline, developer workflows
-***REMOVED*** Map size: 5,000 entries (vs 100,000 production)
-***REMOVED*** Expected time: ~5 minutes (vs ~25 minutes for stress test)
-***REMOVED***
-***REMOVED*** Connection counts auto-scale:
-***REMOVED***   Phase 1: 1,500 connections (30% of 5K)
-***REMOVED***   Phase 2: 3,500 connections (70% of 5K)
-***REMOVED***   Phase 3: 1,500 connections (30% more = 130% total)
-***REMOVED***
-***REMOVED*** What it validates:
-***REMOVED***   ✓ Overflow mechanism works correctly
-***REMOVED***   ✓ Ringbuffer activation at capacity
-***REMOVED***   ✓ Data integrity under overflow conditions
-***REMOVED***   ✓ Metrics continue exporting correctly
-.ONESHELL:
-test-e2e-fast:
-	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
-	@echo "$(GREEN)  Fast E2E Overflow Test (5K BPF Map)$(NC)"
-	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
-	@echo "$(YELLOW)Regenerating BPF code with BPF_MAP_SIZE=5000...$(NC)"
-ifdef IS_MACOS
-	@$(DOCKER) run --rm \
-		-v $(shell pwd):/workspace \
-		-w /workspace \
-		$(BPF_BUILDER_IMAGE) \
-		bash -c "cd internal/bpf && \
-			bpf2go -go-package bpf -cc clang-14 \
-				-cflags '-O2 -Wall -Werror -DBPF_MAP_SIZE=5000' \
-				-target amd64,arm64 \
-				network ../../bpf/network_monitor.c"
-else
-	@cd $(INTERNAL_BPF_DIR) && \
-		bpf2go -go-package bpf -cc clang \
-			-cflags "$(BPF_CFLAGS) -DBPF_MAP_SIZE=5000" \
-			-target amd64,arm64 \
-			network ../../bpf/network_monitor.c
-endif
-	@echo "$(GREEN)Building E2E test binary with 5K map...$(NC)"
-	@mkdir -p $(BUILD_DIR)
-	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
-	@echo "$(YELLOW)Building agent Docker image for fast E2E tests...$(NC)"
-	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/ebpf-agent:test -f Dockerfile .
-	@echo "$(GREEN)Running fast E2E overflow test (BPF_MAP_SIZE=5000)...$(NC)"
-	@$(GO) clean -testcache
-	@BPF_MAP_SIZE=5000 $(GO) test -p 1 -timeout 15m -v ./test/e2e/... -run TestE2EConnectionOverflowRealistic
-	@echo "$(GREEN)Fast E2E test complete (~5 minutes)$(NC)"
-	@echo ""
-	@echo "$(YELLOW)Restoring production BPF map size (100K)...$(NC)"
-	@$(MAKE) generate > /dev/null 2>&1
-	@echo "$(GREEN)✓ BPF code restored to production configuration$(NC)"
-
-***REMOVED*** Stress E2E overflow test - 100K BPF map for weekly/release validation (~25 minutes)
-***REMOVED*** ────────────────────────────────────────────────────────────────────────
-***REMOVED*** This target uses production BPF map size (100,000 entries) and runs
-***REMOVED*** full-scale overflow tests with large connection bursts.
-***REMOVED***
-***REMOVED*** Use case: Weekly regression tests, pre-release validation, performance benchmarking
-***REMOVED*** Map size: 100,000 entries (production configuration)
-***REMOVED*** Expected time: ~25 minutes (comprehensive stress test)
-***REMOVED***
-***REMOVED*** Connection counts (production-scale):
-***REMOVED***   Phase 1: 30,000 connections (30% of 100K)
-***REMOVED***   Phase 2: 70,000 connections (70% of 100K)
-***REMOVED***   Phase 3: 30,000 connections (30% more = 130% total)
-***REMOVED***
-***REMOVED*** What it validates (beyond fast test):
-***REMOVED***   ✓ Large-scale overflow handling (100K+ connections)
-***REMOVED***   ✓ Memory pressure under production-like load
-***REMOVED***   ✓ BPF verifier limits with large maps
-***REMOVED***   ✓ Hash collision behavior at scale
-***REMOVED***   ✓ Ringbuffer capacity under sustained overflow
-***REMOVED***   ✓ Performance degradation patterns
-.ONESHELL:
-test-e2e-stress:
-	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
-	@echo "$(GREEN)  Stress E2E Overflow Test (100K BPF Map)$(NC)"
-	@echo "$(GREEN)═══════════════════════════════════════════════════════$(NC)"
-	@echo "$(YELLOW)Regenerating BPF code with BPF_MAP_SIZE=100000...$(NC)"
-ifdef IS_MACOS
-	@$(DOCKER) run --rm \
-		-v $(shell pwd):/workspace \
-		-w /workspace \
-		$(BPF_BUILDER_IMAGE) \
-		bash -c "cd internal/bpf && \
-			bpf2go -go-package bpf -cc clang-14 \
-				-cflags '-O2 -Wall -Werror -DBPF_MAP_SIZE=100000' \
-				-target amd64,arm64 \
-				network ../../bpf/network_monitor.c"
-else
-	@cd $(INTERNAL_BPF_DIR) && \
-		bpf2go -go-package bpf -cc clang \
-			-cflags "$(BPF_CFLAGS) -DBPF_MAP_SIZE=100000" \
-			-target amd64,arm64 \
-			network ../../bpf/network_monitor.c
-endif
-	@echo "$(GREEN)Building E2E test binary with 100K map...$(NC)"
-	@mkdir -p $(BUILD_DIR)
-	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
-	@echo "$(YELLOW)Building agent Docker image for stress E2E tests...$(NC)"
-	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/ebpf-agent:test -f Dockerfile .
-	@echo "$(GREEN)Running stress E2E overflow test (BPF_MAP_SIZE=100000)...$(NC)"
-	@$(GO) clean -testcache
-	@BPF_MAP_SIZE=100000 $(GO) test -p 1 -timeout 60m -v ./test/e2e/... -run TestE2EConnectionOverflowRealistic
-	@echo "$(GREEN)Stress E2E test complete (~25 minutes)$(NC)"
 
 ***REMOVED*** Lint the code (Go and C)
 lint:
@@ -505,19 +437,81 @@ ifdef IS_MACOS
 	@echo "  ✓ BPF map dumping every 30s"
 	@echo "  ✓ Metrics at http://localhost:9090/metrics"
 	@echo ""
-	@$(DOCKER) compose up ebpf-dev
+	@echo "$(YELLOW)Endpoints accessible at:$(NC)"
+	@echo "  • Metrics:   http://localhost:9090/metrics"
+	@echo "  • Health:    http://localhost:9090/health"
+	@echo "  • Profiling: http://localhost:6060/debug/pprof/"
+	@echo ""
+	@$(DOCKER) compose --profile dev up ebpf-dev
 else
 	@echo "$(GREEN)Starting development mode with air (full debugging enabled)...$(NC)"
 	@echo "$(YELLOW)Features enabled:$(NC)"
 	@echo "  ✓ Live reload with Air"
-	@echo "  ✓ Debug logging (text format)"
+	@echo "  ✓ Debug logging (text format, sampling disabled)"
 	@echo "  ✓ pprof profiling at http://localhost:6060/debug/pprof/"
 	@echo "  ✓ BPF map dumping every 30s"
 	@echo "  ✓ Metrics at http://localhost:9090/metrics"
 	@echo ""
-	@EBPF_DEBUG=true \
-	 EBPF_LOG_LEVEL=debug \
+	@EBPF_LOG_LEVEL=debug \
 	 EBPF_LOG_FORMAT=text \
+	 EBPF_COLLECTION_INTERVAL=25s \
+	 EBPF_ENABLE_PROFILING=true \
+	 EBPF_PROFILING_PORT=6060 \
+	 EBPF_DUMP_BPF_MAPS=true \
+	 EBPF_DUMP_MAP_INTERVAL=30s \
+	 sudo -E air -c .air.toml
+endif
+
+***REMOVED*** Development mode with bridge networking (macOS browser access)
+***REMOVED*** This mode uses bridge networking to allow port mapping for localhost access
+***REMOVED*** Trade-off: Cannot test disabled filter mode (requires host network mode)
+dev-bridge:
+ifdef IS_MACOS
+	@echo "$(GREEN)Starting development mode with bridge networking (macOS browser access)...$(NC)"
+	@echo "$(YELLOW)Features enabled:$(NC)"
+	@echo "  ✓ Live reload with Air"
+	@echo "  ✓ Debug logging (text format)"
+	@echo "  ✓ pprof profiling"
+	@echo "  ✓ BPF map dumping every 30s"
+	@echo "  ✓ Port mapping for macOS browser access"
+	@echo ""
+	@echo "$(CYAN)Services accessible at:$(NC)"
+	@echo "  • Metrics:   http://localhost:9090/metrics"
+	@echo "  • Health:    http://localhost:9090/health"
+	@echo "  • Profiling: http://localhost:6060/debug/pprof/"
+	@echo ""
+	@echo "$(YELLOW)Note: Only 'default' filter mode works in bridge mode$(NC)"
+	@echo "$(YELLOW)      Use 'make dev' + docker exec for disabled filter mode$(NC)"
+	@echo ""
+	@$(DOCKER) compose --profile dev-bridge up ebpf-dev-bridge
+else
+	@echo "$(YELLOW)Bridge mode is primarily for macOS. On Linux, use 'make dev' with host networking.$(NC)"
+	@$(DOCKER) compose --profile dev-bridge up ebpf-dev-bridge
+endif
+
+***REMOVED*** Development mode with disabled filter mode (tracks systemd processes)
+***REMOVED*** Requires host networking mode to capture host process traffic
+dev-disabled:
+ifdef IS_MACOS
+	@echo "$(GREEN)Starting development mode with DISABLED filter mode...$(NC)"
+	@echo "$(YELLOW)Features enabled:$(NC)"
+	@echo "  ✓ Live reload with Air"
+	@echo "  ✓ Debug logging (text format)"
+	@echo "  ✓ DISABLED filter mode (tracks ALL traffic including systemd)"
+	@echo "  ✓ Host networking mode"
+	@echo ""
+	@echo "$(CYAN)Note: On macOS Docker Desktop:$(NC)"
+	@echo "  • Tracks Linux VM systemd processes (NOT macOS processes)"
+	@echo "  • Access metrics via: docker exec kubeadapt-ebpf-dev curl localhost:9090/metrics"
+	@echo ""
+	@EBPF_NETNS_FILTER_MODE=disabled $(DOCKER) compose --profile dev up ebpf-dev
+else
+	@echo "$(GREEN)Starting development mode with DISABLED filter mode...$(NC)"
+	@echo "$(YELLOW)Tracking ALL traffic (including host systemd, sshd, kubelet)$(NC)"
+	@echo ""
+	@EBPF_LOG_LEVEL=debug \
+	 EBPF_LOG_FORMAT=text \
+	 EBPF_NETNS_FILTER_MODE=disabled \
 	 EBPF_COLLECTION_INTERVAL=25s \
 	 EBPF_ENABLE_PROFILING=true \
 	 EBPF_PROFILING_PORT=6060 \
@@ -600,7 +594,7 @@ quickstart: init generate build
 	@echo "$(YELLOW)Next steps:$(NC)"
 ifdef IS_MACOS
 	@echo "  1. Run locally:     $(GREEN)make run-local$(NC)"
-	@echo "  2. Run tests:       $(GREEN)make test-docker$(NC)"
+	@echo "  2. Run tests:       $(GREEN)make test-integration-docker$(NC)"
 else
 	@echo "  1. Run locally:     $(GREEN)sudo make run$(NC)"
 	@echo "  2. Run tests:       $(GREEN)make test$(NC)"

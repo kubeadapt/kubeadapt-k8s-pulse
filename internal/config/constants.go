@@ -11,12 +11,6 @@ const (
 	// RECOMMENDED for most use cases
 	NetnsFilterModeDefault = "default"
 
-	// NetnsFilterModeStrict tracks only pods with separate network namespaces
-	// Filters host processes AND hostNetwork:true pods
-	// Uses BTF runtime offset detection for network namespace comparison
-	// Use when you want to exclude hostNetwork pods from tracking
-	NetnsFilterModeStrict = "strict"
-
 	// NetnsFilterModeDisabled tracks everything (no filtering at all)
 	// Useful for debugging - shows all network activity including host processes
 	NetnsFilterModeDisabled = "disabled"
@@ -44,15 +38,6 @@ const (
 	//
 	// Rule: collection_interval = scrape_interval - 5s buffer
 	DefaultCollectionInterval = 25 * time.Second
-
-	// DefaultDumpMapInterval is the interval for dumping BPF maps (debug mode)
-	// CRITICAL: Must be < CollectionInterval to see data before deletion
-	// 15s allows 1-2 dumps per 25s collection cycle, showing live data
-	//
-	// Timeline example:
-	//   - Collection at: 0s, 25s, 50s (reads + deletes map)
-	//   - Dumps at: 0s, 15s, 30s, 45s (dumps at 15s/45s show data)
-	DefaultDumpMapInterval = 15 * time.Second
 )
 
 // Log format constants

@@ -23,14 +23,9 @@ func TestFilterModeToInt(t *testing.T) {
 			expected: 0,
 		},
 		{
-			name:     "strict mode",
-			mode:     config.NetnsFilterModeStrict,
-			expected: 1,
-		},
-		{
 			name:     "disabled mode",
 			mode:     config.NetnsFilterModeDisabled,
-			expected: 2,
+			expected: 1,
 		},
 		{
 			name:     "invalid mode falls back to default",

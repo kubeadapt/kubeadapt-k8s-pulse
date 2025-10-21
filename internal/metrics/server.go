@@ -181,17 +181,20 @@ func (s *Server) ReportBPFLoadFailure(err error, duration time.Duration) {
 	s.bpfLoadDuration.Set(duration.Seconds())
 	s.bpfLoadStatus.Set(0)
 
-	// Store full error message for /health endpoint and logs
-	fullErrorMsg := err.Error()
-	if len(fullErrorMsg) > 256 {
-		fullErrorMsg = fullErrorMsg[:253] + "..."
+	// Truncate error for /health endpoint (256 chars max for HTTP response)
+	// Full error is logged below for troubleshooting
+	truncatedErrorMsg := err.Error()
+	if len(truncatedErrorMsg) > 256 {
+		truncatedErrorMsg = truncatedErrorMsg[:253] + "..."
 	}
 
-	s.bpfLoadError = fullErrorMsg
+	s.bpfLoadError = truncatedErrorMsg
 	s.bpfLoadSuccessful = false
 	s.SetReady(false) // Keep server NOT ready when BPF fails
+
+	// Log FULL error to pod logs for troubleshooting (not truncated)
 	s.logger.Error("BPF load status reported as failed",
-		zap.Error(err),
+		zap.Error(err), // Full error (can be 64KB+ for BPF verifier errors)
 		zap.Duration("duration", duration))
 }
 

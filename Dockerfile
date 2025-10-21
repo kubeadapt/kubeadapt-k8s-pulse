@@ -9,21 +9,12 @@ ARG TARGETOS
 ARG TARGETARCH
 ARG BUILDPLATFORM
 
-***REMOVED*** Install BPF build dependencies
+***REMOVED*** Install minimal build dependencies
+***REMOVED*** Note: We don't need clang/llvm/libbpf because BPF bindings are pre-generated
 RUN apt-get update && apt-get install -y \
-    clang-14 \
-    llvm-14 \
-    libbpf-dev \
-    linux-headers-generic \
-    make \
-    gcc \
     git \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-
-***REMOVED*** Create symlinks for asm headers to fix cross-compilation
-RUN ln -sf /usr/include/$(uname -m)-linux-gnu/asm /usr/include/asm && \
-    ln -sf /usr/include/$(uname -m)-linux-gnu/asm-generic /usr/include/asm-generic
 
 WORKDIR /build
 

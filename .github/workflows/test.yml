@@ -2,7 +2,8 @@ name: Pull Request Checks
 
 on:
   pull_request:
-    branches: [ '*' ]
+    branches:
+      - main
     paths:
       - '**.go'
       - '**.c'
@@ -13,8 +14,8 @@ on:
       - '.github/workflows/test.yml'
 
 jobs:
-  test:
-    name: Test and Lint
+  fast-checks:
+    name: Lint & Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,11 +26,20 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install make
-        run: sudo apt-get install -y make
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y make
 
-      - name: Run verification and tests
-        run: make lint test test-coverage
+      - name: Run lint
+        run: make lint
+
+      - name: Run unit tests
+        run: make test
+
+      - name: Generate coverage report
+        run: make test-coverage
+
+      - name: Exclude generated code from coverage
+        run: make cov-exclude-generated
 
       - name: Check clean generate
         run: make generate && git add -A && git diff HEAD --exit-code
@@ -46,7 +56,7 @@ jobs:
   integration-tests:
     name: Integration Tests (Docker)
     runs-on: ubuntu-latest
-    needs: test
+    needs: fast-checks
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,16 +66,17 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install make
-        run: sudo apt-get install -y make
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y make
 
       - name: Run integration tests in Docker
-        run: make test-docker
+        run: make test-integration-docker
 
   e2e-tests:
     name: E2E Tests (Kind Cluster)
     runs-on: ubuntu-latest
-    needs: test
+    needs: fast-checks
+    timeout-minutes: 60
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,12 +91,17 @@ jobs:
 
       - name: Run E2E tests
         run: make test-e2e
-        timeout-minutes: 35
+        ***REMOVED*** Makefile target handles:
+        ***REMOVED*** - Building image with BPF_MAP_SIZE=1000
+        ***REMOVED*** - Creating Kind cluster
+        ***REMOVED*** - Loading image to Kind
+        ***REMOVED*** - Running all E2E tests
+        ***REMOVED*** - Cleanup
 
       - name: Export Kind cluster logs
         if: always()
         run: |
-          CLUSTER_NAME=$(kind get clusters | head -n1)
+          CLUSTER_NAME=$(kind get clusters 2>/dev/null | head -n1 || echo "")
           if [ ! -z "$CLUSTER_NAME" ]; then
             kind export logs e2e-logs --name "$CLUSTER_NAME" || true
           fi
@@ -254,12 +270,12 @@ jobs:
             ls -lh "$BPF_OBJ"
 
             ***REMOVED*** Test verifier acceptance with bpftool
-            ***REMOVED*** NOTE: This tests basic verifier compatibility
-            ***REMOVED*** Full loader testing (with offset detection) happens in E2E tests
+            ***REMOVED*** NOTE: This tests basic verifier compatibility for TC programs
+            ***REMOVED*** Full loader testing (with TCX/legacy TC attachment) happens in E2E tests
             echo ""
-            echo "Loading eBPF program through verifier..."
-            if bpftool prog load "$BPF_OBJ" /sys/fs/bpf/kubeadapt_test type kprobe 2>&1 | tee /tmp/bpftool.log; then
-              echo "✓ eBPF program passed verifier"
+            echo "Loading TC eBPF program through verifier..."
+            if bpftool prog load "$BPF_OBJ" /sys/fs/bpf/kubeadapt_test type classifier 2>&1 | tee /tmp/bpftool.log; then
+              echo "✓ TC eBPF program passed verifier"
 
               echo ""
               echo "=== Loaded Programs ==="

@@ -4,10 +4,10 @@ global:
 
 scrape_configs:
   ***REMOVED*** Scrape the production ebpf-agent service (used by make run-local)
-  ***REMOVED*** Uses Docker Compose service name for DNS resolution
+  ***REMOVED*** Uses Docker Compose service name for DNS resolution (bridge networking)
   - job_name: 'ebpf-agent'
     static_configs:
-      - targets: ['ebpf-agent:9090']  ***REMOVED*** Service name, NOT localhost
+      - targets: ['ebpf-agent:9090']  ***REMOVED*** Docker service name (bridge networking)
         labels:
           component: 'ebpf-agent'
           environment: 'development'

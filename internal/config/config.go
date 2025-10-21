@@ -39,10 +39,6 @@ type Config struct {
 	//                Filter only host system processes (kubelet, containerd, sshd)
 	//                Uses simple cgroup check (cgroup_id != 1)
 	//                RECOMMENDED for most use cases
-	//   - "strict":  Track only pods with separate network namespaces (hostNetwork:false)
-	//                Filter host processes AND hostNetwork:true pods
-	//                Uses CO-RE network namespace inode comparison
-	//                Use when you want to exclude hostNetwork pods from tracking
 	//   - "disabled": Track everything (no filtering at all)
 	//                 Useful for debugging - shows all network activity including host processes
 	NetnsFilterMode string `yaml:"netns_filter_mode" env:"EBPF_NETNS_FILTER_MODE" default:"default"`
@@ -58,13 +54,11 @@ type Config struct {
 	NodeName string `yaml:"node_name" env:"NODE_NAME" default:""`
 
 	// Debug options
-	Debug           bool `yaml:"debug" env:"EBPF_DEBUG" default:"false"`
 	EnableProfiling bool `yaml:"enable_profiling" env:"EBPF_ENABLE_PROFILING" default:"false"`
 	ProfilingPort   int  `yaml:"profiling_port" env:"EBPF_PROFILING_PORT" default:"6060"`
-	DumpBPFMaps     bool `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
-	// DumpMapInterval must be < CollectionInterval (25s) to see data before deletion
-	// 15s allows 1-2 dumps per collection cycle, showing live data
-	DumpMapInterval time.Duration `yaml:"dump_map_interval" env:"EBPF_DUMP_MAP_INTERVAL" default:"15s"`
+	// DumpBPFMaps triggers map dumping BEFORE deletion in collector (synchronized with collection cycle)
+	// When enabled, dumps first 10 connection entries before read-then-delete operation
+	DumpBPFMaps bool `yaml:"dump_bpf_maps" env:"EBPF_DUMP_BPF_MAPS" default:"false"`
 }
 
 // Load loads configuration from file and environment
@@ -102,13 +96,16 @@ func (c *Config) setDefaults() {
 	c.LogLevel = "info"
 	c.LogFormat = LogFormatJSON
 	c.ProfilingPort = DefaultProfilingPort
-	c.DumpMapInterval = DefaultDumpMapInterval
 }
 
 // loadFromFile loads configuration from a YAML file
 func (c *Config) loadFromFile(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
+		// Handle missing file gracefully - use defaults
+		if os.IsNotExist(err) {
+			return nil
+		}
 		return fmt.Errorf("reading file: %w", err)
 	}
 
@@ -164,9 +161,6 @@ func (c *Config) loadFromEnv() {
 	}
 
 	// Debug options
-	if v := os.Getenv("EBPF_DEBUG"); v != "" {
-		c.Debug = v == BoolStringTrue || v == BoolStringOne
-	}
 	if v := os.Getenv("EBPF_ENABLE_PROFILING"); v != "" {
 		c.EnableProfiling = v == BoolStringTrue || v == BoolStringOne
 	}
@@ -177,11 +171,6 @@ func (c *Config) loadFromEnv() {
 	}
 	if v := os.Getenv("EBPF_DUMP_BPF_MAPS"); v != "" {
 		c.DumpBPFMaps = v == BoolStringTrue || v == BoolStringOne
-	}
-	if v := os.Getenv("EBPF_DUMP_MAP_INTERVAL"); v != "" {
-		if d, err := time.ParseDuration(v); err == nil {
-			c.DumpMapInterval = d
-		}
 	}
 }
 
@@ -204,24 +193,17 @@ func (c *Config) validate() error {
 
 	// Validate network namespace filter mode
 	switch c.NetnsFilterMode {
-	case NetnsFilterModeDefault, NetnsFilterModeStrict, NetnsFilterModeDisabled:
+	case NetnsFilterModeDefault, NetnsFilterModeDisabled:
 		// Valid modes
 	default:
-		return fmt.Errorf("invalid netns filter mode: %s (must be '%s', '%s', or '%s')",
-			c.NetnsFilterMode, NetnsFilterModeDefault, NetnsFilterModeStrict, NetnsFilterModeDisabled)
+		return fmt.Errorf("invalid netns filter mode: %s (must be '%s' or '%s')",
+			c.NetnsFilterMode, NetnsFilterModeDefault, NetnsFilterModeDisabled)
 	}
 
 	// Validate profiling port if profiling is enabled
 	if c.EnableProfiling {
 		if c.ProfilingPort < 1 || c.ProfilingPort > 65535 {
 			return fmt.Errorf("invalid profiling port: %d", c.ProfilingPort)
-		}
-	}
-
-	// Validate dump interval if map dumping is enabled
-	if c.DumpBPFMaps {
-		if c.DumpMapInterval < time.Second {
-			return fmt.Errorf("dump map interval too short: %s", c.DumpMapInterval)
 		}
 	}
 
@@ -253,8 +235,10 @@ func (c *Config) BuildLogger() (*zap.Logger, error) {
 		"node":    c.NodeName,
 	}
 
-	// Disable sampling in debug mode
-	if c.Debug {
+	// Disable sampling when log level is debug (we want to see everything)
+	// Sampling is production optimization that groups repetitive messages
+	// Not needed in debug mode where thoroughness > performance
+	if level == zapcore.DebugLevel {
 		cfg.Sampling = nil
 	}
 
@@ -298,12 +282,16 @@ func (c *Config) String() string {
 	sb.WriteString(fmt.Sprintf("  Log Level: %s\n", c.LogLevel))
 	sb.WriteString(fmt.Sprintf("  Log Format: %s\n", c.LogFormat))
 	sb.WriteString(fmt.Sprintf("  Node Name: %s\n", c.NodeName))
-	sb.WriteString(fmt.Sprintf("  Debug: %t\n", c.Debug))
 	if c.EnableProfiling {
 		sb.WriteString(fmt.Sprintf("  Profiling Enabled: true (port %d)\n", c.ProfilingPort))
 	}
 	if c.DumpBPFMaps {
-		sb.WriteString(fmt.Sprintf("  BPF Map Dumping: enabled (interval %s)\n", c.DumpMapInterval))
+		sb.WriteString("  BPF Map Dumping: enabled (synchronized with collector)\n")
 	}
 	return sb.String()
+}
+
+// GetDumpBPFMaps returns the DumpBPFMaps flag (for collector interface)
+func (c *Config) GetDumpBPFMaps() bool {
+	return c.DumpBPFMaps
 }

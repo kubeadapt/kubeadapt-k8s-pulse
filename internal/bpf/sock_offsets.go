@@ -115,13 +115,13 @@ func (o *SockCommonOffsets) ValidateOffsets() error {
 	const maxReasonableOffset = 256
 
 	fields := map[string]uint32{
-		"skc_family":      o.SkcFamily,
-		"skc_dport":       o.SkcDport,
-		"skc_num":         o.SkcNum,
-		"skc_daddr":       o.SkcDaddr,
-		"skc_rcv_saddr":   o.SkcRcvSaddr,
-		"skc_state":       o.SkcState,
-		"skc_v6_daddr":    o.SkcV6Daddr,
+		"skc_family":       o.SkcFamily,
+		"skc_dport":        o.SkcDport,
+		"skc_num":          o.SkcNum,
+		"skc_daddr":        o.SkcDaddr,
+		"skc_rcv_saddr":    o.SkcRcvSaddr,
+		"skc_state":        o.SkcState,
+		"skc_v6_daddr":     o.SkcV6Daddr,
 		"skc_v6_rcv_saddr": o.SkcV6RcvSaddr,
 	}
 

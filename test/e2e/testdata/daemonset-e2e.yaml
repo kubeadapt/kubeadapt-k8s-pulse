@@ -47,10 +47,9 @@ spec:
         - name: EBPF_COLLECTION_INTERVAL
           value: "25s"  ***REMOVED*** Must be < Prometheus scrape interval (30s)
         ***REMOVED*** Enable BPF map dumping for e2e test debugging
+        ***REMOVED*** Map dumping is synchronized with collection cycle (25s interval)
         - name: EBPF_DUMP_BPF_MAPS
           value: "true"
-        - name: EBPF_DUMP_MAP_INTERVAL
-          value: "15s"  ***REMOVED*** < COLLECTION_INTERVAL to see data before deletion
         securityContext:
           ***REMOVED*** eBPF agents require privileged mode for:
           ***REMOVED*** - BPF syscalls and map operations

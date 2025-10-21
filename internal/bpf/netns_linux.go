@@ -1,3 +1,5 @@
+//go:build linux
+
 package bpf
 
 import (
@@ -61,34 +63,29 @@ func GetHostNetNSInode() (uint64, error) {
 // FilterModeToInt converts string filter mode to BPF map value
 // Returns:
 //   - 0 for "default"  (track all K8s pods, filter host processes)
-//   - 1 for "strict"   (track only non-hostNetwork pods)
-//   - 2 for "disabled" (no filtering, track everything)
+//   - 1 for "disabled" (no filtering, track everything)
 func FilterModeToInt(mode string) uint32 {
 	switch mode {
 	case config.NetnsFilterModeDefault, "":
 		return 0 // default mode
-	case config.NetnsFilterModeStrict:
-		return 1 // strict mode
 	case config.NetnsFilterModeDisabled:
-		return 2 // disabled mode
+		return 1 // disabled mode
 	default:
 		return 0 // fallback to default
 	}
 }
 
-// InitializeHostNetnsMap populates the host_netns_map and filter_mode_map
+// InitializeHostNetnsMap populates the filter_mode_map
 // This configures the BPF program's network namespace filtering behavior
 //
 // IMPORTANT: This must be called AFTER LoadAndAttach() so that the BPF maps are initialized
 //
 // How it works:
-// 1. Populate filter_mode_map with the configured mode (default/strict/disabled)
-// 2. If strict mode: populate host_netns_map with host netns inode
-// 3. BPF programs use filter mode to decide filtering strategy
+// 1. Populate filter_mode_map with the configured mode (default/disabled)
+// 2. BPF programs use filter mode to decide filtering strategy
 //
 // Filtering modes:
 //   - default:  Track all K8s pods (cgroup check), filter only host processes
-//   - strict:   Track only non-hostNetwork pods (netns comparison)
 //   - disabled: Track everything (no filtering)
 func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 	// Get the BPF maps from collection
@@ -101,11 +98,6 @@ func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 		return fmt.Errorf("filter_mode_map not found in BPF collection")
 	}
 
-	hostNetnsMap := m.collection.Maps["host_netns_map"]
-	if hostNetnsMap == nil {
-		return fmt.Errorf("host_netns_map not found in BPF collection")
-	}
-
 	// Populate filter mode map
 	key := uint32(0)
 	modeValue := FilterModeToInt(filterMode)
@@ -114,74 +106,19 @@ func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 		return fmt.Errorf("failed to populate filter_mode_map: %w", err)
 	}
 
-	// If strict mode, populate host netns map for netns comparison
-	// For default/disabled modes, this map is optional (not used)
-	if filterMode == config.NetnsFilterModeStrict {
-		hostNetnsInode, err := GetHostNetNSInode()
-		if err != nil {
-			return fmt.Errorf("failed to get host netns inode for strict mode: %w", err)
-		}
-
-		if err := hostNetnsMap.Put(&key, &hostNetnsInode); err != nil {
-			return fmt.Errorf("failed to populate host_netns_map: %w", err)
-		}
-
-		m.logger.Info("Initialized network namespace filtering",
-			zap.String("mode", filterMode),
-			zap.Uint32("mode_value", modeValue),
-			zap.Uint64("host_netns_inode", hostNetnsInode))
-	} else {
-		m.logger.Info("Initialized network namespace filtering",
-			zap.String("mode", filterMode),
-			zap.Uint32("mode_value", modeValue))
-	}
+	m.logger.Info("Initialized network namespace filtering",
+		zap.String("mode", filterMode),
+		zap.Uint32("mode_value", modeValue))
 
 	return nil
 }
 
-// InitializeOffsetConfig writes runtime-detected struct offsets to the BPF map
-// This allows MODE 1 (strict) filtering to work without CO-RE compilation dependencies
+// InitializeOffsetConfig is DEPRECATED and no longer used
+// Strict mode is not supported for TC programs, so offset configuration is not needed
 //
-// IMPORTANT: This must be called AFTER LoadAndAttach() so that the BPF maps are initialized
-//
-// Parameters:
-//   - offsets: Network namespace offsets detected via BTF
-//
-// Returns:
-//   - error: If writing to BPF map fails
+// NOTE: This function remains for backward compatibility but does nothing
+// It will be removed in a future version
 func (m *Manager) InitializeOffsetConfig(offsets *NetnsOffsets) error {
-	if m.collection == nil {
-		return fmt.Errorf("BPF collection not initialized - call LoadAndAttach() first")
-	}
-
-	offsetConfigMap := m.collection.Maps["offset_config"]
-	if offsetConfigMap == nil {
-		return fmt.Errorf("offset_config map not found in BPF collection")
-	}
-
-	// Prepare offset configuration structure to match BPF map layout
-	type offsetConfig struct {
-		TaskNsproxy  uint32
-		NsproxyNetNs uint32
-		NetNsInum    uint32
-	}
-
-	config := offsetConfig{
-		TaskNsproxy:  offsets.TaskNsproxy,
-		NsproxyNetNs: offsets.NsproxyNetNs,
-		NetNsInum:    offsets.NetNsInum,
-	}
-
-	// Write offsets to BPF map
-	key := uint32(0)
-	if err := offsetConfigMap.Put(&key, &config); err != nil {
-		return fmt.Errorf("failed to populate offset_config map: %w", err)
-	}
-
-	m.logger.Info("Initialized network namespace offset configuration",
-		zap.Uint32("task_nsproxy", config.TaskNsproxy),
-		zap.Uint32("nsproxy_net_ns", config.NsproxyNetNs),
-		zap.Uint32("net_ns_inum", config.NetNsInum))
-
+	m.logger.Warn("InitializeOffsetConfig called but is deprecated - strict mode not supported for TC programs")
 	return nil
 }

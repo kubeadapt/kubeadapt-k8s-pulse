@@ -1,5 +1,5 @@
 services:
-  ***REMOVED*** BPF Builder service - for compiling BPF programs on macOS
+  ***REMOVED*** BPF Builder service - for compiling TC BPF programs on macOS
   bpf-builder:
     image: kubeadapt/bpf-builder:latest
     build:
@@ -9,24 +9,18 @@ services:
     volumes:
       - .:/workspace
     working_dir: /workspace
-    command: |
+    command: >-
       bash -c "
-        echo 'Building BPF programs...'
-        cd internal/bpf
-        bpf2go -cc clang-14 \
-          -cflags '-O2 -g -Wall -Werror' \
-          -target amd64,arm64 \
-          -type container_net_stats,connection_key,connection_stats \
-          network ../../bpf/network_monitor.c
-        bpf2go -cc clang-14 \
-          -cflags '-O2 -g -Wall -Werror' \
-          -target amd64,arm64 \
-          -type connection_key,connection_stats \
-          connection ../../bpf/connection_tracker.c
-        echo 'BPF programs built successfully!'
+      echo 'Building TC BPF programs...' &&
+      cd internal/bpf &&
+      bpf2go -go-package bpf -cc clang-14
+      -cflags '-O2 -Wall -Werror'
+      -target amd64,arm64
+      network ../../bpf/network_monitor_tc.c &&
+      echo 'TC BPF programs built successfully!'
       "
 
-  ***REMOVED*** eBPF Agent service - Production configuration
+  ***REMOVED*** eBPF Agent service - Production configuration with TC hooks
   ebpf-agent:
     build:
       context: .
@@ -36,7 +30,7 @@ services:
         BUILD_TIME: ${BUILD_TIME:-unknown}
     container_name: kubeadapt-ebpf-agent
     privileged: true  ***REMOVED*** Required for eBPF
-    network_mode: host  ***REMOVED*** Required to monitor host network
+    ***REMOVED*** NO network_mode: host - use bridge for macOS browser access (host mode only needed in K8s)
     pid: host  ***REMOVED*** Required to access host processes
     environment:
       ***REMOVED*** Configuration
@@ -45,13 +39,13 @@ services:
       EBPF_LOG_FORMAT: json
       EBPF_COLLECTION_INTERVAL: 25s
       EBPF_PROC_PATH: /host/proc
-      EBPF_DEBUG: ${DEBUG:-false}
       NODE_NAME: ${NODE_NAME:-local-dev}
+      ***REMOVED*** Network namespace filtering (default: track all K8s pods, filter host processes)
+      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
       ***REMOVED*** Optional debugging features
       ***REMOVED*** EBPF_ENABLE_PROFILING: true
       ***REMOVED*** EBPF_PROFILING_PORT: 6060
       ***REMOVED*** EBPF_DUMP_BPF_MAPS: true
-      ***REMOVED*** EBPF_DUMP_MAP_INTERVAL: 60s
     volumes:
       ***REMOVED*** Mount host filesystem for container discovery
       - /proc:/host/proc:ro
@@ -67,6 +61,8 @@ services:
       - BPF  ***REMOVED*** Required for BPF operations (kernel 5.8+)
       - PERFMON  ***REMOVED*** Required for performance monitoring (kernel 5.8+)
     restart: unless-stopped
+    ports:
+      - "9090:9090"  ***REMOVED*** Metrics endpoint (accessible from macOS browser)
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
       interval: 30s
@@ -77,28 +73,47 @@ services:
       bpf-builder:
         condition: service_completed_successfully
 
-  ***REMOVED*** eBPF Agent Development service - with hot reload
+  ***REMOVED*** eBPF Agent Development service - with hot reload (TC implementation)
+  ***REMOVED*** DEFAULT MODE: Bridge networking with port mapping for browser access
+  ***REMOVED***
+  ***REMOVED*** NETWORK MODE BEHAVIOR:
+  ***REMOVED*** ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ***REMOVED*** Bridge Mode (DEFAULT):
+  ***REMOVED***   ✅ Port mapping works - access from browser at http://localhost:9090
+  ***REMOVED***   ✅ default filter mode works perfectly
+  ***REMOVED***   ❌ disabled filter mode CANNOT capture systemd (only sees container's eth0)
+  ***REMOVED***
+  ***REMOVED*** Host Mode (use ebpf-dev-host profile):
+  ***REMOVED***   ✅ disabled filter mode works (sees all interfaces: docker0, br-*, etc.)
+  ***REMOVED***   ✅ default filter mode works
+  ***REMOVED***   ❌ No port mapping (Docker limitation) - must use docker exec curl
+  ***REMOVED***
+  ***REMOVED*** To test disabled mode with host networking:
+  ***REMOVED***   docker compose --profile dev-host up
+  ***REMOVED*** ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ebpf-dev:
+    profiles: ["dev"]  ***REMOVED*** Only start with --profile dev or make dev
     build:
       context: .
       dockerfile: Dockerfile.dev
     container_name: kubeadapt-ebpf-dev
     privileged: true
-    ***REMOVED*** NOTE: NOT using network_mode: host for dev on macOS
-    ***REMOVED*** host mode doesn't expose ports to macOS host (only to Docker VM)
-    ***REMOVED*** For production/real monitoring, use ebpf-agent service with host mode
+    ***REMOVED*** NO network_mode: host - use bridge mode for port mapping
     pid: host
     environment:
       ***REMOVED*** Development configuration
       EBPF_METRICS_PORT: 9090
-      EBPF_LOG_LEVEL: debug
+      EBPF_LOG_LEVEL: debug  ***REMOVED*** Auto-disables sampling
       EBPF_LOG_FORMAT: text
       EBPF_COLLECTION_INTERVAL: 25s
-      EBPF_DEBUG: true
-      NODE_NAME: local-dev
-      ***REMOVED*** Network namespace filtering mode (configurable via env var)
-      ***REMOVED*** Options: "default" (track all K8s pods), "strict" (only non-hostNetwork pods), "disabled" (track everything)
-      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
+      NODE_NAME: local-dev-bridge
+      ***REMOVED*** Network namespace filtering - default mode for bridge networking
+      ***REMOVED*** Bridge mode limitation: ONLY default mode works (disabled requires host mode)
+      EBPF_NETNS_FILTER_MODE: default
+      ***REMOVED*** Enable profiling and BPF map dumping for development
+      EBPF_ENABLE_PROFILING: true
+      EBPF_PROFILING_PORT: 6060
+      EBPF_DUMP_BPF_MAPS: true  ***REMOVED*** Enable for development debugging
     volumes:
       ***REMOVED*** Source code for hot reload
       - .:/workspace
@@ -112,14 +127,58 @@ services:
     working_dir: /workspace
     command: air -c .air.toml
     ports:
-      - "9090:9090"
-    networks:
-      - default
+      - "9090:9090"  ***REMOVED*** Metrics endpoint
+      - "6060:6060"  ***REMOVED*** Profiling endpoint
+    ***REMOVED*** Services accessible at (macOS Chrome/Safari):
+    ***REMOVED***   - Metrics: http://localhost:9090/metrics
+    ***REMOVED***   - Health: http://localhost:9090/health
+    ***REMOVED***   - Profiling: http://localhost:6060/debug/pprof/
+
+  ***REMOVED*** eBPF Agent Development (Host Mode) - for testing disabled filter mode
+  ***REMOVED*** ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ***REMOVED*** Host mode attaches TC to multiple interfaces (eth0, services1, docker0, br-*)
+  ***REMOVED*** Required for disabled filter mode to capture systemd/host process traffic
+  ***REMOVED***
+  ***REMOVED*** Usage: docker compose --profile dev-host up
+  ***REMOVED*** Access: docker exec kubeadapt-ebpf-dev-host curl localhost:9090/metrics
+  ***REMOVED*** ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ebpf-dev-host:
+    profiles: ["dev-host"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kubeadapt-ebpf-dev-host
+    privileged: true
+    network_mode: host  ***REMOVED*** Required for disabled mode
+    pid: host
+    environment:
+      EBPF_METRICS_PORT: 9090
+      EBPF_LOG_LEVEL: debug  ***REMOVED*** Auto-disables sampling
+      EBPF_LOG_FORMAT: text
+      EBPF_COLLECTION_INTERVAL: 25s
+      NODE_NAME: local-dev-host
+      ***REMOVED*** Configurable filter mode (default or disabled)
+      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
+      EBPF_ENABLE_PROFILING: true
+      EBPF_PROFILING_PORT: 6060
+      EBPF_DUMP_BPF_MAPS: true
+    volumes:
+      - .:/workspace
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/bpf:/sys/fs/bpf:rw
+      - /sys/kernel/debug:/sys/kernel/debug:rw
+    working_dir: /workspace
+    command: air -c .air.toml
+    ***REMOVED*** Note: Host mode prevents port mapping
+    ***REMOVED*** Test disabled mode: EBPF_NETNS_FILTER_MODE=disabled docker compose --profile dev-host up
 
   ***REMOVED*** Prometheus for metrics collection
   prometheus:
     image: prom/prometheus:latest
     container_name: kubeadapt-prometheus
+    ***REMOVED*** NO network_mode: host - use bridge for macOS browser access
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -129,7 +188,7 @@ services:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
-      - "9091:9090"  ***REMOVED*** Different port to avoid conflict
+      - "9091:9090"  ***REMOVED*** Map to 9091 to avoid conflict with ebpf-agent:9090
     depends_on:
       - ebpf-agent
     restart: unless-stopped
@@ -155,6 +214,7 @@ services:
     restart: unless-stopped
 
   ***REMOVED*** Node exporter for system metrics (optional)
+  ***REMOVED*** Note: On macOS Docker Desktop, this monitors the Linux VM, not macOS itself
   node-exporter:
     image: prom/node-exporter:latest
     container_name: kubeadapt-node-exporter
@@ -164,7 +224,7 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+)($|/)'
     volumes:
-      - /:/host:ro,rslave
+      - /:/host:ro  ***REMOVED*** Removed rslave for macOS compatibility
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     network_mode: host

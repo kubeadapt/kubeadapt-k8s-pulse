@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -41,30 +42,32 @@ func TestBPFManagerLoadAndAttach(t *testing.T) {
 	// Give some time for the programs to collect data
 	time.Sleep(2 * time.Second)
 
-	// Check if we can retrieve stats map
-	statsMap := manager.GetContainerStats()
-	if statsMap == nil {
-		t.Fatal("Stats map is nil")
+	// Check if we can retrieve connection map
+	connMap := manager.GetConnectionMap()
+	if connMap == nil {
+		t.Fatal("Connection map is nil")
 	}
 
 	// Try to iterate over the map (may be empty if no network activity)
-	iter := statsMap.Iterate()
-	var cgroupID uint64
-	var stats bpf.ContainerNetStats
+	iter := connMap.Iterate()
+	var key bpf.ConnectionKey
+	var stats bpf.ConnectionStats
 
 	hasEntries := false
-	for iter.Next(&cgroupID, &stats) {
+	for iter.Next(&key, &stats) {
 		hasEntries = true
-		t.Logf("Found stats for cgroup %d: RX=%d bytes, TX=%d bytes",
-			cgroupID, stats.RxBytes, stats.TxBytes)
+		t.Logf("Found connection: %v:%d -> %v:%d, Bytes=%d, Packets=%d",
+			formatAddr(key.SrcAddr), key.SrcPort,
+			formatAddr(key.DstAddr), key.DstPort,
+			stats.Bytes, stats.Packets)
 	}
 
 	if err := iter.Err(); err != nil {
-		t.Errorf("Error iterating stats map: %v", err)
+		t.Errorf("Error iterating connection map: %v", err)
 	}
 
 	if !hasEntries {
-		t.Log("No entries found in stats map (this is normal if no network activity)")
+		t.Log("No entries found in connection map (this is normal if no network activity)")
 	}
 }
 
@@ -99,18 +102,18 @@ func TestBPFManagerConcurrentAccess(t *testing.T) {
 				case <-ctx.Done():
 					return
 				default:
-					statsMap := manager.GetContainerStats()
-					if statsMap == nil {
+					connMap := manager.GetConnectionMap()
+					if connMap == nil {
 						errChan <- err
 						return
 					}
 
 					// Try to iterate
-					iter := statsMap.Iterate()
-					var cgroupID uint64
-					var stats bpf.ContainerNetStats
+					iter := connMap.Iterate()
+					var key bpf.ConnectionKey
+					var stats bpf.ConnectionStats
 
-					for iter.Next(&cgroupID, &stats) {
+					for iter.Next(&key, &stats) {
 						// Just iterate, don't need to do anything
 					}
 
@@ -161,4 +164,31 @@ func TestKernelCompatibility(t *testing.T) {
 	manager.Close()
 
 	t.Log("Kernel compatibility check passed")
+}
+
+// Helper function to format IP address from [4]uint32 array
+func formatAddr(addr [4]uint32) string {
+	// For IPv4 (only first uint32 is used)
+	if addr[1] == 0 && addr[2] == 0 && addr[3] == 0 {
+		// Convert network byte order to host byte order
+		ip := addr[0]
+		return formatIPv4(uint32(ip))
+	}
+	// For IPv6, format all 4 uint32s
+	return formatIPv6(addr)
+}
+
+func formatIPv4(ip uint32) string {
+	return formatUint32ToIPv4(ip)
+}
+
+func formatIPv6(addr [4]uint32) string {
+	// Simplified IPv6 formatting
+	return "ipv6_address"
+}
+
+func formatUint32ToIPv4(ip uint32) string {
+	// Network byte order conversion
+	return fmt.Sprintf("%d.%d.%d.%d",
+		byte(ip), byte(ip>>8), byte(ip>>16), byte(ip>>24))
 }

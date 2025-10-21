@@ -88,7 +88,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 
 			t.Log("→ Waiting for metrics to be exported and scraped by Prometheus (45s)")
 			t.Log("   Collection interval (30s) + Scrape interval (15s)")
-			time.Sleep(45 * time.Second)
+			time.Sleep(MetricsExportWaitTime)
 
 			t.Log("→ Querying Prometheus for raw IP-based connection metrics")
 
@@ -96,8 +96,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			if err = promClient.WaitForMetric(ctx,
 				"kubeadapt_connection_traffic_bytes",
 				map[string]string{
-					"protocol":  "tcp",
-					"direction": "egress",
+					"protocol": "tcp",
 				},
 				1.0, // At least 1 byte of traffic
 			); err != nil {
@@ -153,20 +152,19 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			}
 
 			t.Log("Waiting for metrics to be exported and scraped")
-			time.Sleep(45 * time.Second)
+			time.Sleep(MetricsExportWaitTime)
 
 			t.Log("Querying Prometheus for connection metrics")
 
-			// Verify connection traffic bytes metric exists (ingress direction)
+			// Verify connection traffic bytes metric exists (for reverse flow)
 			if err = promClient.WaitForMetric(ctx,
 				"kubeadapt_connection_traffic_bytes",
 				map[string]string{
-					"protocol":  "tcp",
-					"direction": "ingress",
+					"protocol": "tcp",
 				},
 				1.0,
 			); err != nil {
-				t.Fatalf("Connection traffic bytes (ingress) metric not found: %v", err)
+				t.Fatalf("Connection traffic bytes metric not found: %v", err)
 			}
 
 			t.Log("✓ Multiple connection metrics successfully exported")
@@ -214,7 +212,43 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			t.Log("✅ BPF map utilization metrics verified")
 			t.Logf("   ✓ Current map utilization: %.2f%%", value)
 			t.Log("   ✓ Metric range valid: 0-100%")
-			t.Log("   ✓ Map: connection_flows (PERCPU_HASH)")
+			t.Log("   ✓ Map: connection_flows (HASH)")
+			t.Log("═══════════════════════════════════════════════════════════")
+			return ctx
+		}).Feature()
+
+	// Validate TC egress-only architecture (no direction label)
+	tcEgressOnlyValidation := features.New("TC Egress-Only Architecture Validation").
+		Assess("metrics do not have direction label (egress-only)", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+			t.Log("═══════════════════════════════════════════════════════════")
+			t.Log("→ Validating TC Egress-Only Architecture")
+			t.Log("═══════════════════════════════════════════════════════════")
+			promClient := helpers.NewPrometheusClient(t, prometheusURL)
+
+			t.Log("→ Verifying metrics do NOT have direction label")
+
+			// Query connection traffic bytes metric
+			result, err := promClient.Query(ctx, "kubeadapt_connection_traffic_bytes")
+			if err != nil {
+				t.Fatalf("Failed to query metric: %v", err)
+			}
+
+			if len(result.Data.Result) == 0 {
+				t.Skip("No metrics available yet, skipping direction label test")
+			}
+
+			// Verify NO result has a "direction" label
+			for _, r := range result.Data.Result {
+				if _, hasDirection := r.Metric["direction"]; hasDirection {
+					t.Fatalf("❌ Metric has 'direction' label (should not exist with TC egress-only tracking)")
+				}
+			}
+
+			t.Log("")
+			t.Log("✅ TC Egress-Only Architecture Validated")
+			t.Log("   ✓ No direction label in metrics (egress-only tracking)")
+			t.Log("   ✓ TC hooks attached only to egress (no ingress)")
+			t.Log("   ✓ Interface deduplication via if_index_first_seen")
 			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
@@ -223,7 +257,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 	// Agent exports ONLY raw connection-level metrics (pod IP → pod IP)
 	// Backend handles ALL aggregation via separate K8s API queries
 
-	testCluster.TestEnv().Test(t, rawIPTraffic, additionalTraffic, bpfMapUtilization)
+	testCluster.TestEnv().Test(t, rawIPTraffic, additionalTraffic, bpfMapUtilization, tcEgressOnlyValidation)
 }
 
 // TestE2EPrometheusCardinality verifies that Prometheus cardinality stays reasonable

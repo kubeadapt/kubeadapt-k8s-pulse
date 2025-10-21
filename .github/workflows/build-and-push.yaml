@@ -4,28 +4,164 @@ on:
   push:
     branches:
       - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
+    tags:
+      - 'v*.*.*'  ***REMOVED*** Trigger on version tags
 
 permissions:
   id-token: write
-  contents: read
+  contents: write  ***REMOVED*** Needed for creating releases
 
 jobs:
-  build-and-push-ebpf-agent:
-    uses: kubeadapt/actions/.github/workflows/aws-ecr-golang-build-and-push.yml@main
-    with:
-      docker_file_path: './Dockerfile'
-      go_version: '1.25.x'
-      ecr_repository_name: 'w3l5x6r6/kubeadapt/app/kubeadapt-ebpf-agent'
-      platforms: 'linux/amd64,linux/arm64'
-      run_tests: false  ***REMOVED*** Tests need BPF setup, handled in Docker build
-    secrets:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-      PLATFORM_ASSISTANT_GH_APP_ID: ${{ secrets.PLATFORM_ASSISTANT_GH_APP_ID }}
-      PLATFORM_ASSISTANT_GH_APP_PRIVATE_KEY: ${{ secrets.PLATFORM_ASSISTANT_GH_APP_PRIVATE_KEY }}
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.image_tag.outputs.tag }}
+      is_release: ${{ steps.image_tag.outputs.is_release }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  ***REMOVED*** Needed for git describe
+
+      - name: Validate and Generate Image Tag
+        id: image_tag
+        run: |
+          is_release="false"
+
+          ***REMOVED*** Check if this is a tag push
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="${GITHUB_REF***REMOVED***refs/tags/}"
+
+            ***REMOVED*** Validate tag format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2
+            if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+|-beta[0-9]+)?$ ]]; then
+              echo "❌ ERROR: '$tag' is NOT a valid release tag"
+              echo "Expected format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2"
+              exit 1
+            fi
+
+            echo "✅ '$tag' is a valid release tag"
+            is_release="true"
+          else
+            ***REMOVED*** Branch push: use main-{short-sha}
+            tag="main-${GITHUB_SHA::7}"
+            echo "Generated tag for main branch: $tag"
+          fi
+
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "is_release=$is_release" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=$tag" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Set up QEMU for Multi-Arch Build
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Multi-Arch Image
+        run: |
+          echo "Building multi-arch image for platforms: linux/amd64,linux/arm64"
+          echo "Using ECR Public registry: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}"
+
+          docker buildx build \
+            --file ./Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --tag public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }} \
+            --push \
+            --provenance=false \
+            .
+
+      - name: Tag as Latest
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || steps.image_tag.outputs.is_release == 'true'
+        run: |
+          echo "Tagging as latest..."
+          docker buildx imagetools create \
+            --tag public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:latest \
+            public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+
+      - name: Extract Binaries from Docker Image
+        if: steps.image_tag.outputs.is_release == 'true'
+        run: |
+          mkdir -p release-assets
+
+          ***REMOVED*** Extract binaries for each architecture from the multi-arch image
+          for arch in amd64 arm64; do
+            echo "Extracting binary for linux/$arch..."
+
+            ***REMOVED*** Create a container from the specific platform variant
+            container_id=$(docker create --platform linux/$arch \
+              public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }})
+
+            ***REMOVED*** Copy the binary out
+            docker cp $container_id:/usr/local/bin/ebpf-agent \
+              release-assets/ebpf-agent-linux-$arch
+
+            ***REMOVED*** Cleanup
+            docker rm $container_id
+
+            echo "✓ Extracted ebpf-agent-linux-$arch"
+          done
+
+          ls -lh release-assets/
+
+      - name: Create GitHub Release
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: ${{ contains(steps.image_tag.outputs.tag, '-rc') || contains(steps.image_tag.outputs.tag, '-beta') }}
+          files: |
+            release-assets/ebpf-agent-linux-amd64
+            release-assets/ebpf-agent-linux-arm64
+          body: |
+            ***REMOVED******REMOVED*** KubeAdapt eBPF Agent ${{ steps.image_tag.outputs.tag }}
+
+            ***REMOVED******REMOVED******REMOVED*** 🐳 Container Images
+            - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}`
+            - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:latest` (updated)
+
+            ***REMOVED******REMOVED******REMOVED*** 📦 Binaries
+            Pre-built binaries for Linux amd64 and arm64 are attached to this release.
+
+            ***REMOVED******REMOVED******REMOVED*** 🚀 Quick Start
+            ```bash
+            ***REMOVED*** Pull the container image
+            docker pull public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+
+            ***REMOVED*** Or download the binary directly
+            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ steps.image_tag.outputs.tag }}/ebpf-agent-linux-amd64
+            chmod +x ebpf-agent-linux-amd64
+            ```
+
+      - name: Image Summary
+        run: |
+          echo "***REMOVED******REMOVED******REMOVED*** 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry**: AWS ECR Public" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository**: \`${{ secrets.ECR_REPOSITORY_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: \`${{ steps.image_tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms**: linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ steps.image_tag.outputs.is_release }}" == "true" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "***REMOVED******REMOVED******REMOVED*** 📦 GitHub Release" >> $GITHUB_STEP_SUMMARY
+            echo "Release created: https://github.com/${{ github.repository }}/releases/tag/${{ steps.image_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          fi

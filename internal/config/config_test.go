@@ -37,8 +37,8 @@ func TestLoad_Defaults(t *testing.T) {
 		t.Errorf("LogLevel = %q, expected %q", cfg.LogLevel, "info")
 	}
 
-	if cfg.DumpMapInterval != DefaultDumpMapInterval {
-		t.Errorf("DumpMapInterval = %v, expected %v", cfg.DumpMapInterval, DefaultDumpMapInterval)
+	if cfg.DumpBPFMaps {
+		t.Error("DumpBPFMaps = true, expected false (default)")
 	}
 }
 
@@ -53,7 +53,7 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 	if err := os.Setenv("EBPF_COLLECTION_INTERVAL", "30s"); err != nil {
 		t.Fatalf("Failed to set EBPF_COLLECTION_INTERVAL: %v", err)
 	}
-	if err := os.Setenv("EBPF_NETNS_FILTER_MODE", "strict"); err != nil {
+	if err := os.Setenv("EBPF_NETNS_FILTER_MODE", "disabled"); err != nil {
 		t.Fatalf("Failed to set EBPF_NETNS_FILTER_MODE: %v", err)
 	}
 	if err := os.Setenv("EBPF_CONNECTION_TRACKING", "false"); err != nil {
@@ -64,9 +64,6 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 	}
 	if err := os.Setenv("EBPF_DUMP_BPF_MAPS", "true"); err != nil {
 		t.Fatalf("Failed to set EBPF_DUMP_BPF_MAPS: %v", err)
-	}
-	if err := os.Setenv("EBPF_DUMP_MAP_INTERVAL", "10s"); err != nil {
-		t.Fatalf("Failed to set EBPF_DUMP_MAP_INTERVAL: %v", err)
 	}
 	defer clearTestEnv(t)
 
@@ -84,8 +81,8 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 		t.Errorf("CollectionInterval = %v, expected 30s", cfg.CollectionInterval)
 	}
 
-	if cfg.NetnsFilterMode != "strict" {
-		t.Errorf("NetnsFilterMode = %q, expected %q", cfg.NetnsFilterMode, "strict")
+	if cfg.NetnsFilterMode != "disabled" {
+		t.Errorf("NetnsFilterMode = %q, expected %q", cfg.NetnsFilterMode, "disabled")
 	}
 
 	if cfg.ConnectionTracking {
@@ -98,10 +95,6 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 
 	if !cfg.DumpBPFMaps {
 		t.Error("DumpBPFMaps = false, expected true")
-	}
-
-	if cfg.DumpMapInterval != 10*time.Second {
-		t.Errorf("DumpMapInterval = %v, expected 10s", cfg.DumpMapInterval)
 	}
 }
 
@@ -161,7 +154,6 @@ netns_filter_mode: disabled
 connection_tracking: false
 log_level: warn
 dump_bpf_maps: true
-dump_map_interval: 12s
 `
 
 	if err := os.WriteFile(configPath, []byte(configYAML), 0644); err != nil {
@@ -293,6 +285,162 @@ func TestValidate_InvalidValues(t *testing.T) {
 	}
 }
 
+// TestLoad_InvalidDuration tests invalid duration string parsing
+func TestLoad_InvalidDuration(t *testing.T) {
+	clearTestEnv(t)
+
+	// Set invalid duration format
+	if err := os.Setenv("EBPF_COLLECTION_INTERVAL", "not-a-duration"); err != nil {
+		t.Fatalf("Failed to set EBPF_COLLECTION_INTERVAL: %v", err)
+	}
+	defer clearTestEnv(t)
+
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	// Should fall back to default when parsing fails
+	if cfg.CollectionInterval != DefaultCollectionInterval {
+		t.Errorf("CollectionInterval = %v, expected default %v for invalid duration",
+			cfg.CollectionInterval, DefaultCollectionInterval)
+	}
+}
+
+// TestLoad_PortBoundaries tests port number edge cases
+func TestLoad_PortBoundaries(t *testing.T) {
+	tests := []struct {
+		name        string
+		port        string
+		shouldError bool
+	}{
+		{"minimum valid port", "1", false},
+		{"low privileged port", "1024", false},
+		{"maximum valid port", "65535", false},
+		{"port too high", "65536", true},
+		{"port zero", "0", true},
+		{"negative port", "-1", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clearTestEnv(t)
+
+			if err := os.Setenv("EBPF_METRICS_PORT", tt.port); err != nil {
+				t.Fatalf("Failed to set EBPF_METRICS_PORT: %v", err)
+			}
+			defer clearTestEnv(t)
+
+			cfg, err := Load("")
+			// Load() calls validate() internally, so invalid ports cause Load() to error
+			if (err != nil) != tt.shouldError {
+				t.Errorf("Load() error = %v, shouldError = %v for port %s",
+					err, tt.shouldError, tt.port)
+				return
+			}
+
+			// For valid ports, verify the config was loaded correctly
+			if !tt.shouldError && cfg == nil {
+				t.Error("Load() returned nil config for valid port")
+			}
+		})
+	}
+}
+
+// TestLoad_MissingConfigFile tests behavior when config file doesn't exist
+func TestLoad_MissingConfigFile(t *testing.T) {
+	clearTestEnv(t)
+	defer clearTestEnv(t)
+
+	// Load with non-existent file path
+	cfg, err := Load("/nonexistent/config.yaml")
+	if err != nil {
+		t.Fatalf("Load() should not error on missing file, got: %v", err)
+	}
+
+	// Should use defaults when file doesn't exist
+	if cfg.MetricsPort != DefaultMetricsPort {
+		t.Errorf("MetricsPort = %d, expected default %d when file missing",
+			cfg.MetricsPort, DefaultMetricsPort)
+	}
+
+	if cfg.CollectionInterval != DefaultCollectionInterval {
+		t.Errorf("CollectionInterval = %v, expected default %v when file missing",
+			cfg.CollectionInterval, DefaultCollectionInterval)
+	}
+}
+
+// TestLoad_MalformedYAML tests handling of malformed YAML
+func TestLoad_MalformedYAML(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "bad-config.yaml")
+
+	// Write malformed YAML
+	malformedYAML := `
+metrics_port: [invalid
+collection_interval: "not properly quoted
+	bad indentation
+`
+	if err := os.WriteFile(configPath, []byte(malformedYAML), 0644); err != nil {
+		t.Fatalf("Failed to write malformed config: %v", err)
+	}
+
+	clearTestEnv(t)
+	defer clearTestEnv(t)
+
+	// Should return error for malformed YAML
+	_, err := Load(configPath)
+	if err == nil {
+		t.Error("Load() should return error for malformed YAML")
+	}
+}
+
+// TestLoad_CollectionIntervalBoundaries tests collection interval edge cases
+func TestLoad_CollectionIntervalBoundaries(t *testing.T) {
+	tests := []struct {
+		name        string
+		interval    string
+		shouldError bool
+		expectedVal time.Duration
+	}{
+		{"exactly minimum", "1s", false, 1 * time.Second},
+		{"below minimum", "500ms", true, 0},
+		{"standard value", "10s", false, 10 * time.Second},
+		{"large value", "5m", false, 5 * time.Minute},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clearTestEnv(t)
+
+			if err := os.Setenv("EBPF_COLLECTION_INTERVAL", tt.interval); err != nil {
+				t.Fatalf("Failed to set interval: %v", err)
+			}
+			defer clearTestEnv(t)
+
+			cfg, err := Load("")
+			// Load() calls validate() internally, so invalid intervals cause Load() to error
+			if (err != nil) != tt.shouldError {
+				t.Errorf("Load() error = %v, shouldError = %v for interval %s",
+					err, tt.shouldError, tt.interval)
+				return
+			}
+
+			// For valid intervals, verify the value was loaded correctly
+			if !tt.shouldError {
+				if cfg == nil {
+					t.Error("Load() returned nil config for valid interval")
+					return
+				}
+				if cfg.CollectionInterval != tt.expectedVal {
+					t.Errorf("CollectionInterval = %v, expected %v",
+						cfg.CollectionInterval, tt.expectedVal)
+				}
+			}
+		})
+	}
+}
+
 // Helper function to clear test environment variables
 func clearTestEnv(t *testing.T) {
 	t.Helper()
@@ -309,7 +457,6 @@ func clearTestEnv(t *testing.T) {
 		"EBPF_ENABLE_PROFILING",
 		"EBPF_PROFILING_PORT",
 		"EBPF_DUMP_BPF_MAPS",
-		"EBPF_DUMP_MAP_INTERVAL",
 	}
 	for _, env := range envVars {
 		if err := os.Unsetenv(env); err != nil {

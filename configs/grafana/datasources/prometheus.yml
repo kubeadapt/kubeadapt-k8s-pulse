@@ -4,9 +4,9 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: http://prometheus:9090  ***REMOVED*** Docker service name (bridge networking, internal port)
     isDefault: true
-    editable: true
+    editable: false
     jsonData:
       timeInterval: 10s
       queryTimeout: 60s

@@ -79,7 +79,6 @@ func main() {
 	// CRITICAL: Start metrics server BEFORE BPF loading
 	// This ensures metrics are scrapable even if BPF load fails
 	// ═══════════════════════════════════════════════════════════════
-	logger.Info("Starting metrics server", zap.Int("port", cfg.MetricsPort))
 	metricsServer := metrics.NewServer(cfg.MetricsPort, logger)
 	go func() {
 		if err := metricsServer.Start(); err != nil {
@@ -91,7 +90,6 @@ func main() {
 	time.Sleep(100 * time.Millisecond)
 
 	// Initialize BPF manager
-	logger.Info("Initializing BPF programs...")
 	bpfManager, err := bpf.NewManager(logger)
 	if err != nil {
 		// Don't use Fatal - keep metrics server alive for observability
@@ -109,8 +107,6 @@ func main() {
 	}()
 
 	// Load and attach BPF programs with timing
-	logger.Info("Loading BPF programs...",
-		zap.String("netns_filter_mode", cfg.NetnsFilterMode))
 	bpfLoadStart := time.Now()
 	if err := bpfManager.LoadAndAttach(cfg.NetnsFilterMode); err != nil {
 		bpfLoadDuration := time.Since(bpfLoadStart)
@@ -153,34 +149,9 @@ func main() {
 		}()
 	}
 
-	// Initialize BPF map dumping if enabled (debug mode)
-	if cfg.DumpBPFMaps {
-		logger.Info("Starting BPF map dumping",
-			zap.Duration("interval", cfg.DumpMapInterval))
-		go func() {
-			ticker := time.NewTicker(cfg.DumpMapInterval)
-			defer ticker.Stop()
-
-			for {
-				select {
-				case <-ctx.Done():
-					logger.Info("Stopping BPF map dumping")
-					return
-				case <-ticker.C:
-					// Dump all BPF maps for debugging
-					mapData, err := bpfManager.DumpMaps()
-					if err != nil {
-						logger.Error("Failed to dump BPF maps", zap.Error(err))
-						continue
-					}
-
-					// Log map data (structured logging)
-					logger.Info("BPF map dump",
-						zap.Any("maps", mapData))
-				}
-			}
-		}()
-	}
+	// NOTE: BPF map dumping moved to collector (synchronized with collection cycle)
+	// When cfg.DumpBPFMaps is enabled, collector dumps maps before deletion
+	// This ensures perfect synchronization with read-then-delete pattern
 
 	// NOTE: Container-level metrics collector removed
 	// Raw IP-based connection metrics are sufficient (pod-level, no container granularity)
@@ -194,11 +165,11 @@ func main() {
 	// This collector NO LONGER exports high-cardinality IP-level metrics
 	// It only tracks connection counts and BPF map utilization
 	if cfg.ConnectionTracking {
-		logger.Info("Starting connection collector (map utilization tracking only)...")
 		connectionCollector := collector.NewConnectionCollector(
 			bpfManager,
 			logger,
 			metricsServer.Registry(),
+			cfg, // Pass config for DumpBPFMaps flag
 		)
 
 		// Configure connection collector
@@ -212,6 +183,13 @@ func main() {
 		// Start overflow handler for ringbuffer monitoring
 		if err := connectionCollector.StartOverflowHandler(ctx); err != nil {
 			logger.Warn("Failed to start overflow handler", zap.Error(err))
+		}
+
+		// Warn if debug logging is enabled - high overflow rates may block ring buffer reader
+		if logger.Level() == zap.DebugLevel {
+			logger.Warn("Debug logging is enabled with connection tracking - " +
+				"high overflow rates may block ring buffer reader. " +
+				"Consider using INFO level in production.")
 		}
 
 		logger.Info("Connection tracking enabled (read-then-delete pattern with overflow ringbuffer)",
