@@ -48,7 +48,7 @@ YELLOW := \033[1;33m
 NC := \033[0m ***REMOVED*** No Color
 
 ***REMOVED*** Targets
-.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated test-integration-docker test-docker test-e2e docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
+.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated check-vendors test-integration-docker test-docker test-e2e test-e2e-ci docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
 
 ***REMOVED*** Default target
 all: build
@@ -73,8 +73,10 @@ help:
 	@echo "  $(GREEN)make dev$(NC)            - Run with live reload for development"
 	@echo "  $(GREEN)make test$(NC)           - Run unit tests"
 	@echo "  $(GREEN)make test-coverage$(NC)  - Generate test coverage report (excludes generated code)"
+	@echo "  $(GREEN)make check-vendors$(NC)  - Verify go.mod/go.sum are in sync (CI check)"
 	@echo "  $(GREEN)make test-integration-docker$(NC) - Run BPF integration tests in Docker"
-	@echo "  $(GREEN)make test-e2e$(NC)       - Run E2E tests with Kind cluster (all tests)"
+	@echo "  $(GREEN)make test-e2e$(NC)       - Run E2E tests with Kind cluster (local, with restoration)"
+	@echo "  $(GREEN)make test-e2e-ci$(NC)    - Run E2E tests for CI (no BPF code restoration)"
 	@echo "  $(GREEN)make lint$(NC)           - Run linters (Go + C code)"
 	@echo "  $(GREEN)make fmt$(NC)            - Format code (Go + C code with clang-format)"
 	@echo "  $(GREEN)make cov-exclude-generated$(NC) - Exclude generated code from coverage report"
@@ -222,6 +224,15 @@ test: lint
 	@echo "$(GREEN)Test coverage report:$(NC)"
 	@$(GO) tool cover -func=coverage.out | tail -1
 
+***REMOVED*** Check that go.mod and go.sum are in sync (for CI verification)
+***REMOVED*** Similar to netobserv's vendor check - catches dependency drift
+check-vendors:
+	@echo "$(GREEN)Checking go.mod and go.sum are in sync...$(NC)"
+	@$(GO) mod tidy
+	@git diff --exit-code go.mod go.sum || \
+		(echo "$(RED)go.mod or go.sum is out of sync. Run 'go mod tidy' locally.$(NC)" && exit 1)
+	@echo "$(GREEN)✓ Dependencies are in sync$(NC)"
+
 ***REMOVED*** Exclude generated code from coverage report
 cov-exclude-generated:
 	@echo "$(GREEN)Excluding generated code from coverage...$(NC)"
@@ -300,9 +311,10 @@ build-for-e2e: lint
 	@echo "$(GREEN)E2E image built for native architecture: $(ARCH)$(NC)"
 	@echo "$(YELLOW)Image available in local Docker registry: localhost/ebpf-agent:test$(NC)"
 
-***REMOVED*** Run E2E tests with Kind cluster
+***REMOVED*** Run E2E tests with Kind cluster (Local development)
 ***REMOVED*** NOTE: Builds for native architecture to avoid Rosetta eBPF kprobe issues on M-series Macs
 ***REMOVED*** NOTE: Uses BPF_MAP_SIZE=1000 for overflow testing (build-for-e2e compiles with this)
+***REMOVED*** NOTE: Restores production BPF code after tests (keeps working directory clean)
 .ONESHELL:
 test-e2e: build-for-e2e
 	@echo "$(GREEN)Running E2E tests with Kind cluster (BPF_MAP_SIZE=1000)...$(NC)"
@@ -313,6 +325,17 @@ test-e2e: build-for-e2e
 	@echo "$(YELLOW)Restoring original BPF code (production config)...$(NC)"
 	@$(MAKE) generate
 	@echo "$(GREEN)Original BPF code restored (BPF_MAP_SIZE=100000)$(NC)"
+
+***REMOVED*** Run E2E tests for CI/CD (NO restoration of BPF code)
+***REMOVED*** NOTE: CI environments are stateless - each job starts with clean checkout
+***REMOVED*** NOTE: Restoration is unnecessary and wastes 2-3 minutes of CI time
+.ONESHELL:
+test-e2e-ci: build-for-e2e
+	@echo "$(GREEN)Running E2E tests in CI (BPF_MAP_SIZE=1000)...$(NC)"
+	@$(GO) clean -testcache
+	@echo "$(GREEN)Running E2E tests (timeout: 60m)...$(NC)"
+	@$(GO) test -p 1 -timeout 60m -v ./test/e2e/...
+	@echo "$(GREEN)E2E tests complete (CI - no restoration needed)$(NC)"
 
 
 ***REMOVED*** Lint the code (Go and C)

@@ -1,0 +1,218 @@
+name: Build and Push PR Image
+
+***REMOVED*** Security Pattern: Label-gated workflow for fork PR safety
+***REMOVED*** - Uses pull_request_target to access secrets (required for ECR push)
+***REMOVED*** - Only runs when maintainer adds "ok-to-test" label
+***REMOVED*** - Label auto-removed on new commits (see rm-ok-to-test.yml)
+on:
+  pull_request_target:
+    types: [labeled]
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  ***REMOVED*** Security check: Verify authorized maintainer
+  check-authorization:
+    name: Check Label Authorization
+    if: github.event.label.name == 'ok-to-test'
+    runs-on: ubuntu-latest
+    outputs:
+      is_authorized: ${{ steps.check.outputs.authorized }}
+    steps:
+      - name: Check if actor is authorized
+        id: check
+        env:
+          ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ***REMOVED*** List of authorized maintainers who can trigger PR image builds
+          ***REMOVED*** Option 1: Hardcoded list (simple, but needs manual updates)
+          AUTHORIZED_USERS="ugurcancaykara other-maintainer-username"
+
+          ***REMOVED*** Option 2: Check GitHub team membership (requires organization)
+          ***REMOVED*** Uncomment below and comment out hardcoded list if using GitHub Teams
+          ***REMOVED*** TEAM_SLUG="ebpf-agent-maintainers"
+          ***REMOVED*** ORG_NAME="your-org-name"
+          ***REMOVED*** TEAM_MEMBERS=$(gh api /orgs/$ORG_NAME/teams/$TEAM_SLUG/members --jq '.[].login' | tr '\n' ' ')
+          ***REMOVED*** AUTHORIZED_USERS="$TEAM_MEMBERS"
+
+          if echo "$AUTHORIZED_USERS" | grep -qw "$ACTOR"; then
+            echo "authorized=true" >> $GITHUB_OUTPUT
+            echo "✅ Actor $ACTOR is authorized"
+          else
+            echo "authorized=false" >> $GITHUB_OUTPUT
+            echo "❌ Actor $ACTOR is NOT authorized"
+          fi
+
+      - name: Comment on unauthorized attempt
+        if: steps.check.outputs.authorized == 'false'
+        uses: actions/github-script@v7
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { ACTOR } = process.env;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `***REMOVED******REMOVED*** ⚠️ Unauthorized Label Addition
+
+            **User @${ACTOR} attempted to add \`ok-to-test\` label.**
+
+            This label triggers PR image builds with access to AWS secrets.
+            Only authorized maintainers can add this label.
+
+            ***REMOVED******REMOVED******REMOVED*** For Repository Maintainers
+            If you believe this user should have access, update the authorized users list in:
+            \`.github/workflows/build-pr-image.yml\`
+
+            ---
+            🔒 *This is a security measure to protect repository secrets*
+            `
+            });
+
+            // Remove the label
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: 'ok-to-test'
+            });
+
+  build-and-push-pr:
+    name: Build and Push PR Docker Image
+    needs: check-authorization
+    if: needs.check-authorization.outputs.is_authorized == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+
+      - name: Generate PR image tag
+        id: image_tag
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TAG="pr-${PR_NUMBER}-${SHORT_SHA}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "Generated PR image tag: ${TAG}"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Set up QEMU for Multi-Arch Build
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push PR Multi-Arch Image
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Building PR image for platforms: linux/amd64,linux/arm64"
+          echo "Tag: ${IMAGE_TAG}"
+
+          docker buildx build \
+            --file ./Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --tag public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} \
+            --cache-from type=registry,ref=public.ecr.aws/${ECR_REPO}:buildcache \
+            --cache-to type=registry,ref=public.ecr.aws/${ECR_REPO}:buildcache,mode=max \
+            --push \
+            --provenance=false \
+            .
+
+      - name: Comment on PR with image details
+        uses: actions/github-script@v7
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+          PR_NUMBER: ${{ github.event.number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { ECR_REPO, IMAGE_TAG, PR_NUMBER } = process.env;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `***REMOVED******REMOVED*** 🐳 PR Image Built Successfully!
+
+            **PR ***REMOVED***${PR_NUMBER}** test image is ready:
+
+            ***REMOVED******REMOVED******REMOVED*** 📦 Image Details
+            - **Repository:** \`public.ecr.aws/${ECR_REPO}\`
+            - **Tag:** \`${IMAGE_TAG}\`
+            - **Platforms:** \`linux/amd64\`, \`linux/arm64\`
+
+            ***REMOVED******REMOVED******REMOVED*** 🚀 Quick Test
+            \`\`\`bash
+            ***REMOVED*** Pull the PR image
+            docker pull public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
+
+            ***REMOVED*** Run locally
+            docker run --rm --privileged \\
+              public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
+            \`\`\`
+
+            ***REMOVED******REMOVED******REMOVED*** 🎯 Deploy to Kind for Testing
+            \`\`\`bash
+            ***REMOVED*** Create Kind cluster
+            kind create cluster --name pr-test
+
+            ***REMOVED*** Load PR image to Kind
+            docker pull public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
+            kind load docker-image public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} --name pr-test
+
+            ***REMOVED*** Deploy with PR image
+            kubectl apply -f deployments/kubernetes/
+            kubectl set image daemonset/kubeadapt-ebpf-agent \\
+              ebpf-agent=public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} \\
+              -n kubeadapt-system
+            \`\`\`
+
+            ---
+            `
+            })
+
+      - name: PR Image Summary
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          echo "***REMOVED******REMOVED******REMOVED*** 🐳 PR Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**PR Number**: ***REMOVED***${PR_NUMBER}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: \`${IMAGE_TAG}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms**: linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

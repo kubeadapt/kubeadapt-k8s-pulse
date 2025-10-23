@@ -62,7 +62,6 @@ make run-local
 - Metrics: `http://localhost:9090/metrics`
 - Health check: `http://localhost:9090/health`
 - Prometheus UI: `http://localhost:9091`
-- Grafana: `http://localhost:3000`
 
 ***REMOVED******REMOVED******REMOVED*** The "I Want to Understand Everything" Path
 
@@ -96,7 +95,7 @@ make test
 
 ***REMOVED*** Step 6: Run the full stack
 make run-local
-***REMOVED*** Starts agent + Prometheus + Grafana
+***REMOVED*** Starts agent + Prometheus
 ***REMOVED*** ⏱️  ~30 seconds
 ```
 
@@ -302,7 +301,7 @@ make build     ***REMOVED*** 2 seconds
 ***REMOVED*** Phase 4: Full Testing (~5 minutes)
 make run-local
 curl localhost:9090/metrics | grep duration
-***REMOVED*** Open Grafana, verify the new metric appears
+***REMOVED*** Verify the new metric appears in Prometheus
 
 ***REMOVED*** Phase 5: Submit for Review
 make lint          ***REMOVED*** 5 seconds
@@ -597,8 +596,6 @@ Our `docker-compose.yml` defines the full local development stack:
 | `ebpf-dev`      | Development with hot-reload      | 9090  | `make dev`            |
 | `bpf-builder`   | BPF compilation only             | N/A   | `make generate` (internal) |
 | `prometheus`    | Metrics collection               | 9091  | `make run-local`      |
-| `grafana`       | Metrics visualization            | 3000  | `make run-local`      |
-| `node-exporter` | System metrics (for comparison)  | 9100  | `make run-local`      |
 
 ***REMOVED******REMOVED******REMOVED*** How Docker Builds Actually Work
 
@@ -678,9 +675,9 @@ prometheus.MustRegister(dnsLatencyHistogram)
 make run-local
 curl localhost:9090/metrics | grep dns_latency
 
-***REMOVED*** 6. Verify in Grafana
-***REMOVED*** Open http://localhost:3000
-***REMOVED*** Create panel with: rate(ebpf_dns_latency_seconds_sum[5m])
+***REMOVED*** 6. Verify in Prometheus
+***REMOVED*** Open http://localhost:9091
+***REMOVED*** Query: rate(ebpf_dns_latency_seconds_sum[5m])
 ```
 
 **Time**: ~30 minutes end-to-end
@@ -1160,7 +1157,7 @@ High-level explanation of your approach
 - [ ] BPF programs load successfully
 
 ***REMOVED******REMOVED*** Screenshots (if applicable)
-Grafana dashboard showing new metric
+Prometheus query showing new metric
 
 ***REMOVED******REMOVED*** Checklist
 - [ ] Code follows style guidelines (`make lint`)
