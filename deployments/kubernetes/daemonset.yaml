@@ -28,6 +28,17 @@ spec:
         image: kubeadapt/ebpf-agent:latest
         imagePullPolicy: Always
         env:
+        ***REMOVED*** DaemonSet pod identity (for Prometheus metric labels)
+        ***REMOVED*** These labels disambiguate agent restarts in Counter metrics
+        - name: DAEMONSET_POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        - name: DAEMONSET_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        ***REMOVED*** Legacy pod metadata (kept for backward compatibility)
         - name: NODE_NAME
           valueFrom:
             fieldRef:

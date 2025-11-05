@@ -94,7 +94,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 
 			// Verify connection traffic bytes metric exists (with any IP addresses)
 			if err = promClient.WaitForMetric(ctx,
-				"kubeadapt_connection_traffic_bytes",
+				"kubeadapt_connection_traffic_bytes_total",
 				map[string]string{
 					"protocol": "tcp",
 				},
@@ -105,7 +105,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 
 			// Verify connection traffic packets metric exists
 			if err = promClient.WaitForMetric(ctx,
-				"kubeadapt_connection_traffic_packets",
+				"kubeadapt_connection_traffic_packets_total",
 				map[string]string{
 					"protocol": "tcp",
 				},
@@ -158,7 +158,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 
 			// Verify connection traffic bytes metric exists (for reverse flow)
 			if err = promClient.WaitForMetric(ctx,
-				"kubeadapt_connection_traffic_bytes",
+				"kubeadapt_connection_traffic_bytes_total",
 				map[string]string{
 					"protocol": "tcp",
 				},
@@ -228,7 +228,7 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			t.Log("→ Verifying metrics do NOT have direction label")
 
 			// Query connection traffic bytes metric
-			result, err := promClient.Query(ctx, "kubeadapt_connection_traffic_bytes")
+			result, err := promClient.Query(ctx, "kubeadapt_connection_traffic_bytes_total")
 			if err != nil {
 				t.Fatalf("Failed to query metric: %v", err)
 			}
@@ -272,7 +272,7 @@ func TestE2EPrometheusCardinality(t *testing.T) {
 		prometheusURL     = "http://localhost:30090"
 		maxCardinality    = 50_000 // Maximum allowed time series per metric for test environment (see CARDINALITY_ANALYSIS.md)
 		testNamespace     = "test"
-		cardinalityMetric = "kubeadapt_connection_traffic_bytes"
+		cardinalityMetric = "kubeadapt_connection_traffic_bytes_total"
 	)
 
 	cardinalityCheck := features.New("Prometheus Cardinality Check").

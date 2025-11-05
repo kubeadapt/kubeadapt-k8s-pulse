@@ -35,6 +35,10 @@ func TestConnectionTracking(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	// Set required environment variables for DaemonSet pod identity
+	os.Setenv("DAEMONSET_POD_UID", "test-pod-uid-12345")
+	os.Setenv("DAEMONSET_NODE_NAME", "test-node")
+
 	logger := zaptest.NewLogger(t)
 
 	// Create BPF manager
@@ -87,13 +91,13 @@ func TestConnectionTracking(t *testing.T) {
 	// Verify connection tracking metrics exist
 	// These are the actual metrics exported by the collector
 	expectedMetrics := []string{
-		"kubeadapt_connection_traffic_bytes",       // Gauge for cumulative bytes
-		"kubeadapt_connection_traffic_packets",     // Gauge for cumulative packets
-		"kubeadapt_active_connections",             // Gauge for number of active connections
-		"kubeadapt_connection_tracking_info",       // Info metric with version/build details
-		"kubeadapt_bpf_map_utilization_percent",    // Gauge for BPF map utilization
-		"kubeadapt_overflow_flows_total",           // Counter for overflow events
-		"kubeadapt_ip_pairs_batch_size",            // Gauge for batch size
+		"kubeadapt_connection_traffic_bytes_total",   // Counter for cumulative bytes (read-then-delete)
+		"kubeadapt_connection_traffic_packets_total", // Counter for cumulative packets (read-then-delete)
+		"kubeadapt_active_connections",               // Gauge for number of active connections
+		"kubeadapt_connection_tracking_info",         // Info metric with version/build details
+		"kubeadapt_bpf_map_utilization_percent",      // Gauge for BPF map utilization
+		"kubeadapt_overflow_flows_total",             // Counter for overflow events
+		"kubeadapt_ip_pairs_batch_size",              // Gauge for batch size
 	}
 
 	foundMetrics := make(map[string]bool)
@@ -391,8 +395,8 @@ func TestIPv6Connections(t *testing.T) {
 		},
 		SrcPort:  8080,
 		DstPort:  443,
-		Protocol: 6,      // TCP
-		Family:   10,     // AF_INET6
+		Protocol: 6,  // TCP
+		Family:   10, // AF_INET6
 	}
 
 	testStats := bpf.ConnectionStats{
@@ -541,14 +545,14 @@ func TestMetricValueAssertions(t *testing.T) {
 	// Find total bytes and packets from metrics
 	var actualTotalBytes, actualTotalPackets float64
 	for _, mf := range metricFamilies {
-		if *mf.Name == "kubeadapt_connection_traffic_bytes" {
+		if *mf.Name == "kubeadapt_connection_traffic_bytes_total" {
 			for _, m := range mf.Metric {
-				actualTotalBytes += *m.Gauge.Value
+				actualTotalBytes += *m.Counter.Value
 			}
 		}
-		if *mf.Name == "kubeadapt_connection_traffic_packets" {
+		if *mf.Name == "kubeadapt_connection_traffic_packets_total" {
 			for _, m := range mf.Metric {
-				actualTotalPackets += *m.Gauge.Value
+				actualTotalPackets += *m.Counter.Value
 			}
 		}
 	}

@@ -65,7 +65,6 @@ type networkMapSpecs struct {
 	FilterModeMap   *ebpf.MapSpec `ebpf:"filter_mode_map"`
 	GlobalCounters  *ebpf.MapSpec `ebpf:"global_counters"`
 	HostNetnsMap    *ebpf.MapSpec `ebpf:"host_netns_map"`
-	OffsetConfig    *ebpf.MapSpec `ebpf:"offset_config"`
 	OverflowEvents  *ebpf.MapSpec `ebpf:"overflow_events"`
 }
 
@@ -99,7 +98,6 @@ type networkMaps struct {
 	FilterModeMap   *ebpf.Map `ebpf:"filter_mode_map"`
 	GlobalCounters  *ebpf.Map `ebpf:"global_counters"`
 	HostNetnsMap    *ebpf.Map `ebpf:"host_netns_map"`
-	OffsetConfig    *ebpf.Map `ebpf:"offset_config"`
 	OverflowEvents  *ebpf.Map `ebpf:"overflow_events"`
 }
 
@@ -109,7 +107,6 @@ func (m *networkMaps) Close() error {
 		m.FilterModeMap,
 		m.GlobalCounters,
 		m.HostNetnsMap,
-		m.OffsetConfig,
 		m.OverflowEvents,
 	)
 }

@@ -112,13 +112,3 @@ func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 
 	return nil
 }
-
-// InitializeOffsetConfig is DEPRECATED and no longer used
-// Strict mode is not supported for TC programs, so offset configuration is not needed
-//
-// NOTE: This function remains for backward compatibility but does nothing
-// It will be removed in a future version
-func (m *Manager) InitializeOffsetConfig(offsets *NetnsOffsets) error {
-	m.logger.Warn("InitializeOffsetConfig called but is deprecated - strict mode not supported for TC programs")
-	return nil
-}

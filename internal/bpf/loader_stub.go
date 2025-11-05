@@ -60,8 +60,3 @@ func (m *Manager) Close() error {
 func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 	return fmt.Errorf("eBPF is only supported on Linux")
 }
-
-// InitializeOffsetConfig returns an error on non-Linux platforms
-func (m *Manager) InitializeOffsetConfig(offsets *NetnsOffsets) error {
-	return fmt.Errorf("eBPF is only supported on Linux")
-}

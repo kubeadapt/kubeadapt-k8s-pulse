@@ -38,8 +38,7 @@ type Manager struct {
 
 	// Maps for easy access
 	// TC implementation uses connection_flows for tracking, overflow_events for overflow events,
-	// and global_counters for observability. Network namespace filtering uses filter_mode_map,
-	// host_netns_map, and offset_config (not exposed via getters).
+	// and global_counters for observability. Network namespace filtering uses filter_mode_map.
 	connectionFlows *ebpf.Map // Connection tracking map
 	overflowRingbuf *ebpf.Map // Overflow ringbuffer for flow records
 	globalCounters  *ebpf.Map // eBPF observability counters

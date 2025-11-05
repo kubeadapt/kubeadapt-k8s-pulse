@@ -107,6 +107,9 @@ services:
       EBPF_LOG_FORMAT: text
       EBPF_COLLECTION_INTERVAL: 25s
       NODE_NAME: local-dev-bridge
+      ***REMOVED*** DaemonSet pod identity (for Prometheus metric labels)
+      DAEMONSET_POD_UID: dev-local-pod-12345-abcde
+      DAEMONSET_NODE_NAME: docker-desktop-m1
       ***REMOVED*** Network namespace filtering - default mode for bridge networking
       ***REMOVED*** Bridge mode limitation: ONLY default mode works (disabled requires host mode)
       EBPF_NETNS_FILTER_MODE: default
