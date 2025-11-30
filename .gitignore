@@ -25,8 +25,7 @@ coverage.txt
 *.cov
 
 ***REMOVED*** Dependency directories
-vendor/*
-!vendor/modules.txt
+vendor/
 
 ***REMOVED*** IDE directories
 .idea/
