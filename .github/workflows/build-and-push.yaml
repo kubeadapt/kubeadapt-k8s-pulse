@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
     tags:
       - 'v*.*.*'  ***REMOVED*** Trigger on version tags
 
@@ -18,12 +19,24 @@ jobs:
     outputs:
       image_tag: ${{ steps.image_tag.outputs.tag }}
       is_release: ${{ steps.image_tag.outputs.is_release }}
+      registry_type: ${{ steps.registry_config.outputs.registry_type }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  ***REMOVED*** Needed for git describe
+
+      - name: Determine Registry Configuration
+        id: registry_config
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/develop ]]; then
+            echo "registry_type=private" >> $GITHUB_OUTPUT
+            echo "🔒 Using PRIVATE ECR (develop branch)"
+          else
+            echo "registry_type=public" >> $GITHUB_OUTPUT
+            echo "🌐 Using PUBLIC ECR (main/release)"
+          fi
 
       - name: Validate and Generate Image Tag
         id: image_tag
@@ -43,8 +56,12 @@ jobs:
 
             echo "✅ '$tag' is a valid release tag"
             is_release="true"
+          elif [[ "$GITHUB_REF" == refs/heads/develop ]]; then
+            ***REMOVED*** Develop branch: use dev-{short-sha}
+            tag="dev-${GITHUB_SHA::7}"
+            echo "Generated tag for develop branch: $tag"
           else
-            ***REMOVED*** Branch push: use main-{short-sha}
+            ***REMOVED*** Main branch: use main-{short-sha}
             tag="main-${GITHUB_SHA::7}"
             echo "Generated tag for main branch: $tag"
           fi
@@ -53,17 +70,33 @@ jobs:
           echo "is_release=$is_release" >> $GITHUB_OUTPUT
           echo "IMAGE_TAG=$tag" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials
+      ***REMOVED*** === PUBLIC ECR (main + releases) ===
+      - name: Configure AWS Credentials (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR Public
-        id: login-ecr
+        if: steps.registry_config.outputs.registry_type == 'public'
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
+
+      ***REMOVED*** === PRIVATE ECR (develop) ===
+      - name: Configure AWS Credentials (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PRIVATE_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_PRIVATE_REGION }}
+
+      - name: Login to Amazon ECR Private
+        if: steps.registry_config.outputs.registry_type == 'private'
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: private
 
       - name: Set up QEMU for Multi-Arch Build
         uses: docker/setup-qemu-action@v3
@@ -71,7 +104,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Multi-Arch Image
+      ***REMOVED*** === BUILD & PUSH: PUBLIC ECR ===
+      - name: Build and Push Multi-Arch Image (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public'
         env:
           ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
@@ -89,8 +124,28 @@ jobs:
             --provenance=false \
             .
 
-      - name: Tag as Latest
-        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || steps.image_tag.outputs.is_release == 'true'
+      ***REMOVED*** === BUILD & PUSH: PRIVATE ECR ===
+      - name: Build and Push Multi-Arch Image (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        env:
+          ECR_REPO: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Building multi-arch image for platforms: linux/amd64,linux/arm64"
+          echo "Using ECR Private registry: ${ECR_REPO}"
+
+          docker buildx build \
+            --file ./Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${ECR_REPO}:${IMAGE_TAG} \
+            --cache-from type=registry,ref=${ECR_REPO}:buildcache \
+            --cache-to type=registry,ref=${ECR_REPO}:buildcache,mode=max \
+            --push \
+            --provenance=false \
+            .
+
+      - name: Tag as Latest (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public' && ((github.ref == 'refs/heads/main' && github.event_name == 'push') || steps.image_tag.outputs.is_release == 'true')
         env:
           ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
@@ -99,6 +154,17 @@ jobs:
           docker buildx imagetools create \
             --tag public.ecr.aws/${ECR_REPO}:latest \
             public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
+
+      - name: Tag as Latest (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        env:
+          ECR_REPO: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Tagging as dev-latest..."
+          docker buildx imagetools create \
+            --tag ${ECR_REPO}:dev-latest \
+            ${ECR_REPO}:${IMAGE_TAG}
 
       - name: Extract Binaries from Docker Image
         if: steps.image_tag.outputs.is_release == 'true'
@@ -159,22 +225,35 @@ jobs:
 
       - name: Image Summary
         env:
-          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          REGISTRY_TYPE: ${{ steps.registry_config.outputs.registry_type }}
+          ECR_REPO_PUBLIC: ${{ secrets.ECR_REPOSITORY_NAME }}
+          ECR_REPO_PRIVATE: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
           IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
           IS_RELEASE: ${{ steps.image_tag.outputs.is_release }}
           GITHUB_REPO: ${{ github.repository }}
         run: |
           echo "***REMOVED******REMOVED******REMOVED*** 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Registry**: AWS ECR Public" >> $GITHUB_STEP_SUMMARY
-          echo "**Repository**: \`${ECR_REPO}\`" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${REGISTRY_TYPE}" == "public" ]]; then
+            echo "**Registry**: AWS ECR Public" >> $GITHUB_STEP_SUMMARY
+            echo "**Repository**: \`${ECR_REPO_PUBLIC}\`" >> $GITHUB_STEP_SUMMARY
+            echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "docker pull public.ecr.aws/${ECR_REPO_PUBLIC}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Registry**: AWS ECR Private (dev)" >> $GITHUB_STEP_SUMMARY
+            echo "**Repository**: \`${ECR_REPO_PRIVATE}\`" >> $GITHUB_STEP_SUMMARY
+            echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "docker pull ${ECR_REPO_PRIVATE}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Tag**: \`${IMAGE_TAG}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Platforms**: linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
-          echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "docker pull public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
 
           if [[ "${IS_RELEASE}" == "true" ]]; then
             echo "" >> $GITHUB_STEP_SUMMARY
