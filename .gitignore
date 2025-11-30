@@ -8,10 +8,11 @@ ebpf-agent
 agent
 ebpf-agent.tar
 
-***REMOVED*** BPF compiled objects (but keep generated Go files - they're committed like netobserv)
+***REMOVED*** BPF compiled objects (but keep generated files - they're committed like netobserv)
 *.o
-***REMOVED*** Exception: internal/bpf/*_bpfel.go and *_bpfeb.go ARE committed (pre-generated)
-***REMOVED*** Only ignore .o files from BPF compilation
+***REMOVED*** Exception: pre-generated BPF bindings ARE committed (required for CI build)
+!internal/bpf/*_bpfel.o
+!internal/bpf/*_bpfeb.o
 bpf/output/
 
 ***REMOVED*** Test binaries
