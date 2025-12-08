@@ -10,16 +10,25 @@
 // - Tracks retransmissions and all network activity
 // - Provides accurate ingress/egress bandwidth metrics
 //
-// Inspired by: NetObserv eBPF agent (github.com/netobserv/netobserv-ebpf-agent)
+// Compile-time Options:
+// - DISABLE_IPV6: Disable IPv6 support for kernel 5.10 compatibility
+//   The BPF verifier on kernel 5.10 has stricter bounds checking that
+//   rejects the IPv6 extension header parsing code. Define this flag
+//   when compiling for older kernels (5.10, 5.11, 5.12, 5.13, 5.14).
+//   IPv6 works correctly on kernel 5.15+.
 // ───────────────────────────────────────────────────────────────────────────
 
 // Standard kernel type definitions
 ***REMOVED***include <linux/bpf.h>
 ***REMOVED***include <linux/if_ether.h>
 ***REMOVED***include <linux/in.h>
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***include <linux/in6.h>
+***REMOVED***endif
 ***REMOVED***include <linux/ip.h>
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***include <linux/ipv6.h>
+***REMOVED***endif
 ***REMOVED***include <linux/tcp.h>
 ***REMOVED***include <linux/types.h>
 ***REMOVED***include <linux/udp.h>
@@ -34,8 +43,10 @@
 ***REMOVED***define AF_INET 2
 ***REMOVED***endif
 
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***ifndef AF_INET6
 ***REMOVED***define AF_INET6 10
+***REMOVED***endif
 ***REMOVED***endif
 
 ***REMOVED***ifndef IPPROTO_TCP
@@ -50,14 +61,17 @@
 ***REMOVED***define ETH_P_IP 0x0800
 ***REMOVED***endif
 
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***ifndef ETH_P_IPV6
 ***REMOVED***define ETH_P_IPV6 0x86DD
+***REMOVED***endif
 ***REMOVED***endif
 
 ***REMOVED***ifndef IPPROTO_ICMP
 ***REMOVED***define IPPROTO_ICMP 1
 ***REMOVED***endif
 
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***ifndef IPPROTO_ICMPV6
 ***REMOVED***define IPPROTO_ICMPV6 58
 ***REMOVED***endif
@@ -104,6 +118,7 @@ struct ipv6_frag_hdr {
 // Fragment offset mask and flags
 ***REMOVED***define IPV6_FRAG_OFF_MASK 0xFFF8  // Bits 15-3: fragment offset (in 8-byte units)
 ***REMOVED***define IPV6_FRAG_MF 0x0001         // Bit 0: More Fragments flag
+***REMOVED***endif // DISABLE_IPV6
 
 // TC return codes
 ***REMOVED***ifndef TC_ACT_OK
@@ -127,7 +142,9 @@ struct ipv6_frag_hdr {
 ***REMOVED***define COUNTER_PARSE_ERRORS 2
 ***REMOVED***define COUNTER_HOST_FILTERED 3
 ***REMOVED***define COUNTER_IPV4_FRAGMENTS 4
+***REMOVED***ifndef DISABLE_IPV6
 ***REMOVED***define COUNTER_IPV6_FRAGMENTS 5
+***REMOVED***endif
 ***REMOVED***define MAX_COUNTERS 16
 
 // BPF map size (should match network_monitor.c)
@@ -247,6 +264,7 @@ static __always_inline void increase_counter(__u32 counter_type) {
   }
 }
 
+***REMOVED***ifndef DISABLE_IPV6
 // IPv6 extension header structure (RFC 8200)
 // Note: This is already defined in <linux/ipv6.h>, but we'll use it directly
 // struct ipv6_opt_hdr {
@@ -389,6 +407,7 @@ static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
   // Exceeded maximum headers - give up
   return -1;
 }
+***REMOVED***endif // DISABLE_IPV6
 
 // Parse IPv4 packet headers
 static __always_inline int
@@ -488,6 +507,7 @@ parse_ipv4(struct iphdr *ip, void *data_end, struct connection_key *key,
   return PARSE_DISCARD;
 }
 
+***REMOVED***ifndef DISABLE_IPV6
 // Parse IPv6 packet headers (WITH extension header support!)
 static __always_inline int parse_ipv6(struct ipv6hdr *ip6, void *data_end,
                                       struct connection_key *key,
@@ -572,6 +592,7 @@ static __always_inline int parse_ipv6(struct ipv6hdr *ip6, void *data_end,
   // Other protocols - discard
   return PARSE_DISCARD;
 }
+***REMOVED***endif // DISABLE_IPV6
 
 // Parse packet and extract connection key
 static __always_inline int
@@ -597,11 +618,14 @@ parse_packet(struct __sk_buff *skb, struct connection_key *key,
   // Parse based on EtherType (now with packet_bytes output)
   if (eth_proto == ETH_P_IP) {
     return parse_ipv4((struct iphdr *)l3_hdr, data_end, key, packet_bytes);
-  } else if (eth_proto == ETH_P_IPV6) {
+  }
+***REMOVED***ifndef DISABLE_IPV6
+  else if (eth_proto == ETH_P_IPV6) {
     return parse_ipv6((struct ipv6hdr *)l3_hdr, data_end, key, packet_bytes);
   }
+***REMOVED***endif
 
-  // Non-IP traffic
+  // Non-IP traffic (or IPv6 when DISABLE_IPV6 is defined)
   return PARSE_DISCARD;
 }
 
@@ -723,7 +747,7 @@ static __always_inline void update_stats(struct connection_key *key,
     long ret =
         bpf_map_update_elem(&connection_flows, key, &new_stats, BPF_NOEXIST);
 
-    // Handle map full condition (learned from NetObserv)
+    // Handle map full condition
     if (ret != 0 && ret != -17) { // -17 = EEXIST (concurrent insert)
       // Map is full or busy - send to overflow ringbuffer
       struct overflow_event *event = bpf_ringbuf_reserve(

@@ -208,7 +208,7 @@ func main() {
 	case sig := <-sigChan:
 		logger.Info("Received signal, shutting down...", zap.String("signal", sig.String()))
 	case <-ctx.Done():
-		logger.Info("Context cancelled, shutting down...")
+		logger.Info("Context canceled, shutting down...")
 	}
 
 	// Graceful shutdown

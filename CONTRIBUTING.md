@@ -137,7 +137,7 @@ This is the most important concept to understand. Here's what happens on **your 
 └─────────────────────────────────────────┘
 ```
 
-**Key insight**: You ARE doing real local development! Docker is just a transparent Linux kernel provider for the parts that need it. This is not a workaround—it's how industry-standard eBPF projects like [NetObserv](https://github.com/netobserv/netobserv-ebpf-agent) do it too.
+**Key insight**: You ARE doing real local development! Docker is just a transparent Linux kernel provider for the parts that need it. This is not a workaround—it's the industry standard approach for cross-platform eBPF development.
 
 ***REMOVED******REMOVED******REMOVED*** Why Docker? (The Real Answer)
 
@@ -149,7 +149,7 @@ This is the most important concept to understand. Here's what happens on **your 
 
 3. **Production parity** - Your Docker container uses the same environment as production Kubernetes clusters. When it works locally, it works in prod.
 
-4. **NetObserv does it** - Red Hat's production eBPF observability project uses the exact same Docker-based compilation approach. If it's good enough for them, it's good enough for us!
+4. **Industry proven** - Production-grade eBPF observability projects use the exact same Docker-based compilation approach.
 
 ***REMOVED******REMOVED******REMOVED*** The Three Dockerfiles (And Why They Exist)
 
@@ -1212,7 +1212,7 @@ git push origin --delete feat/my-awesome-feature
 - **Documentation**:
   - This file (CONTRIBUTING.md)
   - README.md for project overview
-  - docs/NETOBSERV_COMPARISON_ANALYSIS.md for architecture decisions
+  - docs/ARCHITECTURE_DECISIONS.md for architecture decisions
   - docs/ folder for detailed technical docs
 
 ***REMOVED******REMOVED******REMOVED*** Common Questions
@@ -1318,5 +1318,5 @@ Your time and expertise are genuinely appreciated. Welcome to the team! 🚀
 **Quick Links**:
 - [README.md](README.md) - Project overview
 - [Makefile](Makefile) - All available commands (Lines 52-95 for help)
-- [NetObserv Comparison](docs/NETOBSERV_COMPARISON_ANALYSIS.md) - Architecture decisions
+- [Architecture Decisions](docs/ARCHITECTURE_DECISIONS.md) - Design rationale
 - [E2E Testing Guide](test/e2e/README.md) - End-to-end test details

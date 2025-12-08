@@ -8,7 +8,7 @@ ebpf-agent
 agent
 ebpf-agent.tar
 
-***REMOVED*** BPF compiled objects (but keep generated files - they're committed like netobserv)
+***REMOVED*** BPF compiled objects (but keep pre-generated bindings for CI)
 *.o
 ***REMOVED*** Exception: pre-generated BPF bindings ARE committed (required for CI build)
 !internal/bpf/*_bpfel.o
@@ -25,7 +25,7 @@ coverage.txt
 *.cov
 
 ***REMOVED*** Dependency directories
-vendor/
+***REMOVED*** vendor/ - committed for reproducible CI builds
 
 ***REMOVED*** IDE directories
 .idea/

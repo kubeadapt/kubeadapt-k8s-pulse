@@ -12,7 +12,11 @@ ARG BPF2GO_VERSION=v0.19.0
 ARG CLANG_FORMAT_VERSION=14
 
 ***REMOVED*** Install BPF compilation dependencies with explicit versions
-RUN apt-get update && apt-get install -y \
+***REMOVED*** DEBIAN_FRONTEND=noninteractive prevents debconf prompts
+***REMOVED*** Dpkg::Options forces automatic conffile handling (keeps package maintainer's version)
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y --no-install-recommends \
+    -o Dpkg::Options::="--force-confnew" \
     clang-${LLVM_VERSION} \
     llvm-${LLVM_VERSION} \
     libbpf-dev \
@@ -41,12 +45,16 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
         ln -sf /usr/include/aarch64-linux-gnu/asm-generic /usr/include/asm-generic; \
     fi
 
-***REMOVED*** Install bpf2go with pinned version for generating Go bindings
-RUN go install github.com/cilium/ebpf/cmd/bpf2go@${BPF2GO_VERSION}
-
-***REMOVED*** Set up Go environment explicitly (for CI reproducibility)
+***REMOVED*** Set up Go environment explicitly (required BEFORE go install)
+***REMOVED*** This ensures bpf2go binary is in PATH after installation
 ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:/usr/local/go/bin:${PATH}"
+
+***REMOVED*** Install bpf2go with pinned version for generating Go bindings
+***REMOVED*** Verify installation succeeds by checking binary exists
+RUN go install github.com/cilium/ebpf/cmd/bpf2go@${BPF2GO_VERSION} && \
+    which bpf2go && \
+    bpf2go --help | head -1
 
 WORKDIR /workspace
 

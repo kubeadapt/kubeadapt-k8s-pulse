@@ -1,0 +1,4 @@
+***REMOVED*** Force line ending normalisation
+*	text=auto
+***REMOVED*** Show types.go in the PR diff view by default
+internal/sys/types.go linguist-generated=false

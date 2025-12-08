@@ -189,11 +189,11 @@ jobs:
             docker pull public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
             kind load docker-image public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} --name pr-test
 
-            ***REMOVED*** Deploy with PR image
-            kubectl apply -f deployments/kubernetes/
-            kubectl set image daemonset/kubeadapt-ebpf-agent \\
-              ebpf-agent=public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} \\
-              -n kubeadapt-system
+            ***REMOVED*** Deploy with Helm chart (from kubeadapt-helm repository)
+            helm upgrade --install ebpf-agent <path-to-chart> \\
+              --set image.repository=public.ecr.aws/${ECR_REPO} \\
+              --set image.tag=${IMAGE_TAG} \\
+              -n kubeadapt-system --create-namespace
             \`\`\`
 
             ---

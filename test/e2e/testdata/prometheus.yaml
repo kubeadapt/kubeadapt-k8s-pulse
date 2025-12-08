@@ -104,7 +104,7 @@ metadata:
     app: prometheus
 spec:
   ***REMOVED*** NodePort for E2E test access via localhost:30090
-  ***REMOVED*** This follows NetObserv's pattern - no kubectl port-forward needed
+  ***REMOVED*** This follows production eBPF projects's pattern - no kubectl port-forward needed
   ***REMOVED*** NOTE: Kind cluster extraPortMappings makes this accessible on host
   type: NodePort
   ports:

@@ -78,7 +78,7 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 			// Preconditions: Namespaces and RBAC must be created first
 			{
 				Order:        Preconditions,
-				ManifestFile: path.Join(baseDir, "deployments", "kubernetes", "namespace.yaml"),
+				ManifestFile: path.Join(testDataDir(), "namespace.yaml"),
 				Ready:        nil, // Namespace is created synchronously
 			},
 			{
@@ -88,7 +88,7 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 			},
 			{
 				Order:        Preconditions,
-				ManifestFile: path.Join(baseDir, "deployments", "kubernetes", "rbac.yaml"),
+				ManifestFile: path.Join(testDataDir(), "rbac.yaml"),
 				Ready:        nil, // RBAC resources are created synchronously
 			},
 			// External Services: Deploy Prometheus for metrics collection
@@ -155,7 +155,7 @@ func (c *Cluster) Run(m *testing.M) {
 	}
 
 	// Deploy all manifests in order, with readiness checks grouped by order
-	// This follows NetObserv's deployment ordering pattern where dependencies
+	// This follows production eBPF projects's deployment ordering pattern where dependencies
 	// are fully ready before dependent components are deployed
 	var readyFuncs []env.Func
 	currentOrder := Preconditions
@@ -203,7 +203,7 @@ func (c *Cluster) TestEnv() env.Environment {
 }
 
 // orderedDeployments returns deployments sorted by Order, then alphabetically by ManifestFile
-// This implements NetObserv's deployment ordering pattern for explicit dependency management
+// This implements production eBPF projects's deployment ordering pattern for explicit dependency management
 func (c *Cluster) orderedDeployments() []Deployment {
 	sorted := make([]Deployment, len(c.deployments))
 	copy(sorted, c.deployments)

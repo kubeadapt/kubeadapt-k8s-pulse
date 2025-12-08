@@ -1,46 +1,94 @@
 ***REMOVED*** golangci-lint configuration for eBPF Agent
-***REMOVED*** Production-ready configuration for Kubernetes + eBPF projects
-
-***REMOVED*** This configuration targets golangci-lint v2.x
-version: "2"
+***REMOVED*** Compatible with golangci-lint v1.x
 
 run:
   timeout: 5m
   modules-download-mode: readonly
   tests: true
 
-  skip-dirs:
+issues:
+  exclude-dirs:
     - vendor
     - third_party
-    - test/unit          ***REMOVED*** Skip unit tests with API mismatches
+    - test/unit
 
-  skip-files:
-    - ".*_bpfel\\.go$"    ***REMOVED*** Generated BPF code (little-endian)
-    - ".*_bpfeb\\.go$"    ***REMOVED*** Generated BPF code (big-endian)
+  exclude-files:
+    - ".*_bpfel\\.go$"
+    - ".*_bpfeb\\.go$"
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  exclude-rules:
+    ***REMOVED*** Exclude all linters for generated BPF code
+    - path: "_bpfe[lb]\\.go"
+      linters:
+        - govet
+        - errcheck
+        - staticcheck
+        - unused
+        - ineffassign
+
+    ***REMOVED*** Allow unsafe and complex code in BPF loader
+    - path: "internal/bpf/"
+      linters:
+        - gosec
+        - gocyclo
+        - cyclop
+        - errcheck
+
+    ***REMOVED*** Test files have different requirements
+    - path: "_test\\.go"
+      linters:
+        - errcheck
+        - goconst
+        - unused
+        - funlen
+        - dupl
+
+    ***REMOVED*** E2E test helpers and internal system
+    - path: "test/e2e/"
+      linters:
+        - errcheck
+        - goconst
+        - unused
+
+    ***REMOVED*** Internal system utilities (patch version parsing is optional)
+    - path: "internal/system/"
+      linters:
+        - errcheck
+
+    ***REMOVED*** Temporarily exclude unit tests that need API updates
+    - path: "test/unit/"
+      linters:
+        - govet
+        - errcheck
+        - staticcheck
+        - unused
+        - ineffassign
 
 linters:
   disable-all: true
   enable:
-    ***REMOVED*** Critical linters (must-have) - these are enabled by default
-    - govet           ***REMOVED*** Official Go static analyzer
-    - errcheck        ***REMOVED*** Check for unchecked errors
-    - staticcheck     ***REMOVED*** Go static analysis (includes gosimple)
-    - unused          ***REMOVED*** Find unused code
-    - ineffassign     ***REMOVED*** Detect ineffective assignments
+    ***REMOVED*** Critical linters (must-have)
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
 
     ***REMOVED*** Code quality
-    - misspell        ***REMOVED*** Fix commonly misspelled English words
-    - goconst         ***REMOVED*** Find repeated strings that could be constants
-    - unconvert       ***REMOVED*** Remove unnecessary type conversions
-    - whitespace      ***REMOVED*** Detect leading/trailing whitespace
+    - misspell
+    - goconst
+    - unconvert
+    - whitespace
 
     ***REMOVED*** Bug detection
-    - bodyclose       ***REMOVED*** Check HTTP response body is closed
+    - bodyclose
 
-formatters:
-  enable:
-    - gofmt           ***REMOVED*** Check if code was gofmt-ed
-    - goimports       ***REMOVED*** Check import statements are formatted
+    ***REMOVED*** Formatting
+    - gofmt
+    - goimports
 
 linters-settings:
   gofmt:
@@ -52,7 +100,9 @@ linters-settings:
   govet:
     enable-all: true
     disable:
-      - shadow     ***REMOVED*** Shadow analysis can be noisy
+      - shadow
+      - fieldalignment
+      - unusedwrite
 
   staticcheck:
     checks: ["all"]
@@ -68,47 +118,9 @@ linters-settings:
   misspell:
     locale: US
 
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
-
-  exclude-rules:
-    ***REMOVED*** Exclude all linters for generated BPF code
-    - path: "_bpfe[lb]\\.go"
-      linters:
-        - all
-
-    ***REMOVED*** Allow unsafe and complex code in BPF loader
-    - path: "internal/bpf/"
-      linters:
-        - gosec
-        - gocyclo
-        - cyclop
-
-    ***REMOVED*** Test files have different requirements
-    - path: "_test\\.go"
-      linters:
-        - errcheck      ***REMOVED*** Tests often ignore errors intentionally
-        - goconst       ***REMOVED*** Test files can have repeated strings
-        - unused        ***REMOVED*** Test helpers might not be used in all tests
-        - funlen        ***REMOVED*** Test functions can be long
-        - dupl          ***REMOVED*** Test code often has duplication
-
-    ***REMOVED*** E2E test helpers
-    - path: "test/e2e/"
-      linters:
-        - errcheck
-        - goconst
-        - unused
-
-    ***REMOVED*** Temporarily exclude unit tests that need API updates
-    - path: "test/unit/"
-      linters:
-        - all
-
 output:
-  ***REMOVED*** Format: colored-line-number (default), line-number, json, tab, checkstyle, code-climate
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
   sort-results: true

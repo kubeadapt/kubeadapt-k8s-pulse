@@ -65,7 +65,7 @@ import (
 //	✅ Simplicity: No complex TTL logic or edge cases to handle
 //	✅ Memory: Worst case 288 MB (400 nodes × 10K connections × 72 bytes) = 0.45% of 64GB RAM
 //	✅ Correctness: Long-lived connections (DB pools) never reset mid-session
-//	✅ Industry Standard: NetObserv, Cilium Hubble, Datadog use similar patterns
+//	✅ Industry Standard: Production eBPF projects use similar patterns
 //
 //	❌ REJECTED: TTL-based cleanup (5-minute idle timeout)
 //	   - Risk: Breaking long-lived connections that are idle >5min then resume

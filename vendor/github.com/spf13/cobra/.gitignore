@@ -1,0 +1,39 @@
+***REMOVED*** Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+***REMOVED*** Folders
+_obj
+_test
+
+***REMOVED*** Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+***REMOVED*** Vim files https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
+***REMOVED*** swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+***REMOVED*** session
+Session.vim
+***REMOVED*** temporary
+.netrwhist
+*~
+***REMOVED*** auto-generated tag files
+tags
+
+*.exe
+cobra.test
+bin
+
+.idea/
+*.iml

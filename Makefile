@@ -26,13 +26,17 @@ endif
 CMD_DIR := ./cmd/agent
 BPF_DIR := ./bpf
 BUILD_DIR := ./bin
-DEPLOYMENT_DIR := ./deployments/kubernetes
 INTERNAL_BPF_DIR := ./internal/bpf
 
 ***REMOVED*** Build flags
 LDFLAGS := -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(shell date -u '+%Y-%m-%d_%H:%M:%S')"
 GO_BUILD_FLAGS := -v
 BPF_CFLAGS := -O2 -Wall -Werror
+***REMOVED*** Disable IPv6 support for kernel 5.10 compatibility
+***REMOVED*** The BPF verifier on kernel 5.10 has stricter bounds checking that rejects
+***REMOVED*** IPv6 extension header parsing. IPv6 works on kernel 5.15+.
+***REMOVED*** To enable IPv6 (requires kernel 5.15+): unset DISABLE_IPV6 or remove this flag
+BPF_CFLAGS += -DDISABLE_IPV6
 ***REMOVED*** Allow overriding BPF map size via environment variable (for overflow testing)
 ifdef BPF_MAP_SIZE
 BPF_CFLAGS += -DBPF_MAP_SIZE=$(BPF_MAP_SIZE)
@@ -165,7 +169,7 @@ build-bpf-builder:
 	@echo "$(GREEN)BPF builder container ready$(NC)"
 
 ***REMOVED*** Auto-detect OS and generate BPF code appropriately
-***REMOVED*** NOTE: Generated BPF files are committed to the repo (following netobserv pattern)
+***REMOVED*** NOTE: Generated BPF files are committed to the repo for CI reproducibility
 ***REMOVED*** Only run this when you modify bpf/*.c files - NOT for every build
 ***REMOVED*** For development: `make dev` uses pre-generated files for faster hot reload
 ***REMOVED*** NOTE: Using TC (Traffic Control) hooks for accurate packet-level billing metrics
@@ -225,7 +229,7 @@ test: lint
 	@$(GO) tool cover -func=coverage.out | tail -1
 
 ***REMOVED*** Check that go.mod and go.sum are in sync (for CI verification)
-***REMOVED*** Similar to netobserv's vendor check - catches dependency drift
+***REMOVED*** Catches dependency drift before merge
 check-vendors:
 	@echo "$(GREEN)Checking go.mod and go.sum are in sync...$(NC)"
 	@$(GO) mod tidy
@@ -423,17 +427,15 @@ docker-push:
 	@$(DOCKER) push $(DOCKER_IMAGE):latest
 	@echo "$(GREEN)Docker image pushed$(NC)"
 
-***REMOVED*** Deploy to Kubernetes
+***REMOVED*** Deploy to Kubernetes (use Helm chart from kubeadapt-helm repository)
+***REMOVED*** Example: helm upgrade --install ebpf-agent ./charts/ebpf-agent -n kubeadapt-system
 deploy:
-	@echo "$(GREEN)Deploying to Kubernetes...$(NC)"
-	@$(KUBECTL) apply -f $(DEPLOYMENT_DIR)/
-	@echo "$(GREEN)Deployment complete$(NC)"
+	@echo "$(YELLOW)Kubernetes manifests moved to kubeadapt-helm repository$(NC)"
+	@echo "$(YELLOW)Use: helm upgrade --install ebpf-agent <chart-path> -n kubeadapt-system$(NC)"
 
-***REMOVED*** Remove from Kubernetes
+***REMOVED*** Remove from Kubernetes (use Helm)
 undeploy:
-	@echo "$(YELLOW)Removing from Kubernetes...$(NC)"
-	@$(KUBECTL) delete -f $(DEPLOYMENT_DIR)/ --ignore-not-found=true
-	@echo "$(GREEN)Undeployment complete$(NC)"
+	@echo "$(YELLOW)Use: helm uninstall ebpf-agent -n kubeadapt-system$(NC)"
 
 ***REMOVED*** Run locally (requires root on Linux, uses Docker on macOS)
 run: build

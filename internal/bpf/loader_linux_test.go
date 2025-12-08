@@ -1,5 +1,9 @@
 //go:build linux
 
+// Package bpf tests load real BPF programs into the kernel.
+// These tests require CAP_BPF/CAP_SYS_ADMIN (privileged container or root).
+// CI runs these with --privileged Docker flag.
+
 package bpf
 
 import (

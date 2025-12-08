@@ -110,7 +110,7 @@ func (p *PrometheusClient) WaitForMetric(ctx context.Context, metricName string,
 		query = fmt.Sprintf("%s{%s}", metricName, strings.Join(labelSelectors, ","))
 	}
 
-	// Use test.Eventually pattern from NetObserv for cleaner retry logic
+	// Use test.Eventually pattern from production eBPF projects for cleaner retry logic
 	test.Eventually(p.t, 2*time.Minute, func(t require.TestingT) {
 		result, err := p.Query(ctx, query)
 		if err != nil {

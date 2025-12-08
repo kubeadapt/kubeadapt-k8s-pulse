@@ -26,7 +26,7 @@ type TestingT interface {
 }
 
 // PodHelper provides utilities for interacting with pods in E2E tests
-// Follows NetObserv's pattern from e2e/cluster/tester/pods.go
+// Follows production eBPF projects's pattern from e2e/cluster/tester/pods.go
 type PodHelper struct {
 	restConfig *rest.Config
 	clientset  *kubernetes.Clientset
@@ -59,7 +59,7 @@ func NewPodHelperFromConfig(config *rest.Config) (*PodHelper, error) {
 }
 
 // Execute runs a command in a pod and returns stdout, stderr, and error
-// This is similar to NetObserv's Pods.Execute method
+// This is similar to production eBPF projects's Pods.Execute method
 func (p *PodHelper) Execute(ctx context.Context, namespace, name string, command ...string) (stdout, stderr string, err error) {
 	pod, err := p.clientset.CoreV1().Pods(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
@@ -197,7 +197,7 @@ func (p *PodHelper) WaitForReady(ctx context.Context, t TestingT, namespace, nam
 }
 
 // DaemonSetReady checks if a DaemonSet has all desired pods ready
-// Similar to NetObserv's Pods.DSReady method
+// Similar to production eBPF projects's Pods.DSReady method
 func (p *PodHelper) DaemonSetReady(ctx context.Context, namespace, name string) error {
 	ds, err := p.clientset.AppsV1().DaemonSets(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {

@@ -1,9 +1,0 @@
-***REMOVED*** Minimal RBAC: ServiceAccount only (no K8s API permissions needed)
-***REMOVED*** The agent exports raw IP-based metrics - backend handles ALL enrichment
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kubeadapt-ebpf-agent
-  namespace: kubeadapt-system
-  labels:
-    app: kubeadapt-ebpf-agent

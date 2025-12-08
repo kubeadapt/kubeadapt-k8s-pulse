@@ -51,16 +51,18 @@ jobs:
             make lint
 
       ***REMOVED*** Run unit tests in the generator container
+      ***REMOVED*** --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
       - name: Run unit tests
         run: |
-          docker run --rm -v $(pwd):/workspace -w /workspace \
+          docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             make test
 
       ***REMOVED*** Run tests with race detector (catches concurrency bugs)
+      ***REMOVED*** --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
       - name: Run unit tests with race detector
         run: |
-          docker run --rm -v $(pwd):/workspace -w /workspace \
+          docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             bash -c "go test -race -mod vendor ./internal/... ./cmd/..."
 
@@ -84,7 +86,7 @@ jobs:
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
-            bash -c "make generate-native && git add -A && git diff HEAD --exit-code"
+            bash -c "git config --global --add safe.directory /workspace && make generate-native && git add -A && git diff HEAD --exit-code"
 
       ***REMOVED*** Verify that go.mod and go.sum are in sync
       ***REMOVED*** Catches dependency drift and ensures reproducible builds
