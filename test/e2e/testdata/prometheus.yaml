@@ -9,7 +9,7 @@ metadata:
 data:
   prometheus.yml: |
     global:
-      scrape_interval: 30s      ***REMOVED*** Must be > collection interval (25s) for proper metric aggregation
+      scrape_interval: 30s
       evaluation_interval: 30s
 
     scrape_configs:

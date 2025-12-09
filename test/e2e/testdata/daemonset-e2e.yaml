@@ -37,7 +37,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        ***REMOVED*** Legacy metadata (backward compatibility)
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -55,7 +54,7 @@ spec:
         - name: EBPF_METRICS_PORT
           value: "9090"
         - name: EBPF_COLLECTION_INTERVAL
-          value: "25s"  ***REMOVED*** Must be < Prometheus scrape interval (30s)
+          value: "25s"
         ***REMOVED*** Enable BPF map dumping for e2e test debugging
         ***REMOVED*** Map dumping is synchronized with collection cycle (25s interval)
         - name: EBPF_DUMP_BPF_MAPS

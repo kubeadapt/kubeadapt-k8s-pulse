@@ -20,16 +20,10 @@ type Config struct {
 	MetricsPort int `yaml:"metrics_port" env:"EBPF_METRICS_PORT" default:"9090"`
 
 	// Collection configuration
-	// CRITICAL: CollectionInterval must be SHORTER than Prometheus scrape interval
-	// to ensure only ONE collection happens between scrapes (prevents data loss from gauge overwrites).
-	// Default 25s assumes 30s Prometheus scrape interval (leaving 5s safety buffer).
-	// If Prometheus scrapes at different interval, adjust this value accordingly:
-	//   - For 60s scrapes: use 55s collection interval
-	//   - For 15s scrapes: use 12s collection interval
-	// Rule: collection_interval = scrape_interval - 5s buffer
+	// CollectionInterval is how often BPF maps are read and metrics exported
 	CollectionInterval time.Duration `yaml:"collection_interval" env:"EBPF_COLLECTION_INTERVAL" default:"25s"`
 
-	// ProcPath for container discovery (currently not used - kept for future use)
+	// ProcPath for host /proc filesystem access
 	ProcPath string `yaml:"proc_path" env:"EBPF_PROC_PATH" default:"/host/proc"`
 
 	// Network namespace filtering mode

@@ -34,23 +34,19 @@ import (
 //     through separate K8s API queries.
 //
 // MEMORY MANAGEMENT STRATEGY:
-// ══════════════════════════════════════════════════════════════════════════════
 //
 // KERNEL SPACE (BPF Maps):
 //   - connection_flows map: Stores cumulative bytes/packets per connection (5-tuple key)
-//   - Cleanup: Read-then-delete every 25 seconds using bpf_map_lookup_and_delete_elem()
-//   - Rationale: Prevents unbounded growth in kernel memory, supports high connection churn
-//   - Memory: Fixed size BPF map (max 100K entries × ~64 bytes = 6.4 MB per node)
+//   - Cleanup: Read-then-delete pattern prevents unbounded growth
 //
 // USER SPACE (Go):
 //   - aggregated map: Created FRESH each collection cycle (scoped to collect() function)
 //   - Lifetime: Lives only during collection → Go GC automatically cleans after export
-//   - Memory: ~72 bytes × active IP pairs (typically < 1 MB per 25s cycle)
-//   - NO persistent state: Each cycle is independent, no累積 in userspace
+//   - NO persistent state: Each cycle is independent
 //
 // PROMETHEUS METRICS:
 //   - Type: Counter (NOT Gauge) - industry standard for cumulative metrics
-//   - Update: Add() increments by delta from current BPF map window (25s)
+//   - Update: Add() increments by delta from current BPF map window
 //   - Labels: src_ip, dst_ip, protocol, daemonset_pod_uid, daemonset_node_name
 //   - Reset Handling: Counter resets tracked via daemonset_pod_uid label
 //
@@ -58,35 +54,6 @@ import (
 //   - Old pod: Counter stops incrementing (old daemonset_pod_uid time series)
 //   - New pod: New counter series starts (new daemonset_pod_uid)
 //   - Prometheus: Automatically treats as separate time series
-//   - Backend: Can detect agent restart via pod_uid change for auditing
-//
-// RATIONALE FOR "NO TTL CLEANUP":
-//
-//	✅ Simplicity: No complex TTL logic or edge cases to handle
-//	✅ Memory: Worst case 288 MB (400 nodes × 10K connections × 72 bytes) = 0.45% of 64GB RAM
-//	✅ Correctness: Long-lived connections (DB pools) never reset mid-session
-//	✅ Industry Standard: Production eBPF projects use similar patterns
-//
-//	❌ REJECTED: TTL-based cleanup (5-minute idle timeout)
-//	   - Risk: Breaking long-lived connections that are idle >5min then resume
-//	   - Complexity: +200 lines of cleanup logic with edge case handling
-//	   - Savings: ~260 MB memory saved = $0.01/month cost difference (negligible)
-//	   - Verdict: Risk of data loss >> Tiny memory savings
-//
-// PRODUCTION VALIDATION:
-//
-//	✅ Tested: 400 nodes × 10K connections/node = 288 MB total userspace memory
-//	✅ Memory stable over 30-day continuous runs (no leaks)
-//	✅ No kernel OOM events in production workloads
-//	✅ Collection latency p99 < 100ms even with 10K IP pairs
-//
-// MONITORING:
-//
-//	Use: kubectl top pod -n kubeadapt-system (should show < 500MB per DaemonSet pod)
-//	Alert if: Pod memory > 1GB (indicates unusual connection count or potential issue)
-//	Dashboard: kubeadapt_ebpf_collection_duration_seconds histogram tracks performance
-//
-// ══════════════════════════════════════════════════════════════════════════════
 //
 // Example metric output:
 //
@@ -341,9 +308,7 @@ func (c *ConnectionCollector) collect() {
 	// Uses package-level types from types.go for reusability
 	aggregated := make(map[AggKey]AggStats)
 
-	// SINGLE-ITERATION OPTIMIZATION:
-	// Get map info ONCE before iteration for utilization calculation
-	// This avoids redundant map iteration (47% performance improvement)
+	// Get map info once before iteration for utilization calculation
 	info, err := connectionMap.Info()
 	if err != nil {
 		c.logger.Debug("Failed to get map info", zap.Error(err))
@@ -445,9 +410,7 @@ func (c *ConnectionCollector) collect() {
 		}
 	}
 
-	// SINGLE-ITERATION OPTIMIZATION: Calculate map utilization from count obtained during iteration
-	// This replaces the separate updateMapUtilization() call, providing ~47% performance improvement
-	// by eliminating redundant BPF map iteration
+	// Calculate map utilization from count obtained during iteration
 	if maxEntries > 0 {
 		utilization := float64(currentEntries) / float64(maxEntries) * 100.0
 		c.mapUtilization.WithLabelValues("connection_flows").Set(utilization)

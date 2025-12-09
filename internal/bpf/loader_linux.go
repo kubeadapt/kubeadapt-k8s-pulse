@@ -302,17 +302,9 @@ func (m *Manager) StartRingbufReader(ctx context.Context, handler func(*FlowReco
 
 	// IMPORTANT: handler() is called synchronously in the read loop.
 	// Ring buffer reading will BLOCK if handler takes too long.
-	// Keep handler lightweight (< 1ms per event) to prevent overflow loss.
-	// For high-frequency events, consider spawning goroutines per event.
-	//
-	// Current handler is lightweight (~10-50μs):
-	// - Counter increment (atomic operation)
-	// - IP parsing (byte manipulation)
-	// - Debug logging (typically disabled in production)
+	// Keep handler lightweight to prevent overflow loss.
 	//
 	// This synchronous design is optimal for OVERFLOW events (rare).
-	// Unlike high-frequency packet capture scenarios, our overflow events
-	// don't require goroutine-per-event parallelism.
 
 	// Read loop
 	for {

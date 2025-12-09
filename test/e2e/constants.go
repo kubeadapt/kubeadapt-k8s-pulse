@@ -4,9 +4,7 @@ import "time"
 
 // E2E Test Timing Constants
 //
-// These constants define the timing relationships between the eBPF agent's
-// collection cycle and Prometheus scrape intervals. Understanding these
-// relationships is crucial for writing reliable E2E tests.
+// These constants define test timing for the eBPF agent's metric collection.
 //
 // Architecture:
 // 1. Agent collects metrics from BPF maps every 25 seconds

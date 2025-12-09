@@ -28,15 +28,6 @@ const (
 // Collection timing configuration
 const (
 	// DefaultCollectionInterval is the interval between BPF map reads
-	// CRITICAL: Must be SHORTER than Prometheus scrape interval to ensure
-	// only ONE collection happens between scrapes (prevents gauge overwrites)
-	//
-	// Default 25s assumes 30s Prometheus scrape interval (5s safety buffer)
-	// Adjust based on your Prometheus configuration:
-	//   - For 60s scrapes: use 55s
-	//   - For 15s scrapes: use 12s
-	//
-	// Rule: collection_interval = scrape_interval - 5s buffer
 	DefaultCollectionInterval = 25 * time.Second
 )
 

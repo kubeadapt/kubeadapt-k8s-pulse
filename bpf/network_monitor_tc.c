@@ -215,9 +215,6 @@ struct {
 } connection_flows SEC(".maps");
 
 // Overflow ringbuffer (when map is full)
-// ────────────────────────────────────────────────────────────────────────
-// 16MB ringbuffer can hold ~87,000 overflow entries (each ~192 bytes)
-// Sufficient for stress tests with 100K+ connection bursts
 struct {
   __uint(type, BPF_MAP_TYPE_RINGBUF);
   __uint(max_entries, 1 << 24); // 16MB (not 256KB!)
