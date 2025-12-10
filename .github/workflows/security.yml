@@ -18,10 +18,10 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
         with:
           go-version: '1.25'
 
@@ -32,7 +32,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload security report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: gosec-report
@@ -49,7 +49,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -65,10 +65,10 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
 
       - name: Build test image for scanning
         run: |
@@ -85,7 +85,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload container scan results
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         if: always()
         with:
           sarif_file: 'trivy-image.sarif'
@@ -110,19 +110,19 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Initialize CodeQL (quick mode)
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         with:
           languages: go
           queries: security-and-quality
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v4
+        uses: github/codeql-action/autobuild@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         with:
           category: pr-quick-scan
 
@@ -136,18 +136,18 @@ jobs:
       security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Initialize CodeQL (deep mode)
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         with:
           languages: go
           queries: security-extended
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v4
+        uses: github/codeql-action/autobuild@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@cf1bb45a277cb3c205638b2cd5c984db1c46a412 # v4
         with:
           category: scheduled-deep-scan

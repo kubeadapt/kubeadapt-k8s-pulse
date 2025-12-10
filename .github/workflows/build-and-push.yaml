@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0  # Needed for git describe
 
@@ -73,36 +73,36 @@ jobs:
       # === PUBLIC ECR (main + releases) ===
       - name: Configure AWS Credentials (Public ECR)
         if: steps.registry_config.outputs.registry_type == 'public'
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR Public
         if: steps.registry_config.outputs.registry_type == 'public'
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
         with:
           registry-type: public
 
       # === PRIVATE ECR (develop) ===
       - name: Configure AWS Credentials (Private ECR)
         if: steps.registry_config.outputs.registry_type == 'private'
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           role-to-assume: ${{ secrets.AWS_PRIVATE_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_PRIVATE_REGION }}
 
       - name: Login to Amazon ECR Private
         if: steps.registry_config.outputs.registry_type == 'private'
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
         with:
           registry-type: private
 
       - name: Set up QEMU for Multi-Arch Build
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
 
       # === BUILD & PUSH: PUBLIC ECR ===
       - name: Build and Push Multi-Arch Image (Public ECR)
@@ -197,7 +197,7 @@ jobs:
       # Generate SBOM for supply chain security (release only)
       - name: Generate SBOM (SPDX format)
         if: steps.image_tag.outputs.is_release == 'true'
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@43a17d6e7add2b5535efe4dcae9952337c479a93 # v0
         with:
           image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
           format: spdx-json
@@ -206,7 +206,7 @@ jobs:
 
       - name: Generate SBOM (CycloneDX format)
         if: steps.image_tag.outputs.is_release == 'true'
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@43a17d6e7add2b5535efe4dcae9952337c479a93 # v0
         with:
           image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
           format: cyclonedx-json
@@ -215,7 +215,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.image_tag.outputs.is_release == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           draft: false
           prerelease: ${{ contains(steps.image_tag.outputs.tag, '-rc') || contains(steps.image_tag.outputs.tag, '-beta') }}
