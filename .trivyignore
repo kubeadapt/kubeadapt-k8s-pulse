@@ -6,3 +6,162 @@ CVE-2025-6020
 
 # CVE-2023-2953: OpenLDAP NULL pointer deref - agent doesn't use LDAP, transitive dep only
 CVE-2023-2953
+
+# CVE-2025-14104: util-linux setpwnam() heap buffer overread - agent doesn't modify user passwords
+CVE-2025-14104
+
+# CVE-2023-50495: ncurses _nc_wrap_entry segfault - agent has no TUI/terminal interface
+CVE-2023-50495
+
+# CVE-2024-22365: pam_namespace user namespace block DoS - container doesn't use PAM auth
+CVE-2024-22365
+
+# CVE-2024-10041: libpam read hashed password - container doesn't use PAM auth, no /etc/shadow access
+CVE-2024-10041
+
+# CVE-2025-9086: curl cookie path OOB read - healthcheck only uses simple GET, no cookies
+CVE-2025-9086
+
+# CVE-2025-10148: curl predictable WebSocket mask - agent doesn't use WebSocket
+CVE-2025-10148
+
+# CVE-2025-30258: gnupg verification DoS via malicious subkey - agent doesn't do GPG verification
+CVE-2025-30258
+
+# ==============================================================================
+# LOW severity vulnerabilities - Not exploitable in ebpf-agent context
+# Container runs minimal debian:bookworm-slim with only: ca-certificates, iproute2, curl
+# No interactive users, no terminal, no shell access, privileged but read-only rootfs
+# ==============================================================================
+
+# CVE-2005-2541: tar setuid/setgid extraction warning - tar not installed in runtime image
+CVE-2005-2541
+
+# CVE-2007-5686: initscripts /var/log/btmp permissions - rPath Linux specific, not applicable to Debian
+CVE-2007-5686
+
+# CVE-2010-4756: glibc glob DoS - no user-controlled glob patterns processed
+CVE-2010-4756
+
+# CVE-2011-3389: BEAST attack on SSL/TLS - modern TLS 1.2+ used, CBC mode mitigated
+CVE-2011-3389
+
+# CVE-2011-4116: perl File::Temp symlink - container doesn't use Perl
+CVE-2011-4116
+
+# CVE-2012-2663: iptables --syn bypass - iptables not used, agent uses tc/BPF
+CVE-2012-2663
+
+# CVE-2013-4392: systemd TOCTOU - systemd not present in container
+CVE-2013-4392
+
+# CVE-2015-3276: openldap cipher parsing - agent doesn't use LDAP
+CVE-2015-3276
+
+# CVE-2017-14159: openldap privilege escalation - agent doesn't use LDAP
+CVE-2017-14159
+
+# CVE-2017-17740: openldap nops DoS - agent doesn't use LDAP
+CVE-2017-17740
+
+# CVE-2018-20796: glibc regex recursion - no user-controlled regex patterns
+CVE-2018-20796
+
+# CVE-2018-5709: krb5 kadmin integer overflow - agent doesn't use Kerberos admin
+CVE-2018-5709
+
+# CVE-2018-6829: libgcrypt ElGamal semantic security - agent doesn't use ElGamal encryption
+CVE-2018-6829
+
+# CVE-2019-1010022: glibc stack guard bypass - requires local code execution, container isolated
+CVE-2019-1010022
+
+# CVE-2019-1010023: glibc ldd code execution - no ldd execution in container
+CVE-2019-1010023
+
+# CVE-2019-1010024: glibc ASLR bypass - requires local exploitation, container isolated
+CVE-2019-1010024
+
+# CVE-2019-1010025: glibc pthread heap disclosure - requires local exploitation
+CVE-2019-1010025
+
+# CVE-2019-9192: glibc regex recursion - no user-controlled regex patterns
+CVE-2019-9192
+
+# CVE-2020-15719: openldap CN-ID validation - agent doesn't use LDAP
+CVE-2020-15719
+
+# CVE-2022-0563: util-linux chfn/chsh libreadline - no interactive user management
+CVE-2022-0563
+
+# CVE-2022-27943: binutils rust-demangle stack exhaustion - no Rust demangling in runtime
+CVE-2022-27943
+
+# CVE-2023-31437: systemd sealed file modification - systemd not present
+CVE-2023-31437
+
+# CVE-2023-31438: systemd sealed file truncation - systemd not present
+CVE-2023-31438
+
+# CVE-2023-31439: systemd content modification - systemd not present
+CVE-2023-31439
+
+# CVE-2023-31486: HTTP::Tiny insecure TLS - Perl not used in container
+CVE-2023-31486
+
+# CVE-2024-2236: libgcrypt Marvin attack - requires RSA key operations, agent uses ECDSA
+CVE-2024-2236
+
+# CVE-2024-2379: curl QUIC wolfSSL bypass - curl healthcheck uses HTTP, not QUIC
+CVE-2024-2379
+
+# CVE-2024-25260: elfutils buffer overflow - elfutils not used at runtime
+CVE-2024-25260
+
+# CVE-2024-26458: krb5 pmap memory leak - agent doesn't use Kerberos
+CVE-2024-26458
+
+# CVE-2024-26461: krb5 gssapi memory leak - agent doesn't use Kerberos
+CVE-2024-26461
+
+# CVE-2024-56433: shadow-utils subuid conflict - container runs as root, no subuid used
+CVE-2024-56433
+
+# CVE-2025-0725: libcurl zlib overflow - curl healthcheck doesn't process compressed responses
+CVE-2025-0725
+
+# CVE-2025-10966: curl SFTP wolfSSH - agent doesn't use SFTP
+CVE-2025-10966
+
+# CVE-2025-1352: elfutils memory corruption - elfutils not used at runtime
+CVE-2025-1352
+
+# CVE-2025-1365: elfutils buffer overflow - elfutils not used at runtime
+CVE-2025-1365
+
+# CVE-2025-1371: elfutils null deref - elfutils not used at runtime
+CVE-2025-1371
+
+# CVE-2025-1372: elfutils buffer overflow - elfutils not used at runtime
+CVE-2025-1372
+
+# CVE-2025-1376: elfutils strip DoS - elfutils not used at runtime
+CVE-2025-1376
+
+# CVE-2025-1377: elfutils strip DoS - elfutils not used at runtime
+CVE-2025-1377
+
+# CVE-2025-27587: OpenSSL PowerPC Minerva attack - agent runs on amd64/arm64, not PowerPC
+CVE-2025-27587
+
+# CVE-2025-6141: ncurses stack buffer overflow - no TUI/terminal interface in agent
+CVE-2025-6141
+
+# TEMP-0290435-0B57B5: tar rmt side effects - tar not installed in runtime image
+TEMP-0290435-0B57B5
+
+# TEMP-0517018-A83CE6: sysvinit no-root installer flaw - sysvinit not used, container is init-less
+TEMP-0517018-A83CE6
+
+# TEMP-0628843-DBAD28: CVE-2005-4890 related tty hijacking - no interactive terminals in container
+TEMP-0628843-DBAD28
