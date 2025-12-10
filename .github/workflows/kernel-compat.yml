@@ -72,12 +72,6 @@ jobs:
           - 'bpf-next-20251008.075427'
           - 'rhel8.9-20250616.013250'
     steps:
-      # Workaround for cilium/little-vm-helper@v0.0.27 bug
-      # Action uses 'rm' without -f flag, but GitHub removed this file from runner images
-      # See: https://github.com/actions/runner-images/issues/10977
-      - name: Create man-db auto-update file for lvh compatibility
-        run: sudo touch /var/lib/man-db/auto-update
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -87,7 +81,7 @@ jobs:
         run: tar xzf ebpf-agent-build.tar.gz
 
       - name: Test eBPF loading on kernel
-        uses: cilium/little-vm-helper@v0.0.27
+        uses: cilium/little-vm-helper@v0.0.28
         env:
           KERNEL_VERSION: ${{ matrix.kernel }}
         with:
