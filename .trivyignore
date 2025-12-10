@@ -1,0 +1,8 @@
+# CVE-2023-45853: zlib MiniZip integer overflow - agent doesn't use MiniZip (contrib/, unsupported)
+CVE-2023-45853
+
+# CVE-2025-6020: linux-pam pam_namespace symlink race - container doesn't use PAM auth, runs as root
+CVE-2025-6020
+
+# CVE-2023-2953: OpenLDAP NULL pointer deref - agent doesn't use LDAP, transitive dep only
+CVE-2023-2953
