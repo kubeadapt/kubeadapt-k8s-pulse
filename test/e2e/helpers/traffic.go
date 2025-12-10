@@ -186,7 +186,7 @@ func (tg *TrafficGenerator) execInPod(ctx context.Context, namespace, pod, conta
 }
 
 // GenerateUDPTraffic generates UDP traffic from source pod to destination service
-// Uses netcat (nc) to send UDP packets, following production eBPF projects's approach
+// Uses netcat (nc) to send UDP packets
 func (tg *TrafficGenerator) GenerateUDPTraffic(ctx context.Context, namespace, sourcePod, destService string, packets int, packetSize int) error {
 	tg.t.Logf("Generating %d UDP packets (%d bytes each) from %s/%s to %s", packets, packetSize, namespace, sourcePod, destService)
 

@@ -155,8 +155,7 @@ func (c *Cluster) Run(m *testing.M) {
 	}
 
 	// Deploy all manifests in order, with readiness checks grouped by order
-	// This follows production eBPF projects's deployment ordering pattern where dependencies
-	// are fully ready before dependent components are deployed
+	// Dependencies are fully ready before dependent components are deployed
 	var readyFuncs []env.Func
 	currentOrder := Preconditions
 
@@ -203,7 +202,7 @@ func (c *Cluster) TestEnv() env.Environment {
 }
 
 // orderedDeployments returns deployments sorted by Order, then alphabetically by ManifestFile
-// This implements production eBPF projects's deployment ordering pattern for explicit dependency management
+// This implements deployment ordering for explicit dependency management
 func (c *Cluster) orderedDeployments() []Deployment {
 	sorted := make([]Deployment, len(c.deployments))
 	copy(sorted, c.deployments)

@@ -104,8 +104,7 @@ metadata:
     app: prometheus
 spec:
   # NodePort for E2E test access via localhost:30090
-  # This follows production eBPF projects's pattern - no kubectl port-forward needed
-  # NOTE: Kind cluster extraPortMappings makes this accessible on host
+  # Kind cluster extraPortMappings makes this accessible on host
   type: NodePort
   ports:
     - port: 9090
