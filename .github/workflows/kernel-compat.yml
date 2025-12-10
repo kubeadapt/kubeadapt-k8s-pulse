@@ -15,6 +15,7 @@ on:
 jobs:
   build-ebpf-artifacts:
     name: Build eBPF Artifacts
+    if: github.actor != 'renovate[bot]' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -60,6 +61,7 @@ jobs:
   kernel-compatibility:
     name: Test eBPF on ${{ matrix.kernel }}
     needs: build-ebpf-artifacts
+    if: github.actor != 'renovate[bot]' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
