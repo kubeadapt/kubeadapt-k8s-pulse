@@ -49,10 +49,10 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-***REMOVED*** The forked go-yaml.v3 library under this project is covered by two
+# The forked go-yaml.v3 library under this project is covered by two
 different licenses (MIT and Apache):
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** MIT License ***REMOVED******REMOVED******REMOVED******REMOVED***
+#### MIT License ####
 
 The following files were ported to Go from C files of libyaml, and thus
 are still covered by their original MIT license, with the additional
@@ -82,7 +82,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-***REMOVED******REMOVED******REMOVED*** Apache License ***REMOVED******REMOVED******REMOVED***
+### Apache License ###
 
 All the remaining project files are covered by the Apache license:
 
@@ -100,7 +100,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-***REMOVED*** The forked go-yaml.v2 library under the project is covered by an
+# The forked go-yaml.v2 library under the project is covered by an
 Apache license:
 
                                  Apache License

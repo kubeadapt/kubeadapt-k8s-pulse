@@ -230,7 +230,7 @@ const (
 
 // eBPF program types (Windows).
 //
-// See https://github.com/microsoft/ebpf-for-windows/blob/main/include/ebpf_structs.h***REMOVED***L170
+// See https://github.com/microsoft/ebpf-for-windows/blob/main/include/ebpf_structs.h#L170
 const (
 	WindowsXDP ProgramType = ProgramType(platform.WindowsTag) | (iota + 1)
 	WindowsBind
@@ -320,7 +320,7 @@ const (
 
 // Attach types (Windows).
 //
-// See https://github.com/microsoft/ebpf-for-windows/blob/main/include/ebpf_structs.h***REMOVED***L260
+// See https://github.com/microsoft/ebpf-for-windows/blob/main/include/ebpf_structs.h#L260
 const (
 	AttachWindowsXDP = AttachType(platform.WindowsTag | iota + 1)
 	AttachWindowsBind

@@ -45,7 +45,7 @@ var (
 	//
 	// Disable extended CONNECT by default for now.
 	//
-	// Issue ***REMOVED***71128.
+	// Issue #71128.
 	disableExtendedConnectProtocol = true
 )
 
@@ -70,14 +70,14 @@ const (
 	ClientPreface = "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
 
 	// SETTINGS_MAX_FRAME_SIZE default
-	// https://httpwg.org/specs/rfc7540.html***REMOVED***rfc.section.6.5.2
+	// https://httpwg.org/specs/rfc7540.html#rfc.section.6.5.2
 	initialMaxFrameSize = 16384
 
 	// NextProtoTLS is the NPN/ALPN protocol negotiated during
 	// HTTP/2's TLS setup.
 	NextProtoTLS = "h2"
 
-	// https://httpwg.org/specs/rfc7540.html***REMOVED***SettingValues
+	// https://httpwg.org/specs/rfc7540.html#SettingValues
 	initialHeaderTableSize = 4096
 
 	initialWindowSize = 65535 // 6.9.2 Initial Flow Control Window Size
@@ -93,7 +93,7 @@ type streamState int
 
 // HTTP/2 stream states.
 //
-// See http://tools.ietf.org/html/rfc7540***REMOVED***section-5.1.
+// See http://tools.ietf.org/html/rfc7540#section-5.1.
 //
 // For simplicity, the server code merges "reserved (local)" into
 // "half-closed (remote)". This is one less state transition to track.
@@ -126,7 +126,7 @@ func (st streamState) String() string {
 // Setting is a setting parameter: which setting it is, and its value.
 type Setting struct {
 	// ID is which setting is being set.
-	// See https://httpwg.org/specs/rfc7540.html***REMOVED***SettingFormat
+	// See https://httpwg.org/specs/rfc7540.html#SettingFormat
 	ID SettingID
 
 	// Val is the value.
@@ -162,7 +162,7 @@ func (s Setting) Valid() error {
 }
 
 // A SettingID is an HTTP/2 setting as defined in
-// https://httpwg.org/specs/rfc7540.html***REMOVED***iana-settings
+// https://httpwg.org/specs/rfc7540.html#iana-settings
 type SettingID uint16
 
 const (

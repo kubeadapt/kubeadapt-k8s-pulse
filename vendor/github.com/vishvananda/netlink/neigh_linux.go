@@ -325,8 +325,8 @@ func NeighDeserialize(m []byte) (*Neigh, error) {
 			neigh.IP = net.IP(attr.Value)
 		case NDA_LLADDR:
 			// BUG: Is this a bug in the netlink library?
-			// ***REMOVED***define RTA_LENGTH(len) (RTA_ALIGN(sizeof(struct rtattr)) + (len))
-			// ***REMOVED***define RTA_PAYLOAD(rta) ((int)((rta)->rta_len) - RTA_LENGTH(0))
+			// #define RTA_LENGTH(len) (RTA_ALIGN(sizeof(struct rtattr)) + (len))
+			// #define RTA_PAYLOAD(rta) ((int)((rta)->rta_len) - RTA_LENGTH(0))
 			attrLen := attr.Attr.Len - unix.SizeofRtAttr
 			if attrLen == 4 {
 				neigh.LLIPAddr = net.IP(attr.Value)

@@ -22,7 +22,7 @@ import (
 )
 
 // TLSStat struct represents data in /proc/net/tls_stat.
-// See https://docs.kernel.org/networking/tls.html***REMOVED***statistics
+// See https://docs.kernel.org/networking/tls.html#statistics
 type TLSStat struct {
 	// number of TX sessions currently installed where host handles cryptography
 	TLSCurrTxSw int

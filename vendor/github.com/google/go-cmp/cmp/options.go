@@ -94,7 +94,7 @@ func (opts Options) apply(s *state, _, _ reflect.Value) {
 		ss = append(ss, fmt.Sprint(opt))
 	}
 	set := strings.Join(ss, "\n\t")
-	panic(fmt.Sprintf("%s at %***REMOVED***v:\n\t%s\n%s", warning, s.curPath, set, help))
+	panic(fmt.Sprintf("%s at %#v:\n\t%s\n%s", warning, s.curPath, set, help))
 }
 
 func (opts Options) String() string {
@@ -245,7 +245,7 @@ func (validator) apply(s *state, vx, vy reflect.Value) {
 			}
 			name = fmt.Sprintf("%q.(%v)", pkgPath, t.String()) // e.g., "path/to/package".(struct { a int })
 		}
-		panic(fmt.Sprintf("cannot handle unexported field at %***REMOVED***v:\n\t%v\n%s", s.curPath, name, help))
+		panic(fmt.Sprintf("cannot handle unexported field at %#v:\n\t%v\n%s", s.curPath, name, help))
 	}
 
 	panic("not reachable")

@@ -321,7 +321,7 @@ func (r *YAMLReader) Read() ([]byte, error) {
 			i += sep
 			trimmed := strings.TrimSpace(string(line[i:]))
 			// We only allow comments and spaces following the yaml doc separator, otherwise we'll return an error
-			if len(trimmed) > 0 && string(trimmed[0]) != "***REMOVED***" {
+			if len(trimmed) > 0 && string(trimmed[0]) != "#" {
 				return nil, YAMLSyntaxError{
 					err: fmt.Errorf("invalid Yaml document separator: %s", trimmed),
 				}

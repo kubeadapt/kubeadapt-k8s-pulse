@@ -1,9 +1,9 @@
-***REMOVED*** Development image with hot reload support
-***REMOVED*** Based on the builder stage with added development tools
+# Development image with hot reload support
+# Based on the builder stage with added development tools
 
 FROM golang:1.25-bookworm
 
-***REMOVED*** Install BPF compilation and development dependencies
+# Install BPF compilation and development dependencies
 RUN apt-get update && apt-get install -y \
     clang-14 \
     llvm-14 \
@@ -18,14 +18,14 @@ RUN apt-get update && apt-get install -y \
     vim \
     htop \
     bpftool \
-    ***REMOVED*** Additional debugging tools for local testing and troubleshooting
+    # Additional debugging tools for local testing and troubleshooting
     tcpdump \
     net-tools \
     strace \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-***REMOVED*** Install Go development tools
+# Install Go development tools
 RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0 && \
     go install github.com/air-verse/air@latest && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
@@ -34,7 +34,7 @@ RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0 && \
 
 WORKDIR /workspace
 
-***REMOVED*** Create air configuration if it doesn't exist (fallback - workspace .air.toml preferred)
+# Create air configuration if it doesn't exist (fallback - workspace .air.toml preferred)
 RUN cat > /tmp/.air.toml <<'EOF'
 root = "."
 testdata_dir = "testdata"
@@ -71,8 +71,8 @@ tmp_dir = "tmp"
   clean_on_exit = false
 EOF
 
-***REMOVED*** Expose metrics port
+# Expose metrics port
 EXPOSE 9090
 
-***REMOVED*** Default command for development
+# Default command for development
 CMD ["air", "-c", "/tmp/.air.toml"]

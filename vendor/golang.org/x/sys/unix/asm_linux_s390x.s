@@ -4,7 +4,7 @@
 
 //go:build linux && s390x && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for s390x, Linux

@@ -4,7 +4,7 @@
 
 //go:build gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for AMD64, Linux

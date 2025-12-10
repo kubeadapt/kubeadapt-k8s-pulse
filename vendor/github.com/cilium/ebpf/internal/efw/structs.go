@@ -4,10 +4,10 @@ package efw
 
 import "golang.org/x/sys/windows"
 
-// https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h***REMOVED***L366
+// https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h#L366
 const _BPF_OBJ_NAME_LEN = 64
 
-// See https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h***REMOVED***L372-L386
+// See https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h#L372-L386
 type BpfMapInfo struct {
 	_    uint32                  ///< Map ID.
 	_    uint32                  ///< Type of map.
@@ -21,7 +21,7 @@ type BpfMapInfo struct {
 	_ uint32 ///< Number of pinned paths.
 }
 
-// See https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h***REMOVED***L396-L410
+// See https://github.com/microsoft/ebpf-for-windows/blob/95267a53b26c68a94145d1731e2a4c8b546034c3/include/ebpf_structs.h#L396-L410
 type BpfProgInfo struct {
 	_    uint32                  ///< Program ID.
 	_    uint32                  ///< Program type, if a cross-platform type.

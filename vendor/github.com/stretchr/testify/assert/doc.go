@@ -1,6 +1,6 @@
 // Package assert provides a set of comprehensive testing tools for use with the normal Go testing system.
 //
-// ***REMOVED*** Example Usage
+// # Example Usage
 //
 // The following is a complete example using assert in a standard test function:
 //
@@ -34,7 +34,7 @@
 //	  assert.Equal(a, b, "The two words should be the same.")
 //	}
 //
-// ***REMOVED*** Assertions
+// # Assertions
 //
 // Assertions allow you to easily write test code, and are global funcs in the `assert` package.
 // All assertion functions take, as the first argument, the `*testing.T` object provided by the

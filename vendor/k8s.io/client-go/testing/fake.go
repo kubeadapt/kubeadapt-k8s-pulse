@@ -174,7 +174,7 @@ func (c *Fake) InvokesWatch(action Action) (watch.Interface, error) {
 		return ret, err
 	}
 
-	return nil, fmt.Errorf("unhandled watch: %***REMOVED***v", action)
+	return nil, fmt.Errorf("unhandled watch: %#v", action)
 }
 
 // InvokesProxy records the provided Action and then invokes the ReactionFunc

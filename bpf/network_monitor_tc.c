@@ -9,103 +9,94 @@
 // - Measures PACKET bytes (includes IP/TCP/UDP headers)
 // - Tracks retransmissions and all network activity
 // - Provides accurate ingress/egress bandwidth metrics
+// - Full IPv4 and IPv6 dual-stack support
 //
-// Compile-time Options:
-// - DISABLE_IPV6: Disable IPv6 support for kernel 5.10 compatibility
-//   The BPF verifier on kernel 5.10 has stricter bounds checking that
-//   rejects the IPv6 extension header parsing code. Define this flag
-//   when compiling for older kernels (5.10, 5.11, 5.12, 5.13, 5.14).
-//   IPv6 works correctly on kernel 5.15+.
+// Kernel Compatibility (5.10+):
+// - IPv6 parsing uses bpf_skb_load_bytes() instead of direct packet pointer
+//   arithmetic. This avoids BPF verifier precision tracking limitations with
+//   variable offsets through loop iterations (IPv6 extension header parsing).
+//   This pattern is inspired by Cilium's ctx_load_bytes() approach.
 // ───────────────────────────────────────────────────────────────────────────
 
 // Standard kernel type definitions
-***REMOVED***include <linux/bpf.h>
-***REMOVED***include <linux/if_ether.h>
-***REMOVED***include <linux/in.h>
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***include <linux/in6.h>
-***REMOVED***endif
-***REMOVED***include <linux/ip.h>
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***include <linux/ipv6.h>
-***REMOVED***endif
-***REMOVED***include <linux/tcp.h>
-***REMOVED***include <linux/types.h>
-***REMOVED***include <linux/udp.h>
+#include <linux/bpf.h>
+#include <linux/if_ether.h>
+#include <linux/in.h>
+#include <linux/in6.h>
+#include <linux/ip.h>
+#include <linux/ipv6.h>
+#include <linux/tcp.h>
+#include <linux/types.h>
+#include <linux/udp.h>
 
 // BPF helpers
-***REMOVED***include <bpf/bpf_endian.h>
-***REMOVED***include <bpf/bpf_helpers.h>
+#include <bpf/bpf_endian.h>
+#include <bpf/bpf_helpers.h>
 
 // ===== CONSTANTS =====
 
-***REMOVED***ifndef AF_INET
-***REMOVED***define AF_INET 2
-***REMOVED***endif
+#ifndef AF_INET
+#define AF_INET 2
+#endif
 
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***ifndef AF_INET6
-***REMOVED***define AF_INET6 10
-***REMOVED***endif
-***REMOVED***endif
+#ifndef AF_INET6
+#define AF_INET6 10
+#endif
 
-***REMOVED***ifndef IPPROTO_TCP
-***REMOVED***define IPPROTO_TCP 6
-***REMOVED***endif
+#ifndef IPPROTO_TCP
+#define IPPROTO_TCP 6
+#endif
 
-***REMOVED***ifndef IPPROTO_UDP
-***REMOVED***define IPPROTO_UDP 17
-***REMOVED***endif
+#ifndef IPPROTO_UDP
+#define IPPROTO_UDP 17
+#endif
 
-***REMOVED***ifndef ETH_P_IP
-***REMOVED***define ETH_P_IP 0x0800
-***REMOVED***endif
+#ifndef ETH_P_IP
+#define ETH_P_IP 0x0800
+#endif
 
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***ifndef ETH_P_IPV6
-***REMOVED***define ETH_P_IPV6 0x86DD
-***REMOVED***endif
-***REMOVED***endif
+#ifndef ETH_P_IPV6
+#define ETH_P_IPV6 0x86DD
+#endif
 
-***REMOVED***ifndef IPPROTO_ICMP
-***REMOVED***define IPPROTO_ICMP 1
-***REMOVED***endif
+#ifndef IPPROTO_ICMP
+#define IPPROTO_ICMP 1
+#endif
 
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***ifndef IPPROTO_ICMPV6
-***REMOVED***define IPPROTO_ICMPV6 58
-***REMOVED***endif
+#ifndef IPPROTO_ICMPV6
+#define IPPROTO_ICMPV6 58
+#endif
 
 // IPv6 Extension Header Types (RFC 8200)
-***REMOVED***ifndef IPPROTO_HOPOPTS
-***REMOVED***define IPPROTO_HOPOPTS 0
-***REMOVED***endif
+#ifndef IPPROTO_HOPOPTS
+#define IPPROTO_HOPOPTS 0
+#endif
 
-***REMOVED***ifndef IPPROTO_ROUTING
-***REMOVED***define IPPROTO_ROUTING 43
-***REMOVED***endif
+#ifndef IPPROTO_ROUTING
+#define IPPROTO_ROUTING 43
+#endif
 
-***REMOVED***ifndef IPPROTO_FRAGMENT
-***REMOVED***define IPPROTO_FRAGMENT 44
-***REMOVED***endif
+#ifndef IPPROTO_FRAGMENT
+#define IPPROTO_FRAGMENT 44
+#endif
 
-***REMOVED***ifndef IPPROTO_AH
-***REMOVED***define IPPROTO_AH 51
-***REMOVED***endif
+#ifndef IPPROTO_AH
+#define IPPROTO_AH 51
+#endif
 
-***REMOVED***ifndef IPPROTO_DSTOPTS
-***REMOVED***define IPPROTO_DSTOPTS 60
-***REMOVED***endif
+#ifndef IPPROTO_DSTOPTS
+#define IPPROTO_DSTOPTS 60
+#endif
 
-***REMOVED***ifndef IPPROTO_NONE
-***REMOVED***define IPPROTO_NONE 59
-***REMOVED***endif
+#ifndef IPPROTO_NONE
+#define IPPROTO_NONE 59
+#endif
 
 // Maximum IPv6 extension headers to process (BPF verifier requirement)
-***REMOVED***define IPV6_MAX_HEADERS 4
+#define IPV6_MAX_HEADERS 4
 
 // IPv6 extension header lengths
-***REMOVED***define IPV6_FRAGLEN 8 // Fragment header is always 8 bytes
+#define IPV6_FRAGLEN 8 // Fragment header is always 8 bytes
 
 // IPv6 Fragment Header structure (RFC 8200 Section 4.5)
 struct ipv6_frag_hdr {
@@ -116,41 +107,38 @@ struct ipv6_frag_hdr {
 };
 
 // Fragment offset mask and flags
-***REMOVED***define IPV6_FRAG_OFF_MASK 0xFFF8  // Bits 15-3: fragment offset (in 8-byte units)
-***REMOVED***define IPV6_FRAG_MF 0x0001         // Bit 0: More Fragments flag
-***REMOVED***endif // DISABLE_IPV6
+#define IPV6_FRAG_OFF_MASK 0xFFF8  // Bits 15-3: fragment offset (in 8-byte units)
+#define IPV6_FRAG_MF 0x0001         // Bit 0: More Fragments flag
 
 // TC return codes
-***REMOVED***ifndef TC_ACT_OK
-***REMOVED***define TC_ACT_OK 0
-***REMOVED***endif
+#ifndef TC_ACT_OK
+#define TC_ACT_OK 0
+#endif
 
 // Parse results
-***REMOVED***define PARSE_OK 0
-***REMOVED***define PARSE_DISCARD 1
+#define PARSE_OK 0
+#define PARSE_DISCARD 1
 
 // Overflow event reasons
-***REMOVED***define OVERFLOW_REASON_MAP_FULL 0       // Map reached max_entries
-***REMOVED***define OVERFLOW_REASON_RACE_CONDITION 1 // EEXIST + re-lookup failed
-***REMOVED***define OVERFLOW_REASON_EXPLICIT 2       // Explicit overflow (future use)
+#define OVERFLOW_REASON_MAP_FULL 0       // Map reached max_entries
+#define OVERFLOW_REASON_RACE_CONDITION 1 // EEXIST + re-lookup failed
+#define OVERFLOW_REASON_EXPLICIT 2       // Explicit overflow (future use)
 
 // ===== INTERNAL COUNTERS =====
 
 // Counter types for observability
-***REMOVED***define COUNTER_OVERFLOW_EVENTS 0
-***REMOVED***define COUNTER_RACE_CONDITIONS 1
-***REMOVED***define COUNTER_PARSE_ERRORS 2
-***REMOVED***define COUNTER_HOST_FILTERED 3
-***REMOVED***define COUNTER_IPV4_FRAGMENTS 4
-***REMOVED***ifndef DISABLE_IPV6
-***REMOVED***define COUNTER_IPV6_FRAGMENTS 5
-***REMOVED***endif
-***REMOVED***define MAX_COUNTERS 16
+#define COUNTER_OVERFLOW_EVENTS 0
+#define COUNTER_RACE_CONDITIONS 1
+#define COUNTER_PARSE_ERRORS 2
+#define COUNTER_HOST_FILTERED 3
+#define COUNTER_IPV4_FRAGMENTS 4
+#define COUNTER_IPV6_FRAGMENTS 5
+#define MAX_COUNTERS 16
 
 // BPF map size (should match network_monitor.c)
-***REMOVED***ifndef BPF_MAP_SIZE
-***REMOVED***define BPF_MAP_SIZE 100000
-***REMOVED***endif
+#ifndef BPF_MAP_SIZE
+#define BPF_MAP_SIZE 100000
+#endif
 
 // ===== DATA STRUCTURES =====
 // These MUST match network_monitor.c for compatibility!
@@ -261,7 +249,6 @@ static __always_inline void increase_counter(__u32 counter_type) {
   }
 }
 
-***REMOVED***ifndef DISABLE_IPV6
 // IPv6 extension header structure (RFC 8200)
 // Note: This is already defined in <linux/ipv6.h>, but we'll use it directly
 // struct ipv6_opt_hdr {
@@ -288,14 +275,18 @@ static __always_inline __u32 ipv6_authlen(const struct ipv6_opt_hdr *opthdr) {
 
 // Skip IPv6 extension headers to find transport layer protocol
 // ───────────────────────────────────────────────────────────────────────
-// Inspired by Cilium's ipv6_skip_exthdr() implementation
+// Uses bpf_skb_load_bytes() for kernel 5.15+ compatibility
+// The BPF verifier on older kernels can't track variable offsets through
+// packet pointer arithmetic. bpf_skb_load_bytes() performs bounds checking
+// internally, avoiding the verifier's precision tracking limitations.
+//
+// Inspired by Cilium's ctx_load_bytes() pattern for kernel compatibility.
 //
 // Parameters:
-//   - data: pointer to start of IPv6 extension headers (after fixed IPv6
-//   header)
-//   - data_end: end of packet data (for bounds checking)
+//   - skb: pointer to __sk_buff (needed for bpf_skb_load_bytes)
+//   - l3_offset: offset from packet start to IPv6 header (typically 14 for Ethernet)
 //   - nexthdr: pointer to nexthdr field (updated in-place)
-//   - offset: current offset in bytes from data (updated in-place)
+//   - l4_offset: pointer to L4 header offset from packet start (output)
 //
 // Returns:
 //   - 0 on success (found transport protocol, first fragment or non-fragmented)
@@ -307,18 +298,20 @@ static __always_inline __u32 ipv6_authlen(const struct ipv6_opt_hdr *opthdr) {
 //   - Middle/last fragments (offset>0): Returns 1, NO transport header
 //
 // Safety:
-//   - Uses ***REMOVED***pragma unroll for BPF verifier
+//   - Uses #pragma unroll for BPF verifier
 //   - Bounded to IPV6_MAX_HEADERS iterations
-//   - All memory access is bounds-checked
+//   - bpf_skb_load_bytes() handles all bounds checking internally
 //
-static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
-                                            __u8 *nexthdr, __u32 *offset) {
+static __always_inline int ipv6_skip_exthdr(struct __sk_buff *skb,
+                                            __u32 l3_offset, __u8 *nexthdr,
+                                            __u32 *l4_offset) {
   struct ipv6_opt_hdr opthdr;
   __u8 nh = *nexthdr;
-  __u32 off = *offset;
+  // Start after IPv6 fixed header (40 bytes)
+  __u32 off = l3_offset + sizeof(struct ipv6hdr);
 
-// Bounded loop with ***REMOVED***pragma unroll for BPF verifier
-***REMOVED***pragma unroll
+// Bounded loop with #pragma unroll for BPF verifier
+#pragma unroll
   for (int i = 0; i < IPV6_MAX_HEADERS; i++) {
     // Check if current header type is an extension header
     switch (nh) {
@@ -337,17 +330,14 @@ static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
     default:
       // Transport layer protocol (TCP, UDP, ICMP, etc.) - success!
       *nexthdr = nh;
-      *offset = off;
+      *l4_offset = off;
       return 0;
     }
 
-    // Bounds check before reading extension header
-    if (data + off + sizeof(struct ipv6_opt_hdr) > data_end) {
-      return -1; // Truncated packet
+    // Read extension header using bpf_skb_load_bytes (handles bounds checking)
+    if (bpf_skb_load_bytes(skb, off, &opthdr, sizeof(opthdr)) < 0) {
+      return -1; // Truncated packet or invalid offset
     }
-
-    // Read extension header (2 bytes: nexthdr + hdrlen)
-    __builtin_memcpy(&opthdr, data + off, sizeof(struct ipv6_opt_hdr));
 
     // Calculate header length based on CURRENT header type (before updating nh)
     __u32 hdrlen = 0;
@@ -356,13 +346,10 @@ static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
     switch (current_hdr) {
     case IPPROTO_FRAGMENT: {
       // Fragment header - check if this is a non-first fragment
-      // Must use full struct to read frag_off field
-      if (data + off + sizeof(struct ipv6_frag_hdr) > data_end) {
+      struct ipv6_frag_hdr frag_hdr;
+      if (bpf_skb_load_bytes(skb, off, &frag_hdr, sizeof(frag_hdr)) < 0) {
         return -1; // Truncated fragment header
       }
-
-      struct ipv6_frag_hdr frag_hdr;
-      __builtin_memcpy(&frag_hdr, data + off, sizeof(struct ipv6_frag_hdr));
 
       // Extract fragment offset (bits 15-3, in 8-byte units)
       // Network byte order: must convert to host byte order first
@@ -392,11 +379,6 @@ static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
     // Update nexthdr for next iteration
     nh = opthdr.nexthdr;
 
-    // Bounds check for full header
-    if (data + off + hdrlen > data_end) {
-      return -1; // Header extends beyond packet
-    }
-
     // Advance offset by header length
     off += hdrlen;
   }
@@ -404,7 +386,6 @@ static __always_inline int ipv6_skip_exthdr(void *data, void *data_end,
   // Exceeded maximum headers - give up
   return -1;
 }
-***REMOVED***endif // DISABLE_IPV6
 
 // Parse IPv4 packet headers
 static __always_inline int
@@ -504,32 +485,36 @@ parse_ipv4(struct iphdr *ip, void *data_end, struct connection_key *key,
   return PARSE_DISCARD;
 }
 
-***REMOVED***ifndef DISABLE_IPV6
 // Parse IPv6 packet headers (WITH extension header support!)
-static __always_inline int parse_ipv6(struct ipv6hdr *ip6, void *data_end,
+// ───────────────────────────────────────────────────────────────────────
+// Uses bpf_skb_load_bytes() for L4 header access to avoid BPF verifier
+// issues with variable offset packet pointer arithmetic on kernels 5.10-6.6.
+// This approach is inspired by Cilium's ctx_load_bytes() pattern.
+// ───────────────────────────────────────────────────────────────────────
+static __always_inline int parse_ipv6(struct __sk_buff *skb, __u32 l3_offset,
                                       struct connection_key *key,
                                       __u64 *packet_bytes) {
-  // Bounds check
-  if ((void *)(ip6 + 1) > data_end) {
+  // Read IPv6 header using bpf_skb_load_bytes
+  struct ipv6hdr ip6;
+  if (bpf_skb_load_bytes(skb, l3_offset, &ip6, sizeof(ip6)) < 0) {
     return PARSE_DISCARD;
   }
 
   // IPv6 packet size = payload_len + 40-byte fixed header
   // Note: payload_len includes extension headers AND transport layer
-  *packet_bytes = bpf_ntohs(ip6->payload_len) + 40;
+  *packet_bytes = bpf_ntohs(ip6.payload_len) + 40;
 
   // Extract IPv6 addresses (copy all 128 bits)
-  __builtin_memcpy(key->src_addr, &ip6->saddr.in6_u.u6_addr32, 16);
-  __builtin_memcpy(key->dst_addr, &ip6->daddr.in6_u.u6_addr32, 16);
+  __builtin_memcpy(key->src_addr, &ip6.saddr.in6_u.u6_addr32, 16);
+  __builtin_memcpy(key->dst_addr, &ip6.daddr.in6_u.u6_addr32, 16);
   key->family = AF_INET6;
 
   // Skip extension headers to find transport protocol
   // Start with nexthdr from IPv6 fixed header
-  __u8 nexthdr = ip6->nexthdr;
-  __u32 offset = 0; // Offset from (ip6 + 1)
+  __u8 nexthdr = ip6.nexthdr;
+  __u32 l4_offset = 0; // Will be set by ipv6_skip_exthdr
 
-  void *ext_hdr_start = (void *)(ip6 + 1);
-  int ret = ipv6_skip_exthdr(ext_hdr_start, data_end, &nexthdr, &offset);
+  int ret = ipv6_skip_exthdr(skb, l3_offset, &nexthdr, &l4_offset);
 
   if (ret < 0) {
     // Failed to parse extension headers (truncated, too many headers, etc.)
@@ -548,48 +533,46 @@ static __always_inline int parse_ipv6(struct ipv6hdr *ip6, void *data_end,
   }
 
   // Now nexthdr contains the transport protocol (TCP, UDP, ICMP, etc.)
-  // and offset points to the start of transport header
+  // and l4_offset points to the start of transport header from packet start
   key->protocol = nexthdr;
-  void *l4_hdr = ext_hdr_start + offset;
 
-  // Parse TCP
+  // Parse TCP using bpf_skb_load_bytes (avoids variable offset issues)
   if (nexthdr == IPPROTO_TCP) {
-    struct tcphdr *tcp = l4_hdr;
-    if ((void *)(tcp + 1) > data_end) {
+    struct tcphdr tcp;
+    if (bpf_skb_load_bytes(skb, l4_offset, &tcp, sizeof(tcp)) < 0) {
       return PARSE_DISCARD;
     }
-    key->src_port = bpf_ntohs(tcp->source);
-    key->dst_port = bpf_ntohs(tcp->dest);
+    key->src_port = bpf_ntohs(tcp.source);
+    key->dst_port = bpf_ntohs(tcp.dest);
     return PARSE_OK;
   }
 
-  // Parse UDP
+  // Parse UDP using bpf_skb_load_bytes
   if (nexthdr == IPPROTO_UDP) {
-    struct udphdr *udp = l4_hdr;
-    if ((void *)(udp + 1) > data_end) {
+    struct udphdr udp;
+    if (bpf_skb_load_bytes(skb, l4_offset, &udp, sizeof(udp)) < 0) {
       return PARSE_DISCARD;
     }
-    key->src_port = bpf_ntohs(udp->source);
-    key->dst_port = bpf_ntohs(udp->dest);
+    key->src_port = bpf_ntohs(udp.source);
+    key->dst_port = bpf_ntohs(udp.dest);
     return PARSE_OK;
   }
 
-  // Parse ICMPv6 (use type/code as pseudo-ports for aggregation)
+  // Parse ICMPv6 using bpf_skb_load_bytes (type/code as pseudo-ports)
   if (nexthdr == IPPROTO_ICMPV6) {
     // ICMPv6 header: type (1B), code (1B), checksum (2B), ...
-    if (l4_hdr + 4 > data_end) {
+    __u8 icmp6_hdr[4];
+    if (bpf_skb_load_bytes(skb, l4_offset, icmp6_hdr, sizeof(icmp6_hdr)) < 0) {
       return PARSE_DISCARD;
     }
-    __u8 *icmp6 = (__u8 *)l4_hdr;
-    key->src_port = icmp6[0]; // ICMPv6 type
-    key->dst_port = icmp6[1]; // ICMPv6 code
+    key->src_port = icmp6_hdr[0]; // ICMPv6 type
+    key->dst_port = icmp6_hdr[1]; // ICMPv6 code
     return PARSE_OK;
   }
 
   // Other protocols - discard
   return PARSE_DISCARD;
 }
-***REMOVED***endif // DISABLE_IPV6
 
 // Parse packet and extract connection key
 static __always_inline int
@@ -615,14 +598,14 @@ parse_packet(struct __sk_buff *skb, struct connection_key *key,
   // Parse based on EtherType (now with packet_bytes output)
   if (eth_proto == ETH_P_IP) {
     return parse_ipv4((struct iphdr *)l3_hdr, data_end, key, packet_bytes);
+  } else if (eth_proto == ETH_P_IPV6) {
+    // IPv6 uses bpf_skb_load_bytes() for kernel 5.10+ verifier compatibility
+    // Pass skb and L3 offset (Ethernet header size = 14 bytes)
+    __u32 l3_offset = sizeof(struct ethhdr);
+    return parse_ipv6(skb, l3_offset, key, packet_bytes);
   }
-***REMOVED***ifndef DISABLE_IPV6
-  else if (eth_proto == ETH_P_IPV6) {
-    return parse_ipv6((struct ipv6hdr *)l3_hdr, data_end, key, packet_bytes);
-  }
-***REMOVED***endif
 
-  // Non-IP traffic (or IPv6 when DISABLE_IPV6 is defined)
+  // Non-IP traffic
   return PARSE_DISCARD;
 }
 

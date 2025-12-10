@@ -20,8 +20,8 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // SetListOptionsDefaults sets defaults on the provided ListOptions if applicable.
 //
-// TODO(***REMOVED***115478): once the watch-list fg is always on we register this function in the scheme (via AddTypeDefaultingFunc).
-// TODO(***REMOVED***115478): when the function is registered in the scheme remove all callers of this method.
+// TODO(#115478): once the watch-list fg is always on we register this function in the scheme (via AddTypeDefaultingFunc).
+// TODO(#115478): when the function is registered in the scheme remove all callers of this method.
 func SetListOptionsDefaults(obj *ListOptions, isWatchListFeatureEnabled bool) {
 	if !isWatchListFeatureEnabled {
 		return

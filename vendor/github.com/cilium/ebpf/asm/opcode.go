@@ -315,7 +315,7 @@ func (op OpCode) String() string {
 		}
 
 	default:
-		fmt.Fprintf(&f, "OpCode(%***REMOVED***x)", uint8(op))
+		fmt.Fprintf(&f, "OpCode(%#x)", uint8(op))
 	}
 
 	return f.String()

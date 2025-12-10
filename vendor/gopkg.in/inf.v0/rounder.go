@@ -12,7 +12,7 @@ import (
 //
 type Rounder rounder
 
-// See http://speleotrove.com/decimal/damodel.html***REMOVED***refround for more detailed
+// See http://speleotrove.com/decimal/damodel.html#refround for more detailed
 // definitions of these rounding modes.
 var (
 	RoundDown     Rounder // towards 0

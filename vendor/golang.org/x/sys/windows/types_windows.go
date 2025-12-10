@@ -845,7 +845,7 @@ type win32finddata1 struct {
 	// not needed for binaries built for Windows.
 	//
 	// ¹ https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-win32_find_dataw describe
-	// ² https://golang.org/issue/42637***REMOVED***issuecomment-760715755.
+	// ² https://golang.org/issue/42637#issuecomment-760715755.
 }
 
 func copyFindData(dst *Win32finddata, src *win32finddata1) {

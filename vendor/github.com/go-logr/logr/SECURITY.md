@@ -1,4 +1,4 @@
-***REMOVED*** Security Policy
+# Security Policy
 
 If you have discovered a security vulnerability in this project, please report it
 privately. **Do not disclose it as a public issue.** This gives us time to work with you

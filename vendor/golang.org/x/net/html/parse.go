@@ -14,7 +14,7 @@ import (
 )
 
 // A parser implements the HTML5 parsing algorithm:
-// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***tree-construction
+// https://html.spec.whatwg.org/multipage/syntax.html#tree-construction
 type parser struct {
 	// tokenizer provides the tokens for the parser.
 	tokenizer *Tokenizer
@@ -186,7 +186,7 @@ func (p *parser) clearStackToContext(s scope) {
 
 // parseGenericRawTextElement implements the generic raw text element parsing
 // algorithm defined in 12.2.6.2.
-// https://html.spec.whatwg.org/multipage/parsing.html***REMOVED***parsing-elements-that-contain-only-text
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-elements-that-contain-only-text
 // TODO: Since both RAWTEXT and RCDATA states are treated as tokenizer's part
 // officially, need to make tokenizer consider both states.
 func (p *parser) parseGenericRawTextElement() {
@@ -1213,7 +1213,7 @@ func inBodyIM(p *parser) bool {
 
 func (p *parser) inBodyEndTagFormatting(tagAtom a.Atom, tagName string) {
 	// This is the "adoption agency" algorithm, described at
-	// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***adoptionAgency
+	// https://html.spec.whatwg.org/multipage/syntax.html#adoptionAgency
 
 	// TODO: this is a fairly literal line-by-line translation of that algorithm.
 	// Once the code successfully parses the comprehensive test suite, we should
@@ -1366,7 +1366,7 @@ func (p *parser) inBodyEndTagFormatting(tagAtom a.Atom, tagName string) {
 
 // inBodyEndTagOther performs the "any other end tag" algorithm for inBodyIM.
 // "Any other end tag" handling from 12.2.6.5 The rules for parsing tokens in foreign content
-// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***parsing-main-inforeign
+// https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inforeign
 func (p *parser) inBodyEndTagOther(tagAtom a.Atom, tagName string) {
 	for i := len(p.oe) - 1; i >= 0; i-- {
 		// Two element nodes have the same tag if they have the same Data (a
@@ -2336,7 +2336,7 @@ func (p *parser) parse() error {
 // Parse returns the parse tree for the HTML from the given Reader.
 //
 // It implements the HTML5 parsing algorithm
-// (https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***tree-construction),
+// (https://html.spec.whatwg.org/multipage/syntax.html#tree-construction),
 // which is very complicated. The resultant tree can contain implicitly created
 // nodes that have no explicit <tag> listed in r's data, and nodes' parents can
 // differ from the nesting implied by a naive processing of start and end
@@ -2361,7 +2361,7 @@ func ParseFragment(r io.Reader, context *Node) ([]*Node, error) {
 type ParseOption func(p *parser)
 
 // ParseOptionEnableScripting configures the scripting flag.
-// https://html.spec.whatwg.org/multipage/webappapis.html***REMOVED***enabling-and-disabling-scripting
+// https://html.spec.whatwg.org/multipage/webappapis.html#enabling-and-disabling-scripting
 //
 // By default, scripting is enabled.
 func ParseOptionEnableScripting(enable bool) ParseOption {

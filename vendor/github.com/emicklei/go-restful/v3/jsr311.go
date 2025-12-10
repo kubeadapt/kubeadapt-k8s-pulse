@@ -65,7 +65,7 @@ func (RouterJSR311) extractParams(pathExpr *pathExpression, matches []string) ma
 	return params
 }
 
-// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html***REMOVED***x3-360003.7.2
+// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-360003.7.2
 func (r RouterJSR311) detectRoute(routes []Route, httpRequest *http.Request) (*Route, error) {
 	candidates := make([]*Route, 0, 8)
 	for i, each := range routes {
@@ -170,14 +170,14 @@ func (r RouterJSR311) detectRoute(routes []Route, httpRequest *http.Request) (*R
 	return candidates[0], nil
 }
 
-// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html***REMOVED***x3-360003.7.2
+// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-360003.7.2
 // n/m > n/* > */*
 func (r RouterJSR311) bestMatchByMedia(routes []Route, contentType string, accept string) *Route {
 	// TODO
 	return &routes[0]
 }
 
-// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html***REMOVED***x3-360003.7.2  (step 2)
+// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-360003.7.2  (step 2)
 func (r RouterJSR311) selectRoutes(dispatcher *WebService, pathRemainder string) []Route {
 	filtered := &sortableRouteCandidates{}
 	for _, each := range dispatcher.Routes() {
@@ -210,7 +210,7 @@ func (r RouterJSR311) selectRoutes(dispatcher *WebService, pathRemainder string)
 	return matchingRoutes
 }
 
-// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html***REMOVED***x3-360003.7.2 (step 1)
+// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-360003.7.2 (step 1)
 func (r RouterJSR311) detectDispatcher(requestPath string, dispatchers []*WebService) (*WebService, string, error) {
 	filtered := &sortableDispatcherCandidates{}
 	for _, each := range dispatchers {

@@ -4,7 +4,7 @@
 
 //go:build riscv64 && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for linux/riscv64.

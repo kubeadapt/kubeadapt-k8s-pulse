@@ -28,7 +28,7 @@ import (
 // A Pool is a generic wrapper around [sync.Pool] to provide strongly-typed
 // object pooling.
 //
-// Note that SA6002 (ref: https://staticcheck.io/docs/checks/***REMOVED***SA6002) will
+// Note that SA6002 (ref: https://staticcheck.io/docs/checks/#SA6002) will
 // not be detected, so all internal pool use must take care to only store
 // pointer types.
 type Pool[T any] struct {

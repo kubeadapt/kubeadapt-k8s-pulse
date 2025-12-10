@@ -1,4 +1,4 @@
-***REMOVED*** Directory containing the Makefile.
+# Directory containing the Makefile.
 PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 export GOBIN ?= $(PROJECT_ROOT)/bin
@@ -7,10 +7,10 @@ export PATH := $(GOBIN):$(PATH)
 GOVULNCHECK = $(GOBIN)/govulncheck
 BENCH_FLAGS ?= -cpuprofile=cpu.pprof -memprofile=mem.pprof -benchmem
 
-***REMOVED*** Directories containing independent Go modules.
+# Directories containing independent Go modules.
 MODULE_DIRS = . ./exp ./benchmarks ./zapgrpc/internal/test
 
-***REMOVED*** Directories that we want to track coverage for.
+# Directories that we want to track coverage for.
 COVER_DIRS = . ./exp
 
 .PHONY: all

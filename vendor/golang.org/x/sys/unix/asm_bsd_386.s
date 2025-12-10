@@ -4,7 +4,7 @@
 
 //go:build (freebsd || netbsd || openbsd) && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // System call support for 386 BSD
 

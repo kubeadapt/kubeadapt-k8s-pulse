@@ -3,47 +3,47 @@
 // +build gc
 // +build !purego
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // Registers:
-***REMOVED***define digest	R1
-***REMOVED***define h	R2 // return value
-***REMOVED***define p	R3 // input pointer
-***REMOVED***define n	R4 // input length
-***REMOVED***define nblocks	R5 // n / 32
-***REMOVED***define prime1	R7
-***REMOVED***define prime2	R8
-***REMOVED***define prime3	R9
-***REMOVED***define prime4	R10
-***REMOVED***define prime5	R11
-***REMOVED***define v1	R12
-***REMOVED***define v2	R13
-***REMOVED***define v3	R14
-***REMOVED***define v4	R15
-***REMOVED***define x1	R20
-***REMOVED***define x2	R21
-***REMOVED***define x3	R22
-***REMOVED***define x4	R23
+#define digest	R1
+#define h	R2 // return value
+#define p	R3 // input pointer
+#define n	R4 // input length
+#define nblocks	R5 // n / 32
+#define prime1	R7
+#define prime2	R8
+#define prime3	R9
+#define prime4	R10
+#define prime5	R11
+#define v1	R12
+#define v2	R13
+#define v3	R14
+#define v4	R15
+#define x1	R20
+#define x2	R21
+#define x3	R22
+#define x4	R23
 
-***REMOVED***define round(acc, x) \
+#define round(acc, x) \
 	MADD prime2, acc, x, acc \
 	ROR  $64-31, acc         \
 	MUL  prime1, acc
 
 // round0 performs the operation x = round(0, x).
-***REMOVED***define round0(x) \
+#define round0(x) \
 	MUL prime2, x \
 	ROR $64-31, x \
 	MUL prime1, x
 
-***REMOVED***define mergeRound(acc, x) \
+#define mergeRound(acc, x) \
 	round0(x)                     \
 	EOR  x, acc                   \
 	MADD acc, prime4, prime1, acc
 
 // blockLoop processes as many 32-byte blocks as possible,
 // updating v1, v2, v3, and v4. It assumes that n >= 32.
-***REMOVED***define blockLoop() \
+#define blockLoop() \
 	LSR     $5, n, nblocks  \
 	PCALIGN $16             \
 	loop:                   \

@@ -1,11 +1,11 @@
-***REMOVED***!/usr/bin/env bash
-***REMOVED*** Copyright 2009 The Go Authors. All rights reserved.
-***REMOVED*** Use of this source code is governed by a BSD-style
-***REMOVED*** license that can be found in the LICENSE file.
+#!/usr/bin/env bash
+# Copyright 2009 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
-***REMOVED*** Generate Go code listing errors and other ***REMOVED***defined constant
-***REMOVED*** values (ENAMETOOLONG etc.), by asking the preprocessor
-***REMOVED*** about the definitions.
+# Generate Go code listing errors and other #defined constant
+# values (ENAMETOOLONG etc.), by asking the preprocessor
+# about the definitions.
 
 unset LANG
 export LC_ALL=C
@@ -16,7 +16,7 @@ if test -z "$GOARCH" -o -z "$GOOS"; then
 	exit 1
 fi
 
-***REMOVED*** Check that we are using the new build system if we should
+# Check that we are using the new build system if we should
 if [[ "$GOOS" = "linux" ]] && [[ "$GOLANG_SYS_BUILD" != "docker" ]]; then
 	echo 1>&2 "In the Docker based build system, mkerrors should not be called directly."
 	echo 1>&2 "See README.md"
@@ -30,147 +30,147 @@ else
 fi
 
 if [[ "$GOOS" = "solaris" ]]; then
-	***REMOVED*** Assumes GNU versions of utilities in PATH.
+	# Assumes GNU versions of utilities in PATH.
 	export PATH=/usr/gnu/bin:$PATH
 fi
 
 uname=$(uname)
 
 includes_AIX='
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/netopt.h>
-***REMOVED***include <netinet/ip_mroute.h>
-***REMOVED***include <sys/protosw.h>
-***REMOVED***include <sys/stropts.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/poll.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/termio.h>
-***REMOVED***include <termios.h>
-***REMOVED***include <fcntl.h>
+#include <net/if.h>
+#include <net/netopt.h>
+#include <netinet/ip_mroute.h>
+#include <sys/protosw.h>
+#include <sys/stropts.h>
+#include <sys/mman.h>
+#include <sys/poll.h>
+#include <sys/select.h>
+#include <sys/termio.h>
+#include <termios.h>
+#include <fcntl.h>
 
-***REMOVED***define AF_LOCAL AF_UNIX
+#define AF_LOCAL AF_UNIX
 '
 
 includes_Darwin='
-***REMOVED***define _DARWIN_C_SOURCE
-***REMOVED***define KERNEL 1
-***REMOVED***define _DARWIN_USE_64_BIT_INODE
-***REMOVED***define __APPLE_USE_RFC_3542
-***REMOVED***include <stdint.h>
-***REMOVED***include <sys/stdio.h>
-***REMOVED***include <sys/attr.h>
-***REMOVED***include <sys/clonefile.h>
-***REMOVED***include <sys/kern_control.h>
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/event.h>
-***REMOVED***include <sys/ptrace.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/un.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/sys_domain.h>
-***REMOVED***include <sys/sysctl.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/utsname.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <sys/xattr.h>
-***REMOVED***include <sys/vsock.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <termios.h>
+#define _DARWIN_C_SOURCE
+#define KERNEL 1
+#define _DARWIN_USE_64_BIT_INODE
+#define __APPLE_USE_RFC_3542
+#include <stdint.h>
+#include <sys/stdio.h>
+#include <sys/attr.h>
+#include <sys/clonefile.h>
+#include <sys/kern_control.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/ptrace.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <sys/sockio.h>
+#include <sys/sys_domain.h>
+#include <sys/sysctl.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/utsname.h>
+#include <sys/wait.h>
+#include <sys/xattr.h>
+#include <sys/vsock.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <termios.h>
 
 // for backwards compatibility because moved TIOCREMOTE to Kernel.framework after MacOSX12.0.sdk.
-***REMOVED***define TIOCREMOTE 0x80047469
+#define TIOCREMOTE 0x80047469
 '
 
 includes_DragonFly='
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/event.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/sysctl.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <sys/ioctl.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_clone.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <termios.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <net/ip_mroute/ip_mroute.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <sys/stat.h>
+#include <sys/sysctl.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_clone.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <termios.h>
+#include <netinet/ip.h>
+#include <net/ip_mroute/ip_mroute.h>
 '
 
 includes_FreeBSD='
-***REMOVED***include <sys/capsicum.h>
-***REMOVED***include <sys/param.h>
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/disk.h>
-***REMOVED***include <sys/event.h>
-***REMOVED***include <sys/sched.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/un.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/sysctl.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <sys/ioctl.h>
-***REMOVED***include <sys/ptrace.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <termios.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip_mroute.h>
-***REMOVED***include <sys/extattr.h>
+#include <sys/capsicum.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/disk.h>
+#include <sys/event.h>
+#include <sys/sched.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/sockio.h>
+#include <sys/stat.h>
+#include <sys/sysctl.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <sys/ptrace.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <termios.h>
+#include <netinet/ip.h>
+#include <netinet/ip_mroute.h>
+#include <sys/extattr.h>
 
-***REMOVED***if __FreeBSD__ >= 10
-***REMOVED***define IFT_CARP	0xf8	// IFT_CARP is deprecated in FreeBSD 10
-***REMOVED***undef SIOCAIFADDR
-***REMOVED***define SIOCAIFADDR	_IOW(105, 26, struct oifaliasreq)	// ifaliasreq contains if_data
-***REMOVED***undef SIOCSIFPHYADDR
-***REMOVED***define SIOCSIFPHYADDR	_IOW(105, 70, struct oifaliasreq)	// ifaliasreq contains if_data
-***REMOVED***endif
+#if __FreeBSD__ >= 10
+#define IFT_CARP	0xf8	// IFT_CARP is deprecated in FreeBSD 10
+#undef SIOCAIFADDR
+#define SIOCAIFADDR	_IOW(105, 26, struct oifaliasreq)	// ifaliasreq contains if_data
+#undef SIOCSIFPHYADDR
+#define SIOCSIFPHYADDR	_IOW(105, 70, struct oifaliasreq)	// ifaliasreq contains if_data
+#endif
 '
 
 includes_Linux='
-***REMOVED***define _LARGEFILE_SOURCE
-***REMOVED***define _LARGEFILE64_SOURCE
-***REMOVED***ifndef __LP64__
-***REMOVED***define _FILE_OFFSET_BITS 64
-***REMOVED***endif
-***REMOVED***define _GNU_SOURCE
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE64_SOURCE
+#ifndef __LP64__
+#define _FILE_OFFSET_BITS 64
+#endif
+#define _GNU_SOURCE
 
 // See the description in unix/linux/types.go
-***REMOVED***if defined(__ARM_EABI__) || \
+#if defined(__ARM_EABI__) || \
 	(defined(__mips__) && (_MIPS_SIM == _ABIO32)) || \
 	(defined(__powerpc__) && (!defined(__powerpc64__)))
-***REMOVED*** ifdef   _TIME_BITS
-***REMOVED***  undef  _TIME_BITS
-***REMOVED*** endif
-***REMOVED*** define  _TIME_BITS 32
-***REMOVED***endif
+# ifdef   _TIME_BITS
+#  undef  _TIME_BITS
+# endif
+# define  _TIME_BITS 32
+#endif
 
 // <sys/ioctl.h> is broken on powerpc64, as it fails to include definitions of
 // these structures. We just include them copied from <bits/termios.h>.
-***REMOVED***if defined(__powerpc__)
+#if defined(__powerpc__)
 struct sgttyb {
         char    sg_ispeed;
         char    sg_ospeed;
@@ -196,144 +196,144 @@ struct ltchars {
         char    t_werasc;
         char    t_lnextc;
 };
-***REMOVED***endif
+#endif
 
-***REMOVED***include <bits/sockaddr.h>
-***REMOVED***include <sys/epoll.h>
-***REMOVED***include <sys/eventfd.h>
-***REMOVED***include <sys/inotify.h>
-***REMOVED***include <sys/ioctl.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/prctl.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/time.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/signalfd.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/timerfd.h>
-***REMOVED***include <sys/uio.h>
-***REMOVED***include <sys/xattr.h>
-***REMOVED***include <netinet/udp.h>
-***REMOVED***include <linux/audit.h>
-***REMOVED***include <linux/bpf.h>
-***REMOVED***include <linux/can.h>
-***REMOVED***include <linux/can/error.h>
-***REMOVED***include <linux/can/netlink.h>
-***REMOVED***include <linux/can/raw.h>
-***REMOVED***include <linux/capability.h>
-***REMOVED***include <linux/cryptouser.h>
-***REMOVED***include <linux/devlink.h>
-***REMOVED***include <linux/dm-ioctl.h>
-***REMOVED***include <linux/errqueue.h>
-***REMOVED***include <linux/ethtool_netlink.h>
-***REMOVED***include <linux/falloc.h>
-***REMOVED***include <linux/fanotify.h>
-***REMOVED***include <linux/fib_rules.h>
-***REMOVED***include <linux/filter.h>
-***REMOVED***include <linux/fs.h>
-***REMOVED***include <linux/fscrypt.h>
-***REMOVED***include <linux/fsverity.h>
-***REMOVED***include <linux/genetlink.h>
-***REMOVED***include <linux/hdreg.h>
-***REMOVED***include <linux/hidraw.h>
-***REMOVED***include <linux/if.h>
-***REMOVED***include <linux/if_addr.h>
-***REMOVED***include <linux/if_alg.h>
-***REMOVED***include <linux/if_arp.h>
-***REMOVED***include <linux/if_ether.h>
-***REMOVED***include <linux/if_ppp.h>
-***REMOVED***include <linux/if_tun.h>
-***REMOVED***include <linux/if_packet.h>
-***REMOVED***include <linux/if_xdp.h>
-***REMOVED***include <linux/input.h>
-***REMOVED***include <linux/kcm.h>
-***REMOVED***include <linux/kexec.h>
-***REMOVED***include <linux/keyctl.h>
-***REMOVED***include <linux/landlock.h>
-***REMOVED***include <linux/loop.h>
-***REMOVED***include <linux/lwtunnel.h>
-***REMOVED***include <linux/magic.h>
-***REMOVED***include <linux/memfd.h>
-***REMOVED***include <linux/module.h>
-***REMOVED***include <linux/mount.h>
-***REMOVED***include <linux/netfilter/nfnetlink.h>
-***REMOVED***include <linux/netfilter/nf_tables.h>
-***REMOVED***include <linux/netlink.h>
-***REMOVED***include <linux/net_namespace.h>
-***REMOVED***include <linux/nfc.h>
-***REMOVED***include <linux/nsfs.h>
-***REMOVED***include <linux/perf_event.h>
-***REMOVED***include <linux/pps.h>
-***REMOVED***include <linux/ptp_clock.h>
-***REMOVED***include <linux/ptrace.h>
-***REMOVED***include <linux/random.h>
-***REMOVED***include <linux/reboot.h>
-***REMOVED***include <linux/rtc.h>
-***REMOVED***include <linux/rtnetlink.h>
-***REMOVED***include <linux/sched.h>
-***REMOVED***include <linux/seccomp.h>
-***REMOVED***include <linux/serial.h>
-***REMOVED***include <linux/sock_diag.h>
-***REMOVED***include <linux/sockios.h>
-***REMOVED***include <linux/taskstats.h>
-***REMOVED***include <linux/tipc.h>
-***REMOVED***include <linux/vm_sockets.h>
-***REMOVED***include <linux/wait.h>
-***REMOVED***include <linux/watchdog.h>
-***REMOVED***include <linux/wireguard.h>
+#include <bits/sockaddr.h>
+#include <sys/epoll.h>
+#include <sys/eventfd.h>
+#include <sys/inotify.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/select.h>
+#include <sys/signalfd.h>
+#include <sys/socket.h>
+#include <sys/timerfd.h>
+#include <sys/uio.h>
+#include <sys/xattr.h>
+#include <netinet/udp.h>
+#include <linux/audit.h>
+#include <linux/bpf.h>
+#include <linux/can.h>
+#include <linux/can/error.h>
+#include <linux/can/netlink.h>
+#include <linux/can/raw.h>
+#include <linux/capability.h>
+#include <linux/cryptouser.h>
+#include <linux/devlink.h>
+#include <linux/dm-ioctl.h>
+#include <linux/errqueue.h>
+#include <linux/ethtool_netlink.h>
+#include <linux/falloc.h>
+#include <linux/fanotify.h>
+#include <linux/fib_rules.h>
+#include <linux/filter.h>
+#include <linux/fs.h>
+#include <linux/fscrypt.h>
+#include <linux/fsverity.h>
+#include <linux/genetlink.h>
+#include <linux/hdreg.h>
+#include <linux/hidraw.h>
+#include <linux/if.h>
+#include <linux/if_addr.h>
+#include <linux/if_alg.h>
+#include <linux/if_arp.h>
+#include <linux/if_ether.h>
+#include <linux/if_ppp.h>
+#include <linux/if_tun.h>
+#include <linux/if_packet.h>
+#include <linux/if_xdp.h>
+#include <linux/input.h>
+#include <linux/kcm.h>
+#include <linux/kexec.h>
+#include <linux/keyctl.h>
+#include <linux/landlock.h>
+#include <linux/loop.h>
+#include <linux/lwtunnel.h>
+#include <linux/magic.h>
+#include <linux/memfd.h>
+#include <linux/module.h>
+#include <linux/mount.h>
+#include <linux/netfilter/nfnetlink.h>
+#include <linux/netfilter/nf_tables.h>
+#include <linux/netlink.h>
+#include <linux/net_namespace.h>
+#include <linux/nfc.h>
+#include <linux/nsfs.h>
+#include <linux/perf_event.h>
+#include <linux/pps.h>
+#include <linux/ptp_clock.h>
+#include <linux/ptrace.h>
+#include <linux/random.h>
+#include <linux/reboot.h>
+#include <linux/rtc.h>
+#include <linux/rtnetlink.h>
+#include <linux/sched.h>
+#include <linux/seccomp.h>
+#include <linux/serial.h>
+#include <linux/sock_diag.h>
+#include <linux/sockios.h>
+#include <linux/taskstats.h>
+#include <linux/tipc.h>
+#include <linux/vm_sockets.h>
+#include <linux/wait.h>
+#include <linux/watchdog.h>
+#include <linux/wireguard.h>
 
-***REMOVED***include <mtd/ubi-user.h>
-***REMOVED***include <mtd/mtd-user.h>
-***REMOVED***include <net/route.h>
+#include <mtd/ubi-user.h>
+#include <mtd/mtd-user.h>
+#include <net/route.h>
 
-***REMOVED***if defined(__sparc__)
+#if defined(__sparc__)
 // On sparc{,64}, the kernel defines struct termios2 itself which clashes with the
 // definition in glibc. As only the error constants are needed here, include the
 // generic termibits.h (which is included by termbits.h on sparc).
-***REMOVED***include <asm-generic/termbits.h>
-***REMOVED***else
-***REMOVED***include <asm/termbits.h>
-***REMOVED***endif
+#include <asm-generic/termbits.h>
+#else
+#include <asm/termbits.h>
+#endif
 
-***REMOVED***ifndef PTRACE_GETREGS
-***REMOVED***define PTRACE_GETREGS	0xc
-***REMOVED***endif
+#ifndef PTRACE_GETREGS
+#define PTRACE_GETREGS	0xc
+#endif
 
-***REMOVED***ifndef PTRACE_SETREGS
-***REMOVED***define PTRACE_SETREGS	0xd
-***REMOVED***endif
+#ifndef PTRACE_SETREGS
+#define PTRACE_SETREGS	0xd
+#endif
 
-***REMOVED***ifdef SOL_BLUETOOTH
+#ifdef SOL_BLUETOOTH
 // SPARC includes this in /usr/include/sparc64-linux-gnu/bits/socket.h
 // but it is already in bluetooth_linux.go
-***REMOVED***undef SOL_BLUETOOTH
-***REMOVED***endif
+#undef SOL_BLUETOOTH
+#endif
 
 // Certain constants are missing from the fs/crypto UAPI
-***REMOVED***define FS_KEY_DESC_PREFIX              "fscrypt:"
-***REMOVED***define FS_KEY_DESC_PREFIX_SIZE         8
-***REMOVED***define FS_MAX_KEY_SIZE                 64
+#define FS_KEY_DESC_PREFIX              "fscrypt:"
+#define FS_KEY_DESC_PREFIX_SIZE         8
+#define FS_MAX_KEY_SIZE                 64
 
 // The code generator produces -0x1 for (~0), but an unsigned value is necessary
 // for the tipc_subscr timeout __u32 field.
-***REMOVED***undef TIPC_WAIT_FOREVER
-***REMOVED***define TIPC_WAIT_FOREVER 0xffffffff
+#undef TIPC_WAIT_FOREVER
+#define TIPC_WAIT_FOREVER 0xffffffff
 
 // Copied from linux/netfilter/nf_nat.h
 // Including linux/netfilter/nf_nat.h here causes conflicts between linux/in.h
 // and netinet/in.h.
-***REMOVED***define NF_NAT_RANGE_MAP_IPS			(1 << 0)
-***REMOVED***define NF_NAT_RANGE_PROTO_SPECIFIED		(1 << 1)
-***REMOVED***define NF_NAT_RANGE_PROTO_RANDOM		(1 << 2)
-***REMOVED***define NF_NAT_RANGE_PERSISTENT			(1 << 3)
-***REMOVED***define NF_NAT_RANGE_PROTO_RANDOM_FULLY		(1 << 4)
-***REMOVED***define NF_NAT_RANGE_PROTO_OFFSET		(1 << 5)
-***REMOVED***define NF_NAT_RANGE_NETMAP			(1 << 6)
-***REMOVED***define NF_NAT_RANGE_PROTO_RANDOM_ALL		\
+#define NF_NAT_RANGE_MAP_IPS			(1 << 0)
+#define NF_NAT_RANGE_PROTO_SPECIFIED		(1 << 1)
+#define NF_NAT_RANGE_PROTO_RANDOM		(1 << 2)
+#define NF_NAT_RANGE_PERSISTENT			(1 << 3)
+#define NF_NAT_RANGE_PROTO_RANDOM_FULLY		(1 << 4)
+#define NF_NAT_RANGE_PROTO_OFFSET		(1 << 5)
+#define NF_NAT_RANGE_NETMAP			(1 << 6)
+#define NF_NAT_RANGE_PROTO_RANDOM_ALL		\
 	(NF_NAT_RANGE_PROTO_RANDOM | NF_NAT_RANGE_PROTO_RANDOM_FULLY)
-***REMOVED***define NF_NAT_RANGE_MASK					\
+#define NF_NAT_RANGE_MASK					\
 	(NF_NAT_RANGE_MAP_IPS | NF_NAT_RANGE_PROTO_SPECIFIED |	\
 	 NF_NAT_RANGE_PROTO_RANDOM | NF_NAT_RANGE_PERSISTENT |	\
 	 NF_NAT_RANGE_PROTO_RANDOM_FULLY | NF_NAT_RANGE_PROTO_OFFSET | \
@@ -341,130 +341,130 @@ struct ltchars {
 
 // Copied from linux/hid.h.
 // Keep in sync with the size of the referenced fields.
-***REMOVED***define _HIDIOCGRAWNAME_LEN	128 // sizeof_field(struct hid_device, name)
-***REMOVED***define _HIDIOCGRAWPHYS_LEN	64  // sizeof_field(struct hid_device, phys)
-***REMOVED***define _HIDIOCGRAWUNIQ_LEN	64  // sizeof_field(struct hid_device, uniq)
+#define _HIDIOCGRAWNAME_LEN	128 // sizeof_field(struct hid_device, name)
+#define _HIDIOCGRAWPHYS_LEN	64  // sizeof_field(struct hid_device, phys)
+#define _HIDIOCGRAWUNIQ_LEN	64  // sizeof_field(struct hid_device, uniq)
 
-***REMOVED***define _HIDIOCGRAWNAME		HIDIOCGRAWNAME(_HIDIOCGRAWNAME_LEN)
-***REMOVED***define _HIDIOCGRAWPHYS		HIDIOCGRAWPHYS(_HIDIOCGRAWPHYS_LEN)
-***REMOVED***define _HIDIOCGRAWUNIQ		HIDIOCGRAWUNIQ(_HIDIOCGRAWUNIQ_LEN)
+#define _HIDIOCGRAWNAME		HIDIOCGRAWNAME(_HIDIOCGRAWNAME_LEN)
+#define _HIDIOCGRAWPHYS		HIDIOCGRAWPHYS(_HIDIOCGRAWPHYS_LEN)
+#define _HIDIOCGRAWUNIQ		HIDIOCGRAWUNIQ(_HIDIOCGRAWUNIQ_LEN)
 
 '
 
 includes_NetBSD='
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/param.h>
-***REMOVED***include <sys/event.h>
-***REMOVED***include <sys/extattr.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/sched.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/sysctl.h>
-***REMOVED***include <sys/termios.h>
-***REMOVED***include <sys/ttycom.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/in_systm.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip_mroute.h>
-***REMOVED***include <netinet/if_ether.h>
+#include <sys/types.h>
+#include <sys/param.h>
+#include <sys/event.h>
+#include <sys/extattr.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/sched.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <sys/sysctl.h>
+#include <sys/termios.h>
+#include <sys/ttycom.h>
+#include <sys/wait.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netinet/ip_mroute.h>
+#include <netinet/if_ether.h>
 
 // Needed since <sys/param.h> refers to it...
-***REMOVED***define schedppq 1
+#define schedppq 1
 '
 
 includes_OpenBSD='
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/param.h>
-***REMOVED***include <sys/event.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/mount.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/sched.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/sysctl.h>
-***REMOVED***include <sys/termios.h>
-***REMOVED***include <sys/ttycom.h>
-***REMOVED***include <sys/unistd.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/if_var.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/in_systm.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip_mroute.h>
-***REMOVED***include <netinet/if_ether.h>
-***REMOVED***include <net/if_bridge.h>
+#include <sys/types.h>
+#include <sys/param.h>
+#include <sys/event.h>
+#include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/select.h>
+#include <sys/sched.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <sys/stat.h>
+#include <sys/sysctl.h>
+#include <sys/termios.h>
+#include <sys/ttycom.h>
+#include <sys/unistd.h>
+#include <sys/wait.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_types.h>
+#include <net/if_var.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netinet/ip_mroute.h>
+#include <netinet/if_ether.h>
+#include <net/if_bridge.h>
 
 // We keep some constants not supported in OpenBSD 5.5 and beyond for
 // the promise of compatibility.
-***REMOVED***define EMUL_ENABLED		0x1
-***REMOVED***define EMUL_NATIVE		0x2
-***REMOVED***define IPV6_FAITH		0x1d
-***REMOVED***define IPV6_OPTIONS		0x1
-***REMOVED***define IPV6_RTHDR_STRICT	0x1
-***REMOVED***define IPV6_SOCKOPT_RESERVED1	0x3
-***REMOVED***define SIOCGIFGENERIC		0xc020693a
-***REMOVED***define SIOCSIFGENERIC		0x80206939
-***REMOVED***define WALTSIG			0x4
+#define EMUL_ENABLED		0x1
+#define EMUL_NATIVE		0x2
+#define IPV6_FAITH		0x1d
+#define IPV6_OPTIONS		0x1
+#define IPV6_RTHDR_STRICT	0x1
+#define IPV6_SOCKOPT_RESERVED1	0x3
+#define SIOCGIFGENERIC		0xc020693a
+#define SIOCSIFGENERIC		0x80206939
+#define WALTSIG			0x4
 '
 
 includes_SunOS='
-***REMOVED***include <limits.h>
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/select.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <sys/sockio.h>
-***REMOVED***include <sys/stat.h>
-***REMOVED***include <sys/stream.h>
-***REMOVED***include <sys/mman.h>
-***REMOVED***include <sys/wait.h>
-***REMOVED***include <sys/ioctl.h>
-***REMOVED***include <sys/mkdev.h>
-***REMOVED***include <net/bpf.h>
-***REMOVED***include <net/if.h>
-***REMOVED***include <net/if_arp.h>
-***REMOVED***include <net/if_types.h>
-***REMOVED***include <net/route.h>
-***REMOVED***include <netinet/icmp6.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip_mroute.h>
-***REMOVED***include <termios.h>
+#include <limits.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <sys/stat.h>
+#include <sys/stream.h>
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <sys/mkdev.h>
+#include <net/bpf.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/icmp6.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip_mroute.h>
+#include <termios.h>
 '
 
 
 includes='
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/file.h>
-***REMOVED***include <fcntl.h>
-***REMOVED***include <dirent.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip6.h>
-***REMOVED***include <netinet/tcp.h>
-***REMOVED***include <errno.h>
-***REMOVED***include <sys/signal.h>
-***REMOVED***include <signal.h>
-***REMOVED***include <sys/resource.h>
-***REMOVED***include <time.h>
+#include <sys/types.h>
+#include <sys/file.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netinet/tcp.h>
+#include <errno.h>
+#include <sys/signal.h>
+#include <signal.h>
+#include <sys/resource.h>
+#include <time.h>
 '
 ccflags="$@"
 
-***REMOVED*** Write go tool cgo -godefs input.
+# Write go tool cgo -godefs input.
 (
 	echo package unix
 	echo
@@ -477,17 +477,17 @@ ccflags="$@"
 	echo
 	echo 'const ('
 
-	***REMOVED*** The gcc command line prints all the ***REMOVED***defines
-	***REMOVED*** it encounters while processing the input
+	# The gcc command line prints all the #defines
+	# it encounters while processing the input
 	echo "${!indirect} $includes" | $CC -x c - -E -dM $ccflags |
 	awk '
-		$1 != "***REMOVED***define" || $2 ~ /\(/ || $3 == "" {next}
+		$1 != "#define" || $2 ~ /\(/ || $3 == "" {next}
 
-		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ {next}  ***REMOVED*** 386 registers
+		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ {next}  # 386 registers
 		$2 ~ /^(SIGEV_|SIGSTKSZ|SIGRT(MIN|MAX))/ {next}
 		$2 ~ /^(SCM_SRCRT)$/ {next}
 		$2 ~ /^(MAP_FAILED)$/ {next}
-		$2 ~ /^ELF_.*$/ {next}***REMOVED*** <asm/elf.h> contains ELF_ARCH, etc.
+		$2 ~ /^ELF_.*$/ {next}# <asm/elf.h> contains ELF_ARCH, etc.
 
 		$2 ~ /^EXTATTR_NAMESPACE_NAMES/ ||
 		$2 ~ /^EXTATTR_NAMESPACE_[A-Z]+_STRING/ {next}
@@ -657,27 +657,27 @@ ccflags="$@"
 	echo ')'
 ) >_const.go
 
-***REMOVED*** Pull out the error names for later.
+# Pull out the error names for later.
 errors=$(
-	echo '***REMOVED***include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^E[A-Z0-9_]+$/ { print $2 }' |
+	echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print $2 }' |
 	sort
 )
 
-***REMOVED*** Pull out the signal names for later.
+# Pull out the signal names for later.
 signals=$(
-	echo '***REMOVED***include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^SIG[A-Z0-9]+$/ { print $2 }' |
+	echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print $2 }' |
 	grep -E -v '(SIGSTKSIZE|SIGSTKSZ|SIGRT|SIGMAX64)' |
 	sort
 )
 
-***REMOVED*** Again, writing regexps to a file.
-echo '***REMOVED***include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^E[A-Z0-9_]+$/ { print "^\t" $2 "[ \t]*=" }' |
+# Again, writing regexps to a file.
+echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	sort >_error.grep
-echo '***REMOVED***include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^SIG[A-Z0-9]+$/ { print "^\t" $2 "[ \t]*=" }' |
+echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	grep -E -v '(SIGSTKSIZE|SIGSTKSZ|SIGRT|SIGMAX64)' |
 	sort >_signal.grep
 
@@ -700,17 +700,17 @@ echo 'const ('
 cat _error.out | grep -f _signal.grep | sed 's/=\(.*\)/= syscall.Signal(\1)/'
 echo ')'
 
-***REMOVED*** Run C program to print error and syscall strings.
+# Run C program to print error and syscall strings.
 (
 	echo -E "
-***REMOVED***include <stdio.h>
-***REMOVED***include <stdlib.h>
-***REMOVED***include <errno.h>
-***REMOVED***include <ctype.h>
-***REMOVED***include <string.h>
-***REMOVED***include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <ctype.h>
+#include <string.h>
+#include <signal.h>
 
-***REMOVED***define nelem(x) (sizeof(x)/sizeof((x)[0]))
+#define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
 enum { A = 'A', Z = 'Z', a = 'a', z = 'z' }; // avoid need for single quotes below
 
@@ -736,7 +736,7 @@ struct tuple signals[] = {
 		echo -E '	{'$i', "'$i'" },'
 	done
 
-	***REMOVED*** Use -E because on some systems bash builtin interprets \n itself.
+	# Use -E because on some systems bash builtin interprets \n itself.
 	echo -E '
 };
 

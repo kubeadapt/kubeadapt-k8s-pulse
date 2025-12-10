@@ -134,7 +134,7 @@ func parseBTFHeader(r io.Reader, bo binary.ByteOrder) (*btfHeader, error) {
 type btfType struct {
 	NameOff uint32
 	/* "info" bits arrangement
-	 * bits  0-15: vlen (e.g. ***REMOVED*** of struct's members), linkage
+	 * bits  0-15: vlen (e.g. # of struct's members), linkage
 	 * bits 16-23: unused
 	 * bits 24-28: kind (e.g. int, ptr, array...etc)
 	 * bits 29-30: unused

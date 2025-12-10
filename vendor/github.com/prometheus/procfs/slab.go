@@ -27,7 +27,7 @@ import (
 var (
 	slabSpace  = regexp.MustCompile(`\s+`)
 	slabVer    = regexp.MustCompile(`slabinfo -`)
-	slabHeader = regexp.MustCompile(`***REMOVED*** name`)
+	slabHeader = regexp.MustCompile(`# name`)
 )
 
 // Slab represents a slab pool in the kernel.

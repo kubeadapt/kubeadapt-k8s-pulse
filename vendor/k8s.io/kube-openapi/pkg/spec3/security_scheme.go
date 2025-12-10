@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// SecurityScheme defines reusable Security Scheme Object, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***securitySchemeObject
+// SecurityScheme defines reusable Security Scheme Object, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securitySchemeObject
 type SecurityScheme struct {
 	spec.Refable
 	SecuritySchemeProps

@@ -1,43 +1,43 @@
-***REMOVED***!/usr/bin/env bash
+#!/usr/bin/env bash
 
-***REMOVED*** Purpose: plain text tar format
-***REMOVED*** Limitations: - only suitable for text files, directories, and symlinks
-***REMOVED***              - stores only filename, content, and mode
-***REMOVED***              - not designed for untrusted input
-***REMOVED***
-***REMOVED*** Note: must work with bash version 3.2 (macOS)
+# Purpose: plain text tar format
+# Limitations: - only suitable for text files, directories, and symlinks
+#              - stores only filename, content, and mode
+#              - not designed for untrusted input
+#
+# Note: must work with bash version 3.2 (macOS)
 
-***REMOVED*** Copyright 2017 Roger Luethi
-***REMOVED***
-***REMOVED*** Licensed under the Apache License, Version 2.0 (the "License");
-***REMOVED*** you may not use this file except in compliance with the License.
-***REMOVED*** You may obtain a copy of the License at
-***REMOVED***
-***REMOVED*** http://www.apache.org/licenses/LICENSE-2.0
-***REMOVED***
-***REMOVED*** Unless required by applicable law or agreed to in writing, software
-***REMOVED*** distributed under the License is distributed on an "AS IS" BASIS,
-***REMOVED*** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-***REMOVED*** See the License for the specific language governing permissions and
-***REMOVED*** limitations under the License.
+# Copyright 2017 Roger Luethi
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 set -o errexit -o nounset
 
-***REMOVED*** Sanitize environment (for instance, standard sorting of glob matches)
+# Sanitize environment (for instance, standard sorting of glob matches)
 export LC_ALL=C
 
 path=""
 CMD=""
 ARG_STRING="$*"
 
-***REMOVED***------------------------------------------------------------------------------
-***REMOVED*** Not all sed implementations can work on null bytes. In order to make ttar
-***REMOVED*** work out of the box on macOS, use Python as a stream editor.
+#------------------------------------------------------------------------------
+# Not all sed implementations can work on null bytes. In order to make ttar
+# work out of the box on macOS, use Python as a stream editor.
 
 USE_PYTHON=0
 
 PYTHON_CREATE_FILTER=$(cat << 'PCF'
-***REMOVED***!/usr/bin/env python
+#!/usr/bin/env python
 
 import re
 import sys
@@ -51,7 +51,7 @@ PCF
 )
 
 PYTHON_EXTRACT_FILTER=$(cat << 'PEF'
-***REMOVED***!/usr/bin/env python
+#!/usr/bin/env python
 
 import re
 import sys
@@ -76,7 +76,7 @@ function test_environment {
     fi
 }
 
-***REMOVED***------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 function usage {
     bname=$(basename "$0")
@@ -159,7 +159,7 @@ while getopts :cf:-:htxvC: opt; do
     esac
 done
 
-***REMOVED*** Remove processed options from arguments
+# Remove processed options from arguments
 shift $(( OPTIND - 1 ));
 
 if [ "${CMD:-}" == "" ]; then
@@ -227,22 +227,22 @@ function extract {
         local eof_without_newline
         if [ "$size" -gt 0 ]; then
             if [[ "$line" =~ [^\\]EOF ]]; then
-                ***REMOVED*** An EOF not preceded by a backslash indicates that the line
-                ***REMOVED*** does not end with a newline
+                # An EOF not preceded by a backslash indicates that the line
+                # does not end with a newline
                 eof_without_newline=1
             else
                 eof_without_newline=0
             fi
-            ***REMOVED*** Replace NULLBYTE with null byte if at beginning of line
-            ***REMOVED*** Replace NULLBYTE with null byte unless preceded by backslash
-            ***REMOVED*** Remove one backslash in front of NULLBYTE (if any)
-            ***REMOVED*** Remove EOF unless preceded by backslash
-            ***REMOVED*** Remove one backslash in front of EOF
+            # Replace NULLBYTE with null byte if at beginning of line
+            # Replace NULLBYTE with null byte unless preceded by backslash
+            # Remove one backslash in front of NULLBYTE (if any)
+            # Remove EOF unless preceded by backslash
+            # Remove one backslash in front of EOF
             if [ $USE_PYTHON -eq 1 ]; then
                 echo -n "$line" | python -c "$PYTHON_EXTRACT_FILTER" >> "$path"
             else
-                ***REMOVED*** The repeated pattern makes up for sed's lack of negative
-                ***REMOVED*** lookbehind assertions (for consecutive null bytes).
+                # The repeated pattern makes up for sed's lack of negative
+                # lookbehind assertions (for consecutive null bytes).
                 echo -n "$line" | \
                     sed -e 's/^NULLBYTE/\x0/g;
                             s/\([^\\]\)NULLBYTE/\1\x0/g;
@@ -266,7 +266,7 @@ function extract {
                 if [ "${RECURSIVE_UNLINK:-}" == "yes" ]; then
                     rm -r "$path"
                 else
-                    ***REMOVED*** Safe because symlinks to directories are dealt with above
+                    # Safe because symlinks to directories are dealt with above
                     rmdir "$path"
                 fi
             elif [ -e "$path" ]; then
@@ -274,7 +274,7 @@ function extract {
             fi
         elif [[ $line =~ ^Lines:\ (.*)$ ]]; then
             size=${BASH_REMATCH[1]}
-            ***REMOVED*** Create file even if it is zero-length.
+            # Create file even if it is zero-length.
             touch "$path"
             vecho "    $path"
         elif [[ $line =~ ^Mode:\ (.*)$ ]]; then
@@ -288,8 +288,8 @@ function extract {
         elif [[ $line =~ ^SymlinkTo:\ (.*)$ ]]; then
             ln -s "${BASH_REMATCH[1]}" "$path"
             vecho "    $path -> ${BASH_REMATCH[1]}"
-        elif [[ $line =~ ^***REMOVED*** ]]; then
-            ***REMOVED*** Ignore comments between files
+        elif [[ $line =~ ^# ]]; then
+            # Ignore comments between files
             continue
         else
             echo >&2 "ERROR: Unknown keyword on line $line_no: $line"
@@ -299,7 +299,7 @@ function extract {
 }
 
 function div {
-    echo "***REMOVED*** ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" \
+    echo "# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" \
          "- - - - - -"
 }
 
@@ -307,13 +307,13 @@ function get_mode {
     local mfile=$1
     if [ -z "${STAT_OPTION:-}" ]; then
         if stat -c '%a' "$mfile" >/dev/null 2>&1; then
-            ***REMOVED*** GNU stat
+            # GNU stat
             STAT_OPTION='-c'
             STAT_FORMAT='%a'
         else
-            ***REMOVED*** BSD stat
+            # BSD stat
             STAT_OPTION='-f'
-            ***REMOVED*** Octal output, user/group/other (omit file type, sticky bit)
+            # Octal output, user/group/other (omit file type, sticky bit)
             STAT_FORMAT='%OLp'
         fi
     fi
@@ -324,7 +324,7 @@ function _create {
     shopt -s nullglob
     local mode
     local eof_without_newline
-    while (( "$***REMOVED***" )); do
+    while (( "$#" )); do
         file=$1
         if [ -L "$file" ]; then
             echo "Path: $file"
@@ -333,14 +333,14 @@ function _create {
             vecho "    $file -> $symlinkTo"
             div
         elif [ -d "$file" ]; then
-            ***REMOVED*** Strip trailing slash (if there is one)
+            # Strip trailing slash (if there is one)
             file=${file%/}
             echo "Directory: $file"
             mode=$(get_mode "$file")
             echo "Mode: $mode"
             vecho "$mode $file/"
             div
-            ***REMOVED*** Find all files and dirs, including hidden/dot files
+            # Find all files and dirs, including hidden/dot files
             for x in "$file/"{*,.[^.]*}; do
                 _create "$x"
             done
@@ -354,9 +354,9 @@ function _create {
                 lines=$((lines+1))
             fi
             echo "Lines: $lines"
-            ***REMOVED*** Add backslash in front of EOF
-            ***REMOVED*** Add backslash in front of NULLBYTE
-            ***REMOVED*** Replace null byte with NULLBYTE
+            # Add backslash in front of EOF
+            # Add backslash in front of NULLBYTE
+            # Replace null byte with NULLBYTE
             if [ $USE_PYTHON -eq 1 ]; then
                 < "$file" python -c "$PYTHON_CREATE_FILTER"
             else
@@ -367,8 +367,8 @@ function _create {
                     '
             fi
             if [[ "$eof_without_newline" -eq 1 ]]; then
-                ***REMOVED*** Finish line with EOF to indicate that the original line did
-                ***REMOVED*** not end with a linefeed
+                # Finish line with EOF to indicate that the original line did
+                # not end with a linefeed
                 echo "EOF"
             fi
             mode=$(get_mode "$file")
@@ -395,7 +395,7 @@ function create {
         rm "$ttar_file"
     fi
     exec > "$ttar_file"
-    echo "***REMOVED*** Archive created by ttar $ARG_STRING"
+    echo "# Archive created by ttar $ARG_STRING"
     _create "$@"
 }
 
@@ -403,8 +403,8 @@ test_environment
 
 if [ -n "${CDIR:-}" ]; then
     if [[ "$ARCHIVE" != /* ]]; then
-        ***REMOVED*** Relative path: preserve the archive's location before changing
-        ***REMOVED*** directory
+        # Relative path: preserve the archive's location before changing
+        # directory
         ARCHIVE="$(pwd)/$ARCHIVE"
     fi
     cd "$CDIR"

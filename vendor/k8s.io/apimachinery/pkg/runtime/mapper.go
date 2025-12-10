@@ -46,7 +46,7 @@ func NewEquivalentResourceRegistry() EquivalentResourceRegistry {
 }
 
 // NewEquivalentResourceRegistryWithIdentity creates a resource mapper with a custom identity function.
-// If "" is returned by the function, GroupResource***REMOVED***String is used as the identity.
+// If "" is returned by the function, GroupResource#String is used as the identity.
 // GroupResources with the same identity string are considered equivalent.
 func NewEquivalentResourceRegistryWithIdentity(keyFunc func(schema.GroupResource) string) EquivalentResourceRegistry {
 	return &equivalentResourceRegistry{keyFunc: keyFunc}

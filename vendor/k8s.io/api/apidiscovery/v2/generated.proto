@@ -36,7 +36,7 @@ message APIGroupDiscovery {
   // The only field completed will be name. For instance, resourceVersion will be empty.
   // name is the name of the API group whose discovery information is presented here.
   // name is allowed to be "" to represent the legacy, ungroupified resources.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -53,7 +53,7 @@ message APIGroupDiscovery {
 // that a cluster supports.
 message APIGroupDiscoveryList {
   // ResourceVersion will not be set, because this does not have a replayable ordering among multiple apiservers.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 

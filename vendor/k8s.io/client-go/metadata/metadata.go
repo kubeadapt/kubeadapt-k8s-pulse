@@ -146,7 +146,7 @@ func (c *client) Delete(ctx context.Context, name string, opts metav1.DeleteOpti
 	// apiextensions-apiserver uses unstructuredNegotiatedSerializer to decode the input,
 	// server-side will reply with 406 errors.
 	// The special treatment here is to be compatible with CRD Handler
-	// see: https://github.com/kubernetes/kubernetes/blob/1a845ccd076bbf1b03420fe694c85a5cd3bd6bed/staging/src/k8s.io/apiextensions-apiserver/pkg/apiserver/customresource_handler.go***REMOVED***L843
+	// see: https://github.com/kubernetes/kubernetes/blob/1a845ccd076bbf1b03420fe694c85a5cd3bd6bed/staging/src/k8s.io/apiextensions-apiserver/pkg/apiserver/customresource_handler.go#L843
 	deleteOptionsByte, err := runtime.Encode(deleteOptionsCodec.LegacyCodec(schema.GroupVersion{Version: "v1"}), &opts)
 	if err != nil {
 		return err
@@ -203,7 +203,7 @@ func (c *client) Get(ctx context.Context, name string, opts metav1.GetOptions, s
 			return nil, fmt.Errorf("unable to decode returned object as PartialObjectMetadata: %v", err)
 		}
 		if !isLikelyObjectMetadata(&partial) {
-			return nil, fmt.Errorf("object does not appear to match the ObjectMeta schema: %***REMOVED***v", partial)
+			return nil, fmt.Errorf("object does not appear to match the ObjectMeta schema: %#v", partial)
 		}
 		partial.TypeMeta = metav1.TypeMeta{}
 		return &partial, nil

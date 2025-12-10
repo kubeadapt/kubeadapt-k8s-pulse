@@ -3,7 +3,7 @@ klog
 
 klog is a permanent fork of https://github.com/golang/glog.
 
-***REMOVED******REMOVED*** Why was klog created?
+## Why was klog created?
 
 The decision to create klog was one that wasn't made lightly, but it was necessary due to some
 drawbacks that are present in [glog](https://github.com/golang/glog). Ultimately, the fork was created due to glog not being under active development; this can be seen in the glog README:
@@ -20,10 +20,10 @@ Historical context is available here:
 
  * https://github.com/kubernetes/kubernetes/issues/61006
  * https://github.com/kubernetes/kubernetes/issues/70264
- * https://groups.google.com/forum/***REMOVED***!msg/kubernetes-sig-architecture/wCWiWf3Juzs/hXRVBH90CgAJ
- * https://groups.google.com/forum/***REMOVED***!msg/kubernetes-dev/7vnijOMhLS0/1oRiNtigBgAJ
+ * https://groups.google.com/forum/#!msg/kubernetes-sig-architecture/wCWiWf3Juzs/hXRVBH90CgAJ
+ * https://groups.google.com/forum/#!msg/kubernetes-dev/7vnijOMhLS0/1oRiNtigBgAJ
 
-***REMOVED******REMOVED*** Release versioning
+## Release versioning
 
 Semantic versioning is used in this repository. It contains several Go modules
 with different levels of stability:
@@ -50,23 +50,23 @@ How to use klog
 
 **NOTE**: please use the newer go versions that support semantic import versioning in modules, ideally go 1.11.4 or greater.
 
-***REMOVED******REMOVED******REMOVED*** Coexisting with klog/v2
+### Coexisting with klog/v2
 
 See [this example](examples/coexist_klog_v1_and_v2/) to see how to coexist with both klog/v1 and klog/v2.
 
-***REMOVED******REMOVED******REMOVED*** Coexisting with glog
+### Coexisting with glog
 This package can be used side by side with glog. [This example](examples/coexist_glog/coexist_glog.go) shows how to initialize and synchronize flags from the global `flag.CommandLine` FlagSet. In addition, the example makes use of stderr as combined output by setting `alsologtostderr` (or `logtostderr`) to `true`.
 
-***REMOVED******REMOVED*** Community, discussion, contribution, and support
+## Community, discussion, contribution, and support
 
 Learn how to engage with the Kubernetes community on the [community page](http://kubernetes.io/community/).
 
 You can reach the maintainers of this project at:
 
 - [Slack](https://kubernetes.slack.com/messages/klog)
-- [Mailing List](https://groups.google.com/forum/***REMOVED***!forum/kubernetes-sig-architecture)
+- [Mailing List](https://groups.google.com/forum/#!forum/kubernetes-sig-architecture)
 
-***REMOVED******REMOVED******REMOVED*** Code of conduct
+### Code of conduct
 
 Participation in the Kubernetes community is governed by the [Kubernetes Code of Conduct](code-of-conduct.md).
 

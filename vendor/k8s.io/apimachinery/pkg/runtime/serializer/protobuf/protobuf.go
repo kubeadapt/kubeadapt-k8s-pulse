@@ -154,10 +154,10 @@ func (s *Serializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, i
 	}
 
 	if len(actual.Kind) == 0 {
-		return nil, &actual, runtime.NewMissingKindErr(fmt.Sprintf("%***REMOVED***v", unk.TypeMeta))
+		return nil, &actual, runtime.NewMissingKindErr(fmt.Sprintf("%#v", unk.TypeMeta))
 	}
 	if len(actual.Version) == 0 {
-		return nil, &actual, runtime.NewMissingVersionErr(fmt.Sprintf("%***REMOVED***v", unk.TypeMeta))
+		return nil, &actual, runtime.NewMissingVersionErr(fmt.Sprintf("%#v", unk.TypeMeta))
 	}
 
 	return unmarshalToObject(s.typer, s.creater, &actual, into, unk.Raw)
@@ -335,7 +335,7 @@ const rawSerializerIdentifier runtime.Identifier = "raw-protobuf"
 // errors, the method will return the calculated schema kind.
 func (s *RawSerializer) Decode(originalData []byte, gvk *schema.GroupVersionKind, into runtime.Object) (runtime.Object, *schema.GroupVersionKind, error) {
 	if into == nil {
-		return nil, nil, fmt.Errorf("this serializer requires an object to decode into: %***REMOVED***v", s)
+		return nil, nil, fmt.Errorf("this serializer requires an object to decode into: %#v", s)
 	}
 
 	if len(originalData) == 0 {

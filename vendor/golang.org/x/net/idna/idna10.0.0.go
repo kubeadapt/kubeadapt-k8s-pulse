@@ -7,12 +7,12 @@
 //go:build go1.10
 
 // Package idna implements IDNA2008 using the compatibility processing
-// defined by UTS (Unicode Technical Standard) ***REMOVED***46, which defines a standard to
+// defined by UTS (Unicode Technical Standard) #46, which defines a standard to
 // deal with the transition from IDNA2003.
 //
 // IDNA2008 (Internationalized Domain Names for Applications), is defined in RFC
 // 5890, RFC 5891, RFC 5892, RFC 5893 and RFC 5894.
-// UTS ***REMOVED***46 is defined in https://www.unicode.org/reports/tr46.
+// UTS #46 is defined in https://www.unicode.org/reports/tr46.
 // See https://unicode.org/cldr/utility/idna.jsp for a visualization of the
 // differences between these two standards.
 package idna // import "golang.org/x/net/idna"
@@ -56,7 +56,7 @@ func ToUnicode(s string) (string, error) {
 type Option func(*options)
 
 // Transitional sets a Profile to use the Transitional mapping as defined in UTS
-// ***REMOVED***46. This will cause, for example, "ß" to be mapped to "ss". Using the
+// #46. This will cause, for example, "ß" to be mapped to "ss". Using the
 // transitional mapping provides a compromise between IDNA2003 and IDNA2008
 // compatibility. It is used by some browsers when resolving domain names. This
 // option is only meaningful if combined with MapForLookup.
@@ -67,7 +67,7 @@ func Transitional(transitional bool) Option {
 // VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
 // are longer than allowed by the RFC.
 //
-// This option corresponds to the VerifyDnsLength flag in UTS ***REMOVED***46.
+// This option corresponds to the VerifyDnsLength flag in UTS #46.
 func VerifyDNSLength(verify bool) Option {
 	return func(o *options) { o.verifyDNSLength = verify }
 }
@@ -82,7 +82,7 @@ func RemoveLeadingDots(remove bool) Option {
 // as defined in Section 5.4 of RFC 5891. This includes testing for correct use
 // of hyphens ('-'), normalization, validity of runes, and the context rules.
 // In particular, ValidateLabels also sets the CheckHyphens and CheckJoiners flags
-// in UTS ***REMOVED***46.
+// in UTS #46.
 func ValidateLabels(enable bool) Option {
 	return func(o *options) {
 		// Don't override existing mappings, but set one that at least checks
@@ -105,7 +105,7 @@ func ValidateLabels(enable bool) Option {
 // labels. Most web browsers do not have this option set, since labels such as
 // "r3---sn-apo3qvuoxuxbt-j5pe" are in common use.
 //
-// This option corresponds to the CheckHyphens flag in UTS ***REMOVED***46.
+// This option corresponds to the CheckHyphens flag in UTS #46.
 func CheckHyphens(enable bool) Option {
 	return func(o *options) { o.checkHyphens = enable }
 }
@@ -113,7 +113,7 @@ func CheckHyphens(enable bool) Option {
 // CheckJoiners sets whether to check the ContextJ rules as defined in Appendix
 // A of RFC 5892, concerning the use of joiner runes.
 //
-// This option corresponds to the CheckJoiners flag in UTS ***REMOVED***46.
+// This option corresponds to the CheckJoiners flag in UTS #46.
 func CheckJoiners(enable bool) Option {
 	return func(o *options) {
 		o.trie = trie
@@ -130,7 +130,7 @@ func CheckJoiners(enable bool) Option {
 // outside this range, for example a '_' (U+005F LOW LINE). See
 // http://www.rfc-editor.org/std/std3.txt for more details.
 //
-// This option corresponds to the UseSTD3ASCIIRules flag in UTS ***REMOVED***46.
+// This option corresponds to the UseSTD3ASCIIRules flag in UTS #46.
 func StrictDomainName(use bool) Option {
 	return func(o *options) { o.useSTD3Rules = use }
 }
@@ -141,7 +141,7 @@ func StrictDomainName(use bool) Option {
 // BidiRule enables the Bidi rule as defined in RFC 5893. Any application
 // that relies on proper validation of labels should include this rule.
 //
-// This option corresponds to the CheckBidi flag in UTS ***REMOVED***46.
+// This option corresponds to the CheckBidi flag in UTS #46.
 func BidiRule() Option {
 	return func(o *options) { o.bidirule = bidirule.ValidString }
 }
@@ -331,7 +331,7 @@ func (e runeError) Error() string {
 	return fmt.Sprintf("idna: disallowed rune %U", e)
 }
 
-// process implements the algorithm described in section 4 of UTS ***REMOVED***46,
+// process implements the algorithm described in section 4 of UTS #46,
 // see https://www.unicode.org/reports/tr46.
 func (p *Profile) process(s string, toASCII bool) (string, error) {
 	var err error

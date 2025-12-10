@@ -303,7 +303,7 @@ func openTracepointPerfEvent(tid uint64, pid int) (*sys.FD, error) {
 
 // Probe BPF perf link.
 //
-// https://elixir.bootlin.com/linux/v5.16.8/source/kernel/bpf/syscall.c***REMOVED***L4307
+// https://elixir.bootlin.com/linux/v5.16.8/source/kernel/bpf/syscall.c#L4307
 // https://github.com/torvalds/linux/commit/b89fbfbb854c9afc3047e8273cc3a694650b802e
 var haveBPFLinkPerfEvent = internal.NewFeatureTest("bpf_link_perf_event", func() error {
 	prog, err := ebpf.NewProgram(&ebpf.ProgramSpec{

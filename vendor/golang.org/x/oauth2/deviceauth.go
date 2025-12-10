@@ -14,7 +14,7 @@ import (
 	"golang.org/x/oauth2/internal"
 )
 
-// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.5
+// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
 const (
 	errAuthorizationPending = "authorization_pending"
 	errSlowDown             = "slow_down"
@@ -23,7 +23,7 @@ const (
 )
 
 // DeviceAuthResponse describes a successful RFC 8628 Device Authorization Response
-// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.2
+// https://datatracker.ietf.org/doc/html/rfc8628#section-3.2
 type DeviceAuthResponse struct {
 	// DeviceCode
 	DeviceCode string `json:"device_code"`
@@ -80,7 +80,7 @@ func (c *DeviceAuthResponse) UnmarshalJSON(data []byte) error {
 // DeviceAuth returns a device auth struct which contains a device code
 // and authorization information provided for users to enter on another device.
 func (c *Config) DeviceAuth(ctx context.Context, opts ...AuthCodeOption) (*DeviceAuthResponse, error) {
-	// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.1
+	// https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
 	v := url.Values{
 		"client_id": {c.ClientID},
 	}
@@ -144,7 +144,7 @@ func (c *Config) DeviceAccessToken(ctx context.Context, da *DeviceAuthResponse, 
 		defer cancel()
 	}
 
-	// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.4
+	// https://datatracker.ietf.org/doc/html/rfc8628#section-3.4
 	v := url.Values{
 		"client_id":   {c.ClientID},
 		"grant_type":  {"urn:ietf:params:oauth:grant-type:device_code"},
@@ -158,7 +158,7 @@ func (c *Config) DeviceAccessToken(ctx context.Context, da *DeviceAuthResponse, 
 	}
 
 	// "If no value is provided, clients MUST use 5 as the default."
-	// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.2
+	// https://datatracker.ietf.org/doc/html/rfc8628#section-3.2
 	interval := da.Interval
 	if interval == 0 {
 		interval = 5
@@ -182,7 +182,7 @@ func (c *Config) DeviceAccessToken(ctx context.Context, da *DeviceAuthResponse, 
 			}
 			switch e.ErrorCode {
 			case errSlowDown:
-				// https://datatracker.ietf.org/doc/html/rfc8628***REMOVED***section-3.5
+				// https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
 				// "the interval MUST be increased by 5 seconds for this and all subsequent requests"
 				interval += 5
 				ticker.Reset(time.Duration(interval) * time.Second)

@@ -46,7 +46,7 @@ func CheckCodec(c Codec, internalType Object, externalTypes ...schema.GroupVersi
 			return fmt.Errorf("external type %s not interpretable: %v", et, err)
 		}
 		if reflect.TypeOf(obj) != reflect.TypeOf(internalType) {
-			return fmt.Errorf("decode of external type %s produced: %***REMOVED***v", et, obj)
+			return fmt.Errorf("decode of external type %s produced: %#v", et, obj)
 		}
 		if err = DecodeInto(c, exBytes, internalType); err != nil {
 			return fmt.Errorf("external type %s not convertible to internal type: %v", et, err)

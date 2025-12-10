@@ -718,7 +718,7 @@ func stringEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 // isValidNumber reports whether s is a valid JSON number literal.
 func isValidNumber(s string) bool {
 	// This function implements the JSON numbers grammar.
-	// See https://tools.ietf.org/html/rfc7159***REMOVED***section-6
+	// See https://tools.ietf.org/html/rfc7159#section-6
 	// and https://www.json.org/img/number.png
 
 	if s == "" {
@@ -1043,7 +1043,7 @@ func isValidTag(s string) bool {
 	}
 	for _, c := range s {
 		switch {
-		case strings.ContainsRune("!***REMOVED***$%&()*+-./:;<=>?@[]^_{|}~ ", c):
+		case strings.ContainsRune("!#$%&()*+-./:;<=>?@[]^_{|}~ ", c):
 			// Backslash and quote chars are reserved, but
 			// otherwise any punctuation chars are allowed
 			// in a tag name.

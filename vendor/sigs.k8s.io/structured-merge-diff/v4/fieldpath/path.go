@@ -101,7 +101,7 @@ func MakePath(parts ...interface{}) (Path, error) {
 			// TODO: make a copy of t
 			fp = append(fp, PathElement{Value: &t})
 		default:
-			return nil, fmt.Errorf("unable to make %***REMOVED***v into a path element", p)
+			return nil, fmt.Errorf("unable to make %#v into a path element", p)
 		}
 	}
 	return fp, nil

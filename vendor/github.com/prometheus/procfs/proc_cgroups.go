@@ -74,7 +74,7 @@ func parseCgroupSummary(data []byte) ([]CgroupSummary, error) {
 	for scanner.Scan() {
 		CgroupSummaryString := scanner.Text()
 		// ignore comment lines
-		if strings.HasPrefix(CgroupSummaryString, "***REMOVED***") {
+		if strings.HasPrefix(CgroupSummaryString, "#") {
 			continue
 		}
 		CgroupSummary, err := parseCgroupSummaryString(CgroupSummaryString)

@@ -346,7 +346,7 @@ func validateContext(contextName string, context clientcmdapi.Context, config cl
 	validationErrors := make([]error, 0)
 
 	if len(contextName) == 0 {
-		validationErrors = append(validationErrors, fmt.Errorf("empty context name for %***REMOVED***v is not allowed", context))
+		validationErrors = append(validationErrors, fmt.Errorf("empty context name for %#v is not allowed", context))
 	}
 
 	if len(context.AuthInfo) == 0 {

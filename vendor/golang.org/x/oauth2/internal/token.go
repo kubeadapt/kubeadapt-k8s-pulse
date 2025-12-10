@@ -57,14 +57,14 @@ type Token struct {
 
 // tokenJSON is the struct representing the HTTP response from OAuth2
 // providers returning a token or error in JSON form.
-// https://datatracker.ietf.org/doc/html/rfc6749***REMOVED***section-5.1
+// https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
 type tokenJSON struct {
 	AccessToken  string         `json:"access_token"`
 	TokenType    string         `json:"token_type"`
 	RefreshToken string         `json:"refresh_token"`
 	ExpiresIn    expirationTime `json:"expires_in"` // at least PayPal returns string, while most return number
 	// error fields
-	// https://datatracker.ietf.org/doc/html/rfc6749***REMOVED***section-5.2
+	// https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
 	ErrorCode        string `json:"error"`
 	ErrorDescription string `json:"error_description"`
 	ErrorURI         string `json:"error_uri"`
@@ -317,7 +317,7 @@ func doTokenRoundTrip(ctx context.Context, req *http.Request) (*Token, error) {
 		json.Unmarshal(body, &token.Raw) // no error checks for optional fields
 	}
 	// according to spec, servers should respond status 400 in error case
-	// https://www.rfc-editor.org/rfc/rfc6749***REMOVED***section-5.2
+	// https://www.rfc-editor.org/rfc/rfc6749#section-5.2
 	// but some unorthodox servers respond 200 in error case
 	if failureStatus || retrieveError.ErrorCode != "" {
 		return nil, retrieveError

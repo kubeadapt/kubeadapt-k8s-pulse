@@ -97,9 +97,9 @@ message MatchCondition {
   //
   // 'object' - The object from the incoming request. The value is null for DELETE requests.
   // 'oldObject' - The existing object. The value is null for CREATE requests.
-  // 'request' - Attributes of the admission request(/pkg/apis/admission/types.go***REMOVED***AdmissionRequest).
+  // 'request' - Attributes of the admission request(/pkg/apis/admission/types.go#AdmissionRequest).
   // 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-  //   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library***REMOVED***Authz
+  //   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
   // 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
   //   request resource.
   // Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
@@ -377,7 +377,7 @@ message MutatingWebhook {
 // MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
 // Deprecated in v1.16, planned for removal in v1.19. Use admissionregistration.k8s.io/v1 MutatingWebhookConfiguration instead.
 message MutatingWebhookConfiguration {
-  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -393,7 +393,7 @@ message MutatingWebhookConfiguration {
 // MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
 message MutatingWebhookConfigurationList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -521,7 +521,7 @@ message TypeChecking {
 // +k8s:prerelease-lifecycle-gen:introduced=1.28
 // ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects an object without changing it.
 message ValidatingAdmissionPolicy {
-  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -548,7 +548,7 @@ message ValidatingAdmissionPolicy {
 // Adding/removing policies, bindings, or params can not affect whether a
 // given (policy, binding, param) combination is within its own CEL budget.
 message ValidatingAdmissionPolicyBinding {
-  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -559,7 +559,7 @@ message ValidatingAdmissionPolicyBinding {
 // ValidatingAdmissionPolicyBindingList is a list of ValidatingAdmissionPolicyBinding.
 message ValidatingAdmissionPolicyBindingList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -637,7 +637,7 @@ message ValidatingAdmissionPolicyBindingSpec {
 // ValidatingAdmissionPolicyList is a list of ValidatingAdmissionPolicy.
 message ValidatingAdmissionPolicyList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -904,7 +904,7 @@ message ValidatingWebhook {
 // ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
 // Deprecated in v1.16, planned for removal in v1.19. Use admissionregistration.k8s.io/v1 ValidatingWebhookConfiguration instead.
 message ValidatingWebhookConfiguration {
-  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -920,7 +920,7 @@ message ValidatingWebhookConfiguration {
 // ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
 message ValidatingWebhookConfigurationList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -936,13 +936,13 @@ message Validation {
   //
   // - 'object' - The object from the incoming request. The value is null for DELETE requests.
   // - 'oldObject' - The existing object. The value is null for CREATE requests.
-  // - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go***REMOVED***AdmissionRequest)).
+  // - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
   // - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
   // - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
   // - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
   //   For example, a variable named 'foo' can be accessed as 'variables.foo'.
   // - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-  //   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library***REMOVED***Authz
+  //   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
   // - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
   //   request resource.
   //
@@ -1045,7 +1045,7 @@ message WebhookClientConfig {
   // webhook, for example, a cluster identifier.
   //
   // Attempting to use a user or basic auth e.g. "user:password@" is not
-  // allowed. Fragments ("***REMOVED***...") and query parameters ("?...") are not
+  // allowed. Fragments ("#...") and query parameters ("?...") are not
   // allowed, either.
   //
   // +optional

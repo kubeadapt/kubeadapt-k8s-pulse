@@ -323,7 +323,7 @@ func (this Extension) GoString() string {
 	if err := this.Encode(); err != nil {
 		return fmt.Sprintf("error encoding extension: %v", err)
 	}
-	return fmt.Sprintf("proto.NewExtension(%***REMOVED***v)", this.enc)
+	return fmt.Sprintf("proto.NewExtension(%#v)", this.enc)
 }
 
 func SetUnsafeExtension(pb Message, fieldNum int32, value interface{}) error {

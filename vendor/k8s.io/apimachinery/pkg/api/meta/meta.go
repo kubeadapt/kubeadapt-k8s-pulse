@@ -151,7 +151,7 @@ func TypeAccessor(obj interface{}) (Type, error) {
 	}
 	t := v.Type()
 	if v.Kind() != reflect.Struct {
-		return nil, fmt.Errorf("expected struct, but got %v: %v (%***REMOVED***v)", v.Kind(), t, v.Interface())
+		return nil, fmt.Errorf("expected struct, but got %v: %v (%#v)", v.Kind(), t, v.Interface())
 	}
 
 	typeMeta := v.FieldByName("TypeMeta")
@@ -160,7 +160,7 @@ func TypeAccessor(obj interface{}) (Type, error) {
 	}
 	a := &genericAccessor{}
 	if err := extractFromTypeMeta(typeMeta, a); err != nil {
-		return nil, fmt.Errorf("unable to find type fields on %***REMOVED***v: %v", typeMeta, err)
+		return nil, fmt.Errorf("unable to find type fields on %#v: %v", typeMeta, err)
 	}
 	return a, nil
 }

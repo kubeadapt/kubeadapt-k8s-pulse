@@ -90,7 +90,7 @@ type Opts struct {
 	// better covered by target labels set by the scraping Prometheus
 	// server, or by one specific metric (e.g. a build_info or a
 	// machine_role metric). See also
-	// https://prometheus.io/docs/instrumenting/writing_exporters/***REMOVED***target-labels-not-static-scraped-labels
+	// https://prometheus.io/docs/instrumenting/writing_exporters/#target-labels-not-static-scraped-labels
 	ConstLabels Labels
 
 	// now is for testing purposes, by default it's time.Now.
@@ -186,7 +186,7 @@ func (m *withExemplarsMetric) Write(pb *dto.Metric) error {
 			if i < len(pb.Histogram.Bucket) {
 				pb.Histogram.Bucket[i].Exemplar = e
 			} else {
-				// The +Inf bucket should be explicitly added if there is an exemplar for it, similar to non-const histogram logic in https://github.com/prometheus/client_golang/blob/main/prometheus/histogram.go***REMOVED***L357-L365.
+				// The +Inf bucket should be explicitly added if there is an exemplar for it, similar to non-const histogram logic in https://github.com/prometheus/client_golang/blob/main/prometheus/histogram.go#L357-L365.
 				b := &dto.Bucket{
 					CumulativeCount: proto.Uint64(pb.Histogram.GetSampleCount()),
 					UpperBound:      proto.Float64(math.Inf(1)),

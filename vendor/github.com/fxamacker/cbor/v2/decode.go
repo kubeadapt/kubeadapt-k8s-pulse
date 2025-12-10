@@ -1774,7 +1774,7 @@ func (d *decoder) parseToTime() (time.Time, bool, error) {
 		}
 
 		if math.IsNaN(f) || math.IsInf(f, 0) {
-			// https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***section-3.4.2-6
+			// https://www.rfc-editor.org/rfc/rfc8949.html#section-3.4.2-6
 			return time.Time{}, true, nil
 		}
 		seconds, fractional := math.Modf(f)

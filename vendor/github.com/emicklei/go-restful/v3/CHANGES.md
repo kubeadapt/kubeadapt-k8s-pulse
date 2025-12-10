@@ -1,98 +1,98 @@
-***REMOVED*** Change history of go-restful
+# Change history of go-restful
 
-***REMOVED******REMOVED*** [v3.11.0] - 2023-08-19
+## [v3.11.0] - 2023-08-19
 
 - restored behavior as <= v3.9.0 with option to change path strategy using TrimRightSlashEnabled. 
 
-***REMOVED******REMOVED*** [v3.10.2] - 2023-03-09 - DO NOT USE
+## [v3.10.2] - 2023-03-09 - DO NOT USE
 
 - introduced MergePathStrategy to be able to revert behaviour of path concatenation to 3.9.0
   see comment in Readme how to customize this behaviour.
 
-***REMOVED******REMOVED*** [v3.10.1] - 2022-11-19 - DO NOT USE
+## [v3.10.1] - 2022-11-19 - DO NOT USE
 
 - fix broken 3.10.0 by using path package for joining paths
 
-***REMOVED******REMOVED*** [v3.10.0] - 2022-10-11 - BROKEN
+## [v3.10.0] - 2022-10-11 - BROKEN
 
-- changed tokenizer to match std route match behavior; do not trimright the path (***REMOVED***511)
-- Add MIME_ZIP (***REMOVED***512)
-- Add MIME_ZIP and HEADER_ContentDisposition (***REMOVED***513)
-- Changed how to get query parameter issue ***REMOVED***510
+- changed tokenizer to match std route match behavior; do not trimright the path (#511)
+- Add MIME_ZIP (#512)
+- Add MIME_ZIP and HEADER_ContentDisposition (#513)
+- Changed how to get query parameter issue #510
 
-***REMOVED******REMOVED*** [v3.9.0] - 2022-07-21
+## [v3.9.0] - 2022-07-21
 
-- add support for http.Handler implementations to work as FilterFunction, issue ***REMOVED***504 (thanks to https://github.com/ggicci)
+- add support for http.Handler implementations to work as FilterFunction, issue #504 (thanks to https://github.com/ggicci)
 
-***REMOVED******REMOVED*** [v3.8.0] - 2022-06-06
+## [v3.8.0] - 2022-06-06
 
-- use exact matching of allowed domain entries, issue ***REMOVED***489 (***REMOVED***493)
+- use exact matching of allowed domain entries, issue #489 (#493)
 	- this changes fixes [security] Authorization Bypass Through User-Controlled Key
 	  by changing the behaviour of the AllowedDomains setting in the CORS filter.
 	  To support the previous behaviour, the CORS filter type now has a AllowedDomainFunc
 	  callback mechanism which is called when a simple domain match fails. 
-- add test and fix for POST without body and Content-type, issue ***REMOVED***492 (***REMOVED***496)
-- [Minor] Bad practice to have a mix of Receiver types. (***REMOVED***491)
+- add test and fix for POST without body and Content-type, issue #492 (#496)
+- [Minor] Bad practice to have a mix of Receiver types. (#491)
 
-***REMOVED******REMOVED*** [v3.7.2] - 2021-11-24
+## [v3.7.2] - 2021-11-24
 
-- restored FilterChain (***REMOVED***482 by SVilgelm)
+- restored FilterChain (#482 by SVilgelm)
 
 
-***REMOVED******REMOVED*** [v3.7.1] - 2021-10-04
+## [v3.7.1] - 2021-10-04
 
-- fix problem with contentEncodingEnabled setting (***REMOVED***479)
+- fix problem with contentEncodingEnabled setting (#479)
 
-***REMOVED******REMOVED*** [v3.7.0] - 2021-09-24
+## [v3.7.0] - 2021-09-24
 
-- feat(parameter): adds additional openapi mappings (***REMOVED***478)
+- feat(parameter): adds additional openapi mappings (#478)
 
-***REMOVED******REMOVED*** [v3.6.0] - 2021-09-18
+## [v3.6.0] - 2021-09-18
 
-- add support for vendor extensions (***REMOVED***477 thx erraggy)
+- add support for vendor extensions (#477 thx erraggy)
 
-***REMOVED******REMOVED*** [v3.5.2] - 2021-07-14
+## [v3.5.2] - 2021-07-14
 
-- fix removing absent route from webservice (***REMOVED***472)
+- fix removing absent route from webservice (#472)
 
-***REMOVED******REMOVED*** [v3.5.1] - 2021-04-12
+## [v3.5.1] - 2021-04-12
 
 - fix handling no match access selected path
 - remove obsolete field
 
-***REMOVED******REMOVED*** [v3.5.0] - 2021-04-10
+## [v3.5.0] - 2021-04-10
 
-- add check for wildcard (***REMOVED***463) in CORS
-- add access to Route from Request, issue ***REMOVED***459 (***REMOVED***462)
+- add check for wildcard (#463) in CORS
+- add access to Route from Request, issue #459 (#462)
 
-***REMOVED******REMOVED*** [v3.4.0] - 2020-11-10
+## [v3.4.0] - 2020-11-10
 
 - Added OPTIONS to WebService
 
-***REMOVED******REMOVED*** [v3.3.2] - 2020-01-23
+## [v3.3.2] - 2020-01-23
 
-- Fixed duplicate compression in dispatch. ***REMOVED***449
+- Fixed duplicate compression in dispatch. #449
 
 
-***REMOVED******REMOVED*** [v3.3.1] - 2020-08-31
+## [v3.3.1] - 2020-08-31
 
-- Added check on writer to prevent compression of response twice. ***REMOVED***447
+- Added check on writer to prevent compression of response twice. #447
 
-***REMOVED******REMOVED*** [v3.3.0] - 2020-08-19
+## [v3.3.0] - 2020-08-19
 
-- Enable content encoding on Handle and ServeHTTP (***REMOVED***446)
-- List available representations in 406 body (***REMOVED***437)
-- Convert to string using rune() (***REMOVED***443)
+- Enable content encoding on Handle and ServeHTTP (#446)
+- List available representations in 406 body (#437)
+- Convert to string using rune() (#443)
 
-***REMOVED******REMOVED*** [v3.2.0] - 2020-06-21
+## [v3.2.0] - 2020-06-21
 
-- 405 Method Not Allowed must have Allow header (***REMOVED***436) (thx Bracken <abdawson@gmail.com>)
-- add field allowedMethodsWithoutContentType (***REMOVED***424)
+- 405 Method Not Allowed must have Allow header (#436) (thx Bracken <abdawson@gmail.com>)
+- add field allowedMethodsWithoutContentType (#424)
 
-***REMOVED******REMOVED*** [v3.1.0]
+## [v3.1.0]
 
-- support describing response headers (***REMOVED***426)
-- fix openapi examples (***REMOVED***425)
+- support describing response headers (#426)
+- fix openapi examples (#425)
 
 v3.0.0
 
@@ -113,15 +113,15 @@ v2.9.6
 
 v2.11.1
 
-- fix WriteError return value (***REMOVED***415)
+- fix WriteError return value (#415)
 
 v2.11.0 
 
-- allow prefix and suffix in path variable expression (***REMOVED***414)
+- allow prefix and suffix in path variable expression (#414)
 
 v2.9.6
 
-- support google custome verb (***REMOVED***413)
+- support google custome verb (#413)
 
 v2.9.5
 
@@ -129,20 +129,20 @@ v2.9.5
 
 v2.9.4
 
-- fix issue ***REMOVED***400 , parsing mime type quality
-- Route Builder added option for contentEncodingEnabled (***REMOVED***398)
+- fix issue #400 , parsing mime type quality
+- Route Builder added option for contentEncodingEnabled (#398)
 
 v2.9.3
 
-- Avoid return of 415 Unsupported Media Type when request body is empty (***REMOVED***396)
+- Avoid return of 415 Unsupported Media Type when request body is empty (#396)
 
 v2.9.2
 
-- Reduce allocations in per-request methods to improve performance (***REMOVED***395)
+- Reduce allocations in per-request methods to improve performance (#395)
 
 v2.9.1
 
-- Fix issue with default responses and invalid status code 0. (***REMOVED***393)
+- Fix issue with default responses and invalid status code 0. (#393)
 
 v2.9.0
 
@@ -174,7 +174,7 @@ v2.6.0
 
 2017-02-16
 
-- solved issue ***REMOVED***304, make operation names unique
+- solved issue #304, make operation names unique
 
 2017-01-30
  
@@ -248,7 +248,7 @@ v2.6.0
 
 2014-11-27
 
-- (api add) PrettyPrint per response. (as proposed in ***REMOVED***167)
+- (api add) PrettyPrint per response. (as proposed in #167)
 
 2014-11-12
 
@@ -306,7 +306,7 @@ v2.6.0
 
 2014-01-10
 
-- (api add) support for CloseNotify, see http://golang.org/pkg/net/http/***REMOVED***CloseNotifier
+- (api add) support for CloseNotify, see http://golang.org/pkg/net/http/#CloseNotifier
 
 2014-01-07
 

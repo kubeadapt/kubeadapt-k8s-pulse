@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-// TODO: This implements the same functionality as https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/runtime/converter.go***REMOVED***L236
+// TODO: This implements the same functionality as https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/runtime/converter.go#L236
 // but is based on the highly efficient approach from https://golang.org/src/encoding/json/encode.go
 
 func lookupJsonTags(f reflect.StructField) (name string, omit bool, inline bool, omitempty bool) {

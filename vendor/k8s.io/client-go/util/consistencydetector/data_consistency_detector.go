@@ -87,14 +87,14 @@ func CheckDataConsistency[T runtime.Object, U any](ctx context.Context, identity
 func canFormAdditionalListCall(lastSyncedResourceVersion string, listOptions metav1.ListOptions) bool {
 	// since we are setting ResourceVersionMatch to metav1.ResourceVersionMatchExact
 	// we need to make sure that the continuation hasn't been set
-	// https://github.com/kubernetes/kubernetes/blob/be4afb9ef90b19ccb6f7e595cbdb247e088b2347/staging/src/k8s.io/apimachinery/pkg/apis/meta/internalversion/validation/validation.go***REMOVED***L38
+	// https://github.com/kubernetes/kubernetes/blob/be4afb9ef90b19ccb6f7e595cbdb247e088b2347/staging/src/k8s.io/apimachinery/pkg/apis/meta/internalversion/validation/validation.go#L38
 	if len(listOptions.Continue) > 0 {
 		return false
 	}
 
 	// since we are setting ResourceVersionMatch to metav1.ResourceVersionMatchExact
 	// we need to make sure that the RV is valid because the validation code forbids RV == "0"
-	// https://github.com/kubernetes/kubernetes/blob/be4afb9ef90b19ccb6f7e595cbdb247e088b2347/staging/src/k8s.io/apimachinery/pkg/apis/meta/internalversion/validation/validation.go***REMOVED***L44
+	// https://github.com/kubernetes/kubernetes/blob/be4afb9ef90b19ccb6f7e595cbdb247e088b2347/staging/src/k8s.io/apimachinery/pkg/apis/meta/internalversion/validation/validation.go#L44
 	if lastSyncedResourceVersion == "0" {
 		return false
 	}

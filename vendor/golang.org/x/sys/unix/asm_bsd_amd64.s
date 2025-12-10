@@ -4,7 +4,7 @@
 
 //go:build (darwin || dragonfly || freebsd || netbsd || openbsd) && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // System call support for AMD64 BSD
 

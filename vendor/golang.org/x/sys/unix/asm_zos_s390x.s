@@ -4,31 +4,31 @@
 
 //go:build zos && s390x && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
-***REMOVED***define PSALAA            1208(R0)
-***REMOVED***define GTAB64(x)           80(x)
-***REMOVED***define LCA64(x)            88(x)
-***REMOVED***define SAVSTACK_ASYNC(x)  336(x) // in the LCA
-***REMOVED***define CAA(x)               8(x)
-***REMOVED***define CEECAATHDID(x)     976(x) // in the CAA
-***REMOVED***define EDCHPXV(x)        1016(x) // in the CAA
-***REMOVED***define GOCB(x)           1104(x) // in the CAA
+#define PSALAA            1208(R0)
+#define GTAB64(x)           80(x)
+#define LCA64(x)            88(x)
+#define SAVSTACK_ASYNC(x)  336(x) // in the LCA
+#define CAA(x)               8(x)
+#define CEECAATHDID(x)     976(x) // in the CAA
+#define EDCHPXV(x)        1016(x) // in the CAA
+#define GOCB(x)           1104(x) // in the CAA
 
 // SS_*, where x=SAVSTACK_ASYNC
-***REMOVED***define SS_LE(x)             0(x)
-***REMOVED***define SS_GO(x)             8(x)
-***REMOVED***define SS_ERRNO(x)         16(x)
-***REMOVED***define SS_ERRNOJR(x)       20(x)
+#define SS_LE(x)             0(x)
+#define SS_GO(x)             8(x)
+#define SS_ERRNO(x)         16(x)
+#define SS_ERRNOJR(x)       20(x)
 
 // Function Descriptor Offsets
-***REMOVED***define __errno  0x156*16
-***REMOVED***define __err2ad 0x16C*16
+#define __errno  0x156*16
+#define __err2ad 0x16C*16
 
 // Call Instructions
-***REMOVED***define LE_CALL    BYTE $0x0D; BYTE $0x76 // BL R7, R6
-***REMOVED***define SVC_LOAD   BYTE $0x0A; BYTE $0x08 // SVC 08 LOAD
-***REMOVED***define SVC_DELETE BYTE $0x0A; BYTE $0x09 // SVC 09 DELETE
+#define LE_CALL    BYTE $0x0D; BYTE $0x76 // BL R7, R6
+#define SVC_LOAD   BYTE $0x0A; BYTE $0x08 // SVC 08 LOAD
+#define SVC_DELETE BYTE $0x0A; BYTE $0x09 // SVC 09 DELETE
 
 DATA zosLibVec<>(SB)/8, $0
 GLOBL zosLibVec<>(SB), NOPTR, $8
@@ -209,7 +209,7 @@ docall:
 	MOVD funcdesc+0(FP), R8 // R8-> function descriptor
 	LMG  0(R8), R5, R6
 	MOVD $0, 0(R9)          // R9 address of SAVSTACK_ASYNC
-	LE_CALL                 // balr R7, R6 (return ***REMOVED***1)
+	LE_CALL                 // balr R7, R6 (return #1)
 	NOPH
 	MOVD R3, ret+32(FP)
 	CMP  R3, $-1            // compare result to -1
@@ -219,14 +219,14 @@ docall:
 	MOVD  zosLibVec<>(SB), R8
 	ADD   $(__errno), R8
 	LMG   0(R8), R5, R6
-	LE_CALL                   // balr R7, R6 __errno (return ***REMOVED***3)
+	LE_CALL                   // balr R7, R6 __errno (return #3)
 	NOPH
 	MOVWZ 0(R3), R3
 	MOVD  R3, err+48(FP)
 	MOVD  zosLibVec<>(SB), R8
 	ADD   $(__err2ad), R8
 	LMG   0(R8), R5, R6
-	LE_CALL                   // balr R7, R6 __err2ad (return ***REMOVED***2)
+	LE_CALL                   // balr R7, R6 __err2ad (return #2)
 	NOPH
 	MOVW  (R3), R2            // retrieve errno2
 	MOVD  R2, errno2+40(FP)   // store in return area
@@ -289,7 +289,7 @@ docall:
 	MOVD funcdesc+0(FP), R8 // R8-> function descriptor
 	LMG  0(R8), R5, R6
 	MOVD $0, 0(R9)          // R9 address of SAVSTACK_ASYNC
-	LE_CALL                 // balr R7, R6 (return ***REMOVED***1)
+	LE_CALL                 // balr R7, R6 (return #1)
 	NOPH
 	MOVD R3, ret+32(FP)
 	CMP  R3, $0             // compare result to 0
@@ -299,14 +299,14 @@ docall:
 	MOVD  zosLibVec<>(SB), R8
 	ADD   $(__errno), R8
 	LMG   0(R8), R5, R6
-	LE_CALL                   // balr R7, R6 __errno (return ***REMOVED***3)
+	LE_CALL                   // balr R7, R6 __errno (return #3)
 	NOPH
 	MOVWZ 0(R3), R3
 	MOVD  R3, err+48(FP)
 	MOVD  zosLibVec<>(SB), R8
 	ADD   $(__err2ad), R8
 	LMG   0(R8), R5, R6
-	LE_CALL                   // balr R7, R6 __err2ad (return ***REMOVED***2)
+	LE_CALL                   // balr R7, R6 __err2ad (return #2)
 	NOPH
 	MOVW  (R3), R2            // retrieve errno2
 	MOVD  R2, errno2+40(FP)   // store in return area

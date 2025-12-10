@@ -22,7 +22,7 @@ type WriteScheduler interface {
 	// AdjustStream adjusts the priority of the given stream. This may be called
 	// on a stream that has not yet been opened or has been closed. Note that
 	// RFC 7540 allows PRIORITY frames to be sent on streams in any state. See:
-	// https://tools.ietf.org/html/rfc7540***REMOVED***section-5.1
+	// https://tools.ietf.org/html/rfc7540#section-5.1
 	AdjustStream(streamID uint32, priority PriorityParam)
 
 	// Push queues a frame in the scheduler. In most cases, this will not be

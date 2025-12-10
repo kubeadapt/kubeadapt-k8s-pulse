@@ -86,9 +86,9 @@ example, to process each anchor node in depth-first order:
 
 The relevant specifications include:
 https://html.spec.whatwg.org/multipage/syntax.html and
-https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***tokenization
+https://html.spec.whatwg.org/multipage/syntax.html#tokenization
 
-***REMOVED*** Security Considerations
+# Security Considerations
 
 Care should be taken when parsing and interpreting HTML, whether full documents
 or fragments, within the framework of the HTML specification, especially with

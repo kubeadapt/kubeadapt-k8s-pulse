@@ -35,12 +35,12 @@ option go_package = "k8s.io/api/extensions/v1beta1";
 // DaemonSet represents the configuration of a daemon set.
 message DaemonSet {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // The desired behavior of this daemon set.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional DaemonSetSpec spec = 2;
 
@@ -48,7 +48,7 @@ message DaemonSet {
   // out of date by some window of time.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional DaemonSetStatus status = 3;
 }
@@ -77,7 +77,7 @@ message DaemonSetCondition {
 // DaemonSetList is a collection of daemon sets.
 message DaemonSetList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -90,7 +90,7 @@ message DaemonSetSpec {
   // A label query over pods that are managed by the daemon set.
   // Must match in order to be controlled.
   // If empty, defaulted to labels on Pod template.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/***REMOVED***label-selectors
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 1;
 
@@ -98,7 +98,7 @@ message DaemonSetSpec {
   // The DaemonSet will create exactly one copy of this pod on every node
   // that matches the template's node selector (or on every node if no node
   // selector is specified).
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller***REMOVED***pod-template
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
   optional .k8s.io.api.core.v1.PodTemplateSpec template = 2;
 
   // An update strategy to replace existing DaemonSet pods with new pods.
@@ -407,7 +407,7 @@ message HTTPIngressPath {
 // In the example: http://<host>/<path>?<searchpart> -> backend where
 // where parts of the url correspond to RFC 3986, this resource will be used
 // to match against everything after the last '/' and before the first '?'
-// or '***REMOVED***'.
+// or '#'.
 message HTTPIngressRuleValue {
   // A collection of paths that map requests to backends.
   // +listType=atomic
@@ -438,17 +438,17 @@ message IPBlock {
 // DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
 message Ingress {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec is the desired state of the Ingress.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional IngressSpec spec = 2;
 
   // Status is the current state of the Ingress.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional IngressStatus status = 3;
 }
@@ -473,7 +473,7 @@ message IngressBackend {
 // IngressList is a collection of Ingress.
 message IngressList {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -649,7 +649,7 @@ message IngressTLS {
 // NetworkPolicy describes what network traffic is allowed for a set of Pods
 message NetworkPolicy {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -708,7 +708,7 @@ message NetworkPolicyIngressRule {
 // Network Policy List is a list of NetworkPolicy objects.
 message NetworkPolicyList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -816,12 +816,12 @@ message NetworkPolicySpec {
 message ReplicaSet {
   // If the Labels of a ReplicaSet are empty, they are defaulted to
   // be the same as the Pod(s) that the ReplicaSet manages.
-  // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the specification of the desired behavior of the ReplicaSet.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ReplicaSetSpec spec = 2;
 
@@ -829,7 +829,7 @@ message ReplicaSet {
   // This data may be out of date by some window of time.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ReplicaSetStatus status = 3;
 }
@@ -858,7 +858,7 @@ message ReplicaSetCondition {
 // ReplicaSetList is a collection of ReplicaSets.
 message ReplicaSetList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -872,7 +872,7 @@ message ReplicaSetSpec {
   // Replicas is the number of desired replicas.
   // This is a pointer to distinguish between explicit zero and unspecified.
   // Defaults to 1.
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/***REMOVED***what-is-a-replicationcontroller
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
   // +optional
   optional int32 replicas = 1;
 
@@ -885,13 +885,13 @@ message ReplicaSetSpec {
   // Selector is a label query over pods that should match the replica count.
   // If the selector is empty, it is defaulted to the labels present on the pod template.
   // Label keys and values that must match in order to be controlled by this replica set.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/***REMOVED***label-selectors
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector selector = 2;
 
   // Template is the object that describes the pod that will be created if
   // insufficient replicas are detected.
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller***REMOVED***pod-template
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
   // +optional
   optional .k8s.io.api.core.v1.PodTemplateSpec template = 3;
 }
@@ -899,7 +899,7 @@ message ReplicaSetSpec {
 // ReplicaSetStatus represents the current status of a ReplicaSet.
 message ReplicaSetStatus {
   // Replicas is the most recently observed number of replicas.
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/***REMOVED***what-is-a-replicationcontroller
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
   optional int32 replicas = 1;
 
   // The number of pods that have labels matching the labels of the pod template of the replicaset.
@@ -1008,15 +1008,15 @@ message RollingUpdateDeployment {
 
 // represents a scaling request for a resource.
 message Scale {
-  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+  // Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
-  // defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status.
+  // defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status.
   // +optional
   optional ScaleSpec spec = 2;
 
-  // current status of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status. Read-only.
+  // current status of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status. Read-only.
   // +optional
   optional ScaleStatus status = 3;
 }
@@ -1043,7 +1043,7 @@ message ScaleStatus {
   // avoid introspection in the clients. The string will be in the same format as the
   // query-param syntax. If the target type only supports map-based selectors, both this
   // field and map-based selector field are populated.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/***REMOVED***label-selectors
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   // +optional
   optional string targetSelector = 3;
 }

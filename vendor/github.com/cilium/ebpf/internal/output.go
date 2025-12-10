@@ -15,7 +15,7 @@ import (
 func Identifier(str string) string {
 	prev := rune(-1)
 	return strings.Map(func(r rune) rune {
-		// See https://golang.org/ref/spec***REMOVED***Identifiers
+		// See https://golang.org/ref/spec#Identifiers
 		switch {
 		case unicode.IsLetter(r):
 			if prev == -1 {

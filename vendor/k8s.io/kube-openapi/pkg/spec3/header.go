@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// Header a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***parameterObject
+// Header a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#parameterObject
 //
 // Note that this struct is actually a thin wrapper around HeaderProps to make it referable and extensible
 type Header struct {

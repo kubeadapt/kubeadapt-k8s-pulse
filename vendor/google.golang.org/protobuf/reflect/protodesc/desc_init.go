@@ -117,7 +117,7 @@ func (r descsByName) initMessagesDeclarations(mds []*descriptorpb.DescriptorProt
 }
 
 // canBePacked returns whether the field can use packed encoding:
-// https://protobuf.dev/programming-guides/encoding/***REMOVED***packed
+// https://protobuf.dev/programming-guides/encoding/#packed
 func canBePacked(fd *descriptorpb.FieldDescriptorProto) bool {
 	if fd.GetLabel() != descriptorpb.FieldDescriptorProto_LABEL_REPEATED {
 		return false // not a repeated field
@@ -129,7 +129,7 @@ func canBePacked(fd *descriptorpb.FieldDescriptorProto) bool {
 
 	case protoreflect.StringKind, protoreflect.BytesKind:
 		// string and bytes can explicitly not be declared as packed,
-		// see https://protobuf.dev/programming-guides/encoding/***REMOVED***packed
+		// see https://protobuf.dev/programming-guides/encoding/#packed
 		return false
 
 	default:

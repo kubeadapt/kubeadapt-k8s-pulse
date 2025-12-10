@@ -108,7 +108,7 @@ func (s PatchMetaFromStruct) LookupPatchMetadataForSlice(key string) (LookupPatc
 		}
 	// If t is an pointer, get the underlying element.
 	// If the underlying element is neither an array nor a slice, the pointer is pointing to a slice,
-	// e.g. https://github.com/kubernetes/kubernetes/blob/bc22e206c79282487ea0bf5696d5ccec7e839a76/staging/src/k8s.io/apimachinery/pkg/util/strategicpatch/patch_test.go***REMOVED***L2782-L2822
+	// e.g. https://github.com/kubernetes/kubernetes/blob/bc22e206c79282487ea0bf5696d5ccec7e839a76/staging/src/k8s.io/apimachinery/pkg/util/strategicpatch/patch_test.go#L2782-L2822
 	// If the underlying element is either an array or a slice, return its element type.
 	case reflect.Pointer:
 		t = t.Elem()
@@ -178,7 +178,7 @@ func resolve(l *PatchMetaFromOpenAPIV3) error {
 		l.Schema = &l.Schema.AllOf[0]
 	}
 	if refString := l.Schema.Ref.String(); refString != "" {
-		str := strings.TrimPrefix(refString, "***REMOVED***/components/schemas/")
+		str := strings.TrimPrefix(refString, "#/components/schemas/")
 		sch, ok := l.SchemaList[str]
 		if ok {
 			l.Schema = sch

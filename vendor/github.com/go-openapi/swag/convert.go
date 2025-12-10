@@ -38,7 +38,7 @@ func IsFloat64AJSONInteger(f float64) bool {
 
 	diff := math.Abs(f - g)
 
-	// more info: https://floating-point-gui.de/errors/comparison/***REMOVED***look-out-for-edge-cases
+	// more info: https://floating-point-gui.de/errors/comparison/#look-out-for-edge-cases
 	switch {
 	case f == g: // best case
 		return true

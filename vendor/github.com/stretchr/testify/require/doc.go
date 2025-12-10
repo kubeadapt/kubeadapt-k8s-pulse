@@ -1,7 +1,7 @@
 // Package require implements the same assertions as the `assert` package but
 // stops test execution when a test fails.
 //
-// ***REMOVED*** Example Usage
+// # Example Usage
 //
 // The following is a complete example using require in a standard test function:
 //
@@ -19,7 +19,7 @@
 //
 //	}
 //
-// ***REMOVED*** Assertions
+// # Assertions
 //
 // The `require` package have same global functions as in the `assert` package,
 // but instead of returning a boolean result they call `t.FailNow()`.

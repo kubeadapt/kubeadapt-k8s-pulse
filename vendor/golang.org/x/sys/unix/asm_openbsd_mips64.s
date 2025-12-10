@@ -4,7 +4,7 @@
 
 //go:build gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System call support for mips64, OpenBSD

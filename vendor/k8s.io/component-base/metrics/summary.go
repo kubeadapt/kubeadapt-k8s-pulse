@@ -141,7 +141,7 @@ func (v *SummaryVec) initializeDeprecatedMetric() {
 // (which means it will never be exposed externally nor consumed), the metric will exist in memory
 // for perpetuity (i.e. throughout application lifecycle).
 //
-// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/histogram.go***REMOVED***L460-L470
+// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/histogram.go#L460-L470
 //
 // In contrast, the Vec behavior in this package is that member extraction before registration
 // returns a permanent noop object.

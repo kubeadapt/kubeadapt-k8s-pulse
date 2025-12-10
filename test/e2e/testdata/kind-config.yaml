@@ -1,33 +1,33 @@
-***REMOVED*** Kind cluster configuration for multi-node testing
-***REMOVED*** This creates a 3-node cluster (1 control-plane + 2 workers) for cross-node traffic testing
+# Kind cluster configuration for multi-node testing
+# This creates a 3-node cluster (1 control-plane + 2 workers) for cross-node traffic testing
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
-  ***REMOVED*** Control plane node
+  # Control plane node
   - role: control-plane
     labels:
       topology.kubernetes.io/zone: us-west-2a
       topology.kubernetes.io/region: us-west-2
-    ***REMOVED*** Expose Prometheus NodePort on host for E2E test access
-    ***REMOVED*** This follows production eBPF projects's pattern for service access without kubectl port-forward
+    # Expose Prometheus NodePort on host for E2E test access
+    # This follows production eBPF projects's pattern for service access without kubectl port-forward
     extraPortMappings:
-      - containerPort: 30090  ***REMOVED*** Prometheus NodePort service
-        hostPort: 30090        ***REMOVED*** Accessible at localhost:30090 from test code
+      - containerPort: 30090  # Prometheus NodePort service
+        hostPort: 30090        # Accessible at localhost:30090 from test code
         protocol: TCP
 
-  ***REMOVED*** Worker node 1 - Different zone from control plane
+  # Worker node 1 - Different zone from control plane
   - role: worker
     labels:
       topology.kubernetes.io/zone: us-west-2b
       topology.kubernetes.io/region: us-west-2
 
-  ***REMOVED*** Worker node 2 - Same zone as worker 1
+  # Worker node 2 - Same zone as worker 1
   - role: worker
     labels:
       topology.kubernetes.io/zone: us-west-2b
       topology.kubernetes.io/region: us-west-2
 
-***REMOVED*** Enable pod networking
+# Enable pod networking
 networking:
   disableDefaultCNI: false
   podSubnet: "10.244.0.0/16"

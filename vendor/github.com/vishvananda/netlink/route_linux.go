@@ -231,7 +231,7 @@ func (e *SEG6Encap) Encode() ([]byte, error) {
 }
 func (e *SEG6Encap) String() string {
 	segs := make([]string, 0, len(e.Segments))
-	// append segment backwards (from n to 0) since seg***REMOVED***0 is the last segment.
+	// append segment backwards (from n to 0) since seg#0 is the last segment.
 	for i := len(e.Segments); i > 0; i-- {
 		segs = append(segs, e.Segments[i-1].String())
 	}
@@ -455,7 +455,7 @@ func (e *SEG6LocalEncap) String() string {
 	}
 	if e.Flags[nl.SEG6_LOCAL_SRH] {
 		segs := make([]string, 0, len(e.Segments))
-		// append segment backwards (from n to 0) since seg***REMOVED***0 is the last segment.
+		// append segment backwards (from n to 0) since seg#0 is the last segment.
 		for i := len(e.Segments); i > 0; i-- {
 			segs = append(segs, e.Segments[i-1].String())
 		}

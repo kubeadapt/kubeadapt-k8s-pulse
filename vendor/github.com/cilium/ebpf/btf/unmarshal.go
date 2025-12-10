@@ -293,7 +293,7 @@ func (d *decoder) inflateType(id TypeID) (typ Type, err error) {
 
 		// err is the return value of the enclosing function, even if an explicit
 		// return is used.
-		// See https://go.dev/ref/spec***REMOVED***Defer_statements
+		// See https://go.dev/ref/spec#Defer_statements
 		if err != nil {
 			// Remove partially inflated type so that d.types only contains
 			// fully inflated ones.

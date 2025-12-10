@@ -18,10 +18,10 @@ type ConntrackTableType uint8
 
 const (
 	// ConntrackTable Conntrack table
-	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/nfnetlink.h -> ***REMOVED***define NFNL_SUBSYS_CTNETLINK		 1
+	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/nfnetlink.h -> #define NFNL_SUBSYS_CTNETLINK		 1
 	ConntrackTable = 1
 	// ConntrackExpectTable Conntrack expect table
-	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/nfnetlink.h -> ***REMOVED***define NFNL_SUBSYS_CTNETLINK_EXP 2
+	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/nfnetlink.h -> #define NFNL_SUBSYS_CTNETLINK_EXP 2
 	ConntrackExpectTable = 2
 )
 

@@ -30,10 +30,10 @@ type TagProps struct {
 }
 
 // Tag allows adding meta data to a single tag that is used by the
-// [Operation Object](http://goo.gl/8us55a***REMOVED***operationObject).
+// [Operation Object](http://goo.gl/8us55a#operationObject).
 // It is not mandatory to have a Tag Object per tag used there.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***tagObject
+// For more information: http://goo.gl/8us55a#tagObject
 type Tag struct {
 	VendorExtensible
 	TagProps

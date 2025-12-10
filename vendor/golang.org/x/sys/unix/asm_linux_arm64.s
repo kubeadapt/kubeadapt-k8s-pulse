@@ -4,7 +4,7 @@
 
 //go:build linux && arm64 && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // Just jump to package syscall's implementation for all these functions.
 // The runtime may know about them.

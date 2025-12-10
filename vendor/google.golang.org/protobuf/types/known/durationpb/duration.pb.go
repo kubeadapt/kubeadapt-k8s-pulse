@@ -35,7 +35,7 @@
 //
 // The Duration message represents a signed span of time.
 //
-// ***REMOVED*** Conversion to a Go Duration
+// # Conversion to a Go Duration
 //
 // The AsDuration method can be used to convert a Duration message to a
 // standard Go time.Duration value:
@@ -64,7 +64,7 @@
 // the resulting value to the closest representable value (e.g., math.MaxInt64
 // for positive overflow and math.MinInt64 for negative overflow).
 //
-// ***REMOVED*** Conversion from a Go Duration
+// # Conversion from a Go Duration
 //
 // The durationpb.New function can be used to construct a Duration message
 // from a standard Go time.Duration value:
@@ -89,7 +89,7 @@ import (
 // two Timestamp values is a Duration and it can be added or subtracted
 // from a Timestamp. Range is approximately +-10,000 years.
 //
-// ***REMOVED*** Examples
+// # Examples
 //
 // Example 1: Compute Duration from two Timestamps in pseudo code.
 //
@@ -131,7 +131,7 @@ import (
 //	duration = Duration()
 //	duration.FromTimedelta(td)
 //
-// ***REMOVED*** JSON Mapping
+// # JSON Mapping
 //
 // In JSON format, the Duration type is encoded as a string rather than an
 // object, where the string ends in the suffix "s" (indicating seconds) and

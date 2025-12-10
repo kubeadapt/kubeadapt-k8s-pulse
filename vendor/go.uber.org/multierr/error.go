@@ -20,7 +20,7 @@
 
 // Package multierr allows combining one or more errors together.
 //
-// ***REMOVED*** Overview
+// # Overview
 //
 // Errors can be combined with the use of the Combine function.
 //
@@ -43,7 +43,7 @@
 //		fmt.Println("The following errors occurred:", errors)
 //	}
 //
-// ***REMOVED*** Appending from a loop
+// # Appending from a loop
 //
 // You sometimes need to append into an error from a loop.
 //
@@ -77,7 +77,7 @@
 //
 // See [AppendInto] for more information.
 //
-// ***REMOVED*** Deferred Functions
+// # Deferred Functions
 //
 // Go makes it possible to modify the return value of a function in a defer
 // block if the function was using named returns. This makes it possible to
@@ -112,7 +112,7 @@
 // NOTE: If you're modifying an error from inside a defer, you MUST use a named
 // return value for that function.
 //
-// ***REMOVED*** Advanced Usage
+// # Advanced Usage
 //
 // Errors returned by Combine and Append MAY implement the following
 // interface.

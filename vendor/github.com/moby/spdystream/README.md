@@ -1,8 +1,8 @@
-***REMOVED*** SpdyStream
+# SpdyStream
 
 A multiplexed stream library using spdy
 
-***REMOVED******REMOVED*** Usage
+## Usage
 
 Client example (connecting to mirroring server without auth)
 
@@ -72,6 +72,6 @@ func main() {
 }
 ```
 
-***REMOVED******REMOVED*** Copyright and license
+## Copyright and license
 
 Copyright 2013-2021 Docker, inc. Released under the [Apache 2.0 license](LICENSE).

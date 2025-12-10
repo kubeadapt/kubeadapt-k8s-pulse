@@ -39,7 +39,7 @@ func (Eviction) SwaggerDoc() map[string]string {
 
 var map_PodDisruptionBudget = map[string]string{
 	"":         "PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods",
-	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
+	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"spec":     "Specification of the desired behavior of the PodDisruptionBudget.",
 	"status":   "Most recently observed status of the PodDisruptionBudget.",
 }
@@ -50,7 +50,7 @@ func (PodDisruptionBudget) SwaggerDoc() map[string]string {
 
 var map_PodDisruptionBudgetList = map[string]string{
 	"":         "PodDisruptionBudgetList is a collection of PodDisruptionBudgets.",
-	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
+	"metadata": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"items":    "items list individual PodDisruptionBudget objects",
 }
 

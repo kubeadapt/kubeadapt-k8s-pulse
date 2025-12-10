@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	fragmentRune = `***REMOVED***`
+	fragmentRune = `#`
 )
 
 // New creates a new reference for the given string

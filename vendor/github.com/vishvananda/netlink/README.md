@@ -1,4 +1,4 @@
-***REMOVED*** netlink - netlink library for go ***REMOVED***
+# netlink - netlink library for go #
 
 ![Build Status](https://github.com/vishvananda/netlink/actions/workflows/main.yml/badge.svg) [![GoDoc](https://godoc.org/github.com/vishvananda/netlink?status.svg)](https://godoc.org/github.com/vishvananda/netlink)
 
@@ -16,7 +16,7 @@ netlink functionality in
 heavily rewritten to improve testability, performance, and to add new
 functionality like ipsec xfrm handling.
 
-***REMOVED******REMOVED*** Local Build and Test ***REMOVED******REMOVED***
+## Local Build and Test ##
 
 You can use go get command:
 
@@ -30,7 +30,7 @@ Testing (requires root):
 
     sudo -E go test github.com/vishvananda/netlink
 
-***REMOVED******REMOVED*** Examples ***REMOVED******REMOVED***
+## Examples ##
 
 Add a new bridge and add eth1 into it:
 
@@ -77,7 +77,7 @@ func main() {
 
 ```
 
-***REMOVED******REMOVED*** Future Work ***REMOVED******REMOVED***
+## Future Work ##
 
 Many pieces of netlink are not yet fully supported in the high-level
 interface. Aspects of virtually all of the high-level objects don't exist.

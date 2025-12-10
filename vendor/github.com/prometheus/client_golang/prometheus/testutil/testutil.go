@@ -233,8 +233,8 @@ func convertReaderToMetricFamily(reader io.Reader) ([]*dto.MetricFamily, error) 
 
 	// The text protocol handles empty help fields inconsistently. When
 	// encoding, any non-nil value, include the empty string, produces a
-	// "***REMOVED*** HELP" line. But when decoding, the help field is only set to a
-	// non-nil value if the "***REMOVED*** HELP" line contains a non-empty value.
+	// "# HELP" line. But when decoding, the help field is only set to a
+	// non-nil value if the "# HELP" line contains a non-empty value.
 	//
 	// Because metrics in a registry always have non-nil help fields, populate
 	// any nil help fields in the parsed metrics with the empty string so that

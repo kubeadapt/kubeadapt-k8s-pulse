@@ -221,7 +221,7 @@ func ValidateFieldManager(fieldManager string, fldPath *field.Path) field.ErrorL
 	// Verify that all characters are printable.
 	for i, r := range fieldManager {
 		if !unicode.IsPrint(r) {
-			allErrs = append(allErrs, field.Invalid(fldPath, fieldManager, fmt.Sprintf("invalid character %***REMOVED***U (at position %d)", r, i)))
+			allErrs = append(allErrs, field.Invalid(fldPath, fieldManager, fmt.Sprintf("invalid character %#U (at position %d)", r, i)))
 		}
 	}
 

@@ -86,7 +86,7 @@ func (op OperationProps) MarshalJSON() ([]byte, error) {
 
 // Operation describes a single API operation on a path.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***operationObject
+// For more information: http://goo.gl/8us55a#operationObject
 type Operation struct {
 	VendorExtensible
 	OperationProps

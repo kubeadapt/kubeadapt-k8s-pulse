@@ -292,7 +292,7 @@ func pmuProbe(args tracefs.ProbeArgs) (*perfEvent, error) {
 
 	// On some old kernels, kprobe PMU doesn't allow `.` in symbol names and
 	// return -EINVAL. Return ErrNotSupported to allow falling back to tracefs.
-	// https://github.com/torvalds/linux/blob/94710cac0ef4/kernel/trace/trace_kprobe.c***REMOVED***L340-L343
+	// https://github.com/torvalds/linux/blob/94710cac0ef4/kernel/trace/trace_kprobe.c#L340-L343
 	if errors.Is(err, unix.EINVAL) && strings.Contains(args.Symbol, ".") {
 		return nil, fmt.Errorf("token %s: older kernels don't accept dots: %w", token, ErrNotSupported)
 	}
@@ -310,7 +310,7 @@ func pmuProbe(args tracefs.ProbeArgs) (*perfEvent, error) {
 	// Since at least commit cb9a19fe4aa51, ENOTSUPP is returned
 	// when attempting to set a uprobe on a trap instruction.
 	if errors.Is(err, sys.ENOTSUPP) {
-		return nil, fmt.Errorf("token %s: failed setting uprobe on offset %***REMOVED***x (possible trap insn): %w", token, args.Offset, err)
+		return nil, fmt.Errorf("token %s: failed setting uprobe on offset %#x (possible trap insn): %w", token, args.Offset, err)
 	}
 
 	if err != nil {

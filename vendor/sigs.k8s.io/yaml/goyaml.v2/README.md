@@ -1,4 +1,4 @@
-***REMOVED*** go-yaml fork
+# go-yaml fork
 
 This package is a fork of the go-yaml library and is intended solely for consumption
 by kubernetes projects. In this fork, we plan to support only critical changes required for
@@ -8,7 +8,7 @@ unless we are pulling them from upstream.
 
 This fork is based on v2.4.0: https://github.com/go-yaml/yaml/releases/tag/v2.4.0
 
-***REMOVED*** YAML support for the Go language
+# YAML support for the Go language
 
 Introduction
 ------------

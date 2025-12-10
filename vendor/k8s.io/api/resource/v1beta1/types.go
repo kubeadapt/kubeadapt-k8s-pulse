@@ -569,7 +569,7 @@ type CELDeviceSelector struct {
 // kube-scheduler enforces the runtime limit instead of relying on validation.
 //
 // According to
-// https://github.com/kubernetes/kubernetes/blob/4aeaf1e99e82da8334c0d6dddd848a194cd44b4f/staging/src/k8s.io/apiserver/pkg/apis/cel/config.go***REMOVED***L20-L22,
+// https://github.com/kubernetes/kubernetes/blob/4aeaf1e99e82da8334c0d6dddd848a194cd44b4f/staging/src/k8s.io/apiserver/pkg/apis/cel/config.go#L20-L22,
 // this gives roughly 0.1 second for each expression evaluation.
 // However, this depends on how fast the machine is.
 const CELSelectorExpressionMaxCost = 1000000

@@ -38,7 +38,7 @@ There are two different approaches spew allows for dumping Go data structures:
 	  and additional debug information such as types and all pointer addresses
 	  used to indirect to the final value
 	* A custom Formatter interface that integrates cleanly with the standard fmt
-	  package and replaces %v, %+v, %***REMOVED***v, and %***REMOVED***+v to provide inline printing
+	  package and replaces %v, %+v, %#v, and %#+v to provide inline printing
 	  similar to the default %v while providing the additional functionality
 	  outlined above and passing unsupported format verbs such as %x and %q
 	  along to fmt
@@ -56,12 +56,12 @@ information use Dump, Fdump, or Sdump:
 
 Alternatively, if you would prefer to use format strings with a compacted inline
 printing style, use the convenience wrappers Printf, Fprintf, etc with
-%v (most compact), %+v (adds pointer addresses), %***REMOVED***v (adds types), or
-%***REMOVED***+v (adds types and pointer addresses):
+%v (most compact), %+v (adds pointer addresses), %#v (adds types), or
+%#+v (adds types and pointer addresses):
 	spew.Printf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)
-	spew.Printf("myVar3: %***REMOVED***v -- myVar4: %***REMOVED***+v", myVar3, myVar4)
+	spew.Printf("myVar3: %#v -- myVar4: %#+v", myVar3, myVar4)
 	spew.Fprintf(someWriter, "myVar1: %v -- myVar2: %+v", myVar1, myVar2)
-	spew.Fprintf(someWriter, "myVar3: %***REMOVED***v -- myVar4: %***REMOVED***+v", myVar3, myVar4)
+	spew.Fprintf(someWriter, "myVar3: %#v -- myVar4: %#+v", myVar3, myVar4)
 
 Configuration Options
 
@@ -152,7 +152,7 @@ Byte (and uint8) arrays and slices are displayed uniquely like the hexdump -C
 command as shown.
 	([]uint8) (len=32 cap=32) {
 	 00000000  11 12 13 14 15 16 17 18  19 1a 1b 1c 1d 1e 1f 20  |............... |
-	 00000010  21 22 23 24 25 26 27 28  29 2a 2b 2c 2d 2e 2f 30  |!"***REMOVED***$%&'()*+,-./0|
+	 00000010  21 22 23 24 25 26 27 28  29 2a 2b 2c 2d 2e 2f 30  |!"#$%&'()*+,-./0|
 	 00000020  31 32                                             |12|
 	}
 
@@ -164,7 +164,7 @@ formatter is useful for inline printing of smaller data types similar to the
 standard %v format specifier.
 
 The custom formatter only responds to the %v (most compact), %+v (adds pointer
-addresses), %***REMOVED***v (adds types), or %***REMOVED***+v (adds types and pointer addresses) verb
+addresses), %#v (adds types), or %#+v (adds types and pointer addresses) verb
 combinations.  Any other verbs such as %x and %q will be sent to the the
 standard fmt package for formatting.  In addition, the custom formatter ignores
 the width and precision arguments (however they will still work on the format
@@ -177,10 +177,10 @@ convenience functions such as spew.Printf, spew.Println, or spew.Printf.  The
 functions have syntax you are most likely already familiar with:
 
 	spew.Printf("myVar1: %v -- myVar2: %+v", myVar1, myVar2)
-	spew.Printf("myVar3: %***REMOVED***v -- myVar4: %***REMOVED***+v", myVar3, myVar4)
+	spew.Printf("myVar3: %#v -- myVar4: %#+v", myVar3, myVar4)
 	spew.Println(myVar, myVar2)
 	spew.Fprintf(os.Stderr, "myVar1: %v -- myVar2: %+v", myVar1, myVar2)
-	spew.Fprintf(os.Stderr, "myVar3: %***REMOVED***v -- myVar4: %***REMOVED***+v", myVar3, myVar4)
+	spew.Fprintf(os.Stderr, "myVar3: %#v -- myVar4: %#+v", myVar3, myVar4)
 
 See the Index for the full list convenience functions.
 
@@ -189,14 +189,14 @@ Sample Formatter Output
 Double pointer to a uint8:
 	  %v: <**>5
 	 %+v: <**>(0xf8400420d0->0xf8400420c8)5
-	 %***REMOVED***v: (**uint8)5
-	%***REMOVED***+v: (**uint8)(0xf8400420d0->0xf8400420c8)5
+	 %#v: (**uint8)5
+	%#+v: (**uint8)(0xf8400420d0->0xf8400420c8)5
 
 Pointer to circular struct with a uint8 field and a pointer to itself:
 	  %v: <*>{1 <*><shown>}
 	 %+v: <*>(0xf84003e260){ui8:1 c:<*>(0xf84003e260)<shown>}
-	 %***REMOVED***v: (*main.circular){ui8:(uint8)1 c:(*main.circular)<shown>}
-	%***REMOVED***+v: (*main.circular)(0xf84003e260){ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>}
+	 %#v: (*main.circular){ui8:(uint8)1 c:(*main.circular)<shown>}
+	%#+v: (*main.circular)(0xf84003e260){ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>}
 
 See the Printf example for details on the setup of variables being shown
 here.

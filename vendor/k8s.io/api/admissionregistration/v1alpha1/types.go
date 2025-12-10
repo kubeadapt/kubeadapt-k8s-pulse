@@ -81,7 +81,7 @@ const (
 // ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects an object without changing it.
 type ValidatingAdmissionPolicy struct {
 	metav1.TypeMeta `json:",inline"`
-	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Specification of the desired behavior of the ValidatingAdmissionPolicy.
@@ -138,7 +138,7 @@ type ExpressionWarning struct {
 type ValidatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// List of ValidatingAdmissionPolicy.
@@ -252,13 +252,13 @@ type Validation struct {
 	//
 	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
 	// - 'oldObject' - The existing object. The value is null for CREATE requests.
-	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go***REMOVED***AdmissionRequest)).
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
 	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
 	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
 	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
 	//   For example, a variable named 'foo' can be accessed as 'variables.foo'.
 	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library***REMOVED***Authz
+	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
 	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
 	//   request resource.
 	//
@@ -386,7 +386,7 @@ type AuditAnnotation struct {
 // given (policy, binding, param) combination is within its own CEL budget.
 type ValidatingAdmissionPolicyBinding struct {
 	metav1.TypeMeta `json:",inline"`
-	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Specification of the desired behavior of the ValidatingAdmissionPolicyBinding.
@@ -400,7 +400,7 @@ type ValidatingAdmissionPolicyBinding struct {
 type ValidatingAdmissionPolicyBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// List of PolicyBinding.
@@ -672,7 +672,7 @@ const (
 // MutatingAdmissionPolicy describes the definition of an admission mutation policy that mutates the object coming into admission chain.
 type MutatingAdmissionPolicy struct {
 	metav1.TypeMeta `json:",inline"`
-	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Specification of the desired behavior of the MutatingAdmissionPolicy.
@@ -686,7 +686,7 @@ type MutatingAdmissionPolicy struct {
 type MutatingAdmissionPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// List of ValidatingAdmissionPolicy.
@@ -839,13 +839,13 @@ type ApplyConfiguration struct {
 	//
 	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
 	// - 'oldObject' - The existing object. The value is null for CREATE requests.
-	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go***REMOVED***AdmissionRequest)).
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
 	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
 	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
 	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
 	//   For example, a variable named 'foo' can be accessed as 'variables.foo'.
 	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library***REMOVED***Authz
+	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
 	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
 	//   request resource.
 	//
@@ -906,17 +906,17 @@ type JSONPatch struct {
 	//
 	// - 'object' - The object from the incoming request. The value is null for DELETE requests.
 	// - 'oldObject' - The existing object. The value is null for CREATE requests.
-	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go***REMOVED***AdmissionRequest)).
+	// - 'request' - Attributes of the API request([ref](/pkg/apis/admission/types.go#AdmissionRequest)).
 	// - 'params' - Parameter resource referred to by the policy binding being evaluated. Only populated if the policy has a ParamKind.
 	// - 'namespaceObject' - The namespace object that the incoming object belongs to. The value is null for cluster-scoped resources.
 	// - 'variables' - Map of composited variables, from its name to its lazily evaluated value.
 	//   For example, a variable named 'foo' can be accessed as 'variables.foo'.
 	// - 'authorizer' - A CEL Authorizer. May be used to perform authorization checks for the principal (user or service account) of the request.
-	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library***REMOVED***Authz
+	//   See https://pkg.go.dev/k8s.io/apiserver/pkg/cel/library#Authz
 	// - 'authorizer.requestResource' - A CEL ResourceCheck constructed from the 'authorizer' and configured with the
 	//   request resource.
 	//
-	// CEL expressions have access to [Kubernetes CEL function libraries](https://kubernetes.io/docs/reference/using-api/cel/***REMOVED***cel-options-language-features-and-libraries)
+	// CEL expressions have access to [Kubernetes CEL function libraries](https://kubernetes.io/docs/reference/using-api/cel/#cel-options-language-features-and-libraries)
 	// as well as:
 	//
 	// - 'jsonpatch.escapeKey' - Performs JSONPatch key escaping. '~' and  '/' are escaped as '~0' and `~1' respectively).
@@ -953,13 +953,13 @@ const (
 // For a given admission request, each binding will cause its policy to be
 // evaluated N times, where N is 1 for policies/bindings that don't use
 // params, otherwise N is the number of parameters selected by the binding.
-// Each evaluation is constrained by a [runtime cost budget](https://kubernetes.io/docs/reference/using-api/cel/***REMOVED***runtime-cost-budget).
+// Each evaluation is constrained by a [runtime cost budget](https://kubernetes.io/docs/reference/using-api/cel/#runtime-cost-budget).
 //
 // Adding/removing policies, bindings, or params can not affect whether a
 // given (policy, binding, param) combination is within its own CEL budget.
 type MutatingAdmissionPolicyBinding struct {
 	metav1.TypeMeta `json:",inline"`
-	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata.
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Specification of the desired behavior of the MutatingAdmissionPolicyBinding.
@@ -973,7 +973,7 @@ type MutatingAdmissionPolicyBinding struct {
 type MutatingAdmissionPolicyBindingList struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// List of PolicyBinding.

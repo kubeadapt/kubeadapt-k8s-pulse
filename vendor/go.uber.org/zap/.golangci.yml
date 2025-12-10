@@ -1,14 +1,14 @@
 output:
-  ***REMOVED*** Make output more digestible with quickfix in vim/emacs/etc.
+  # Make output more digestible with quickfix in vim/emacs/etc.
   sort-results: true
   print-issued-lines: false
 
 linters:
-  ***REMOVED*** We'll track the golangci-lint default linters manually
-  ***REMOVED*** instead of letting them change without our control.
+  # We'll track the golangci-lint default linters manually
+  # instead of letting them change without our control.
   disable-all: true
   enable:
-    ***REMOVED*** golangci-lint defaults:
+    # golangci-lint defaults:
     - errcheck
     - gosimple
     - govet
@@ -16,14 +16,14 @@ linters:
     - staticcheck
     - unused
 
-    ***REMOVED*** Our own extras:
+    # Our own extras:
     - gofumpt
-    - nolintlint ***REMOVED*** lints nolint directives
+    - nolintlint # lints nolint directives
     - revive
 
 linters-settings:
   govet:
-    ***REMOVED*** These govet checks are disabled by default, but they're useful.
+    # These govet checks are disabled by default, but they're useful.
     enable:
       - niliness
       - reflectvaluecompare
@@ -32,8 +32,8 @@ linters-settings:
 
   errcheck:
     exclude-functions:
-      ***REMOVED*** These methods can not fail.
-      ***REMOVED*** They operate on an in-memory buffer.
+      # These methods can not fail.
+      # They operate on an in-memory buffer.
       - (*go.uber.org/zap/buffer.Buffer).Write
       - (*go.uber.org/zap/buffer.Buffer).WriteByte
       - (*go.uber.org/zap/buffer.Buffer).WriteString
@@ -41,37 +41,37 @@ linters-settings:
       - (*go.uber.org/zap/zapio.Writer).Close
       - (*go.uber.org/zap/zapio.Writer).Sync
       - (*go.uber.org/zap/zapio.Writer).Write
-      ***REMOVED*** Write to zapio.Writer cannot fail,
-      ***REMOVED*** so io.WriteString on it cannot fail.
+      # Write to zapio.Writer cannot fail,
+      # so io.WriteString on it cannot fail.
       - io.WriteString(*go.uber.org/zap/zapio.Writer)
 
-      ***REMOVED*** Writing a plain string to a fmt.State cannot fail.
+      # Writing a plain string to a fmt.State cannot fail.
       - io.WriteString(fmt.State)
 
 issues:
-  ***REMOVED*** Print all issues reported by all linters.
+  # Print all issues reported by all linters.
   max-issues-per-linter: 0
   max-same-issues: 0
 
-  ***REMOVED*** Don't ignore some of the issues that golangci-lint considers okay.
-  ***REMOVED*** This includes documenting all exported entities.
+  # Don't ignore some of the issues that golangci-lint considers okay.
+  # This includes documenting all exported entities.
   exclude-use-default: false
 
   exclude-rules:
-    ***REMOVED*** Don't warn on unused parameters.
-    ***REMOVED*** Parameter names are useful; replacing them with '_' is undesirable.
+    # Don't warn on unused parameters.
+    # Parameter names are useful; replacing them with '_' is undesirable.
     - linters: [revive]
       text: 'unused-parameter: parameter \S+ seems to be unused, consider removing or renaming it as _'
 
-    ***REMOVED*** staticcheck already has smarter checks for empty blocks.
-    ***REMOVED*** revive's empty-block linter has false positives.
-    ***REMOVED*** For example, as of writing this, the following is not allowed.
-    ***REMOVED***   for foo() { }
+    # staticcheck already has smarter checks for empty blocks.
+    # revive's empty-block linter has false positives.
+    # For example, as of writing this, the following is not allowed.
+    #   for foo() { }
     - linters: [revive]
       text: 'empty-block: this block is empty, you can remove it'
 
-    ***REMOVED*** Ignore logger.Sync() errcheck failures in example_test.go
-    ***REMOVED*** since those are intended to be uncomplicated examples.
+    # Ignore logger.Sync() errcheck failures in example_test.go
+    # since those are intended to be uncomplicated examples.
     - linters: [errcheck]
       path: example_test.go
       text: 'Error return value of `logger.Sync` is not checked'

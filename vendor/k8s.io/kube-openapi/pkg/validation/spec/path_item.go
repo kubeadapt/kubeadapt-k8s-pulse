@@ -35,11 +35,11 @@ type PathItemProps struct {
 }
 
 // PathItem describes the operations available on a single path.
-// A Path Item may be empty, due to [ACL constraints](http://goo.gl/8us55a***REMOVED***securityFiltering).
+// A Path Item may be empty, due to [ACL constraints](http://goo.gl/8us55a#securityFiltering).
 // The path itself is still exposed to the documentation viewer but they will
 // not know which operations and parameters are available.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***pathItemObject
+// For more information: http://goo.gl/8us55a#pathItemObject
 type PathItem struct {
 	Refable
 	VendorExtensible

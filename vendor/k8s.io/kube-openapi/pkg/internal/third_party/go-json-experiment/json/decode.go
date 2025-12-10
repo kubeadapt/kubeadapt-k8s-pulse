@@ -252,7 +252,7 @@ func (d *Decoder) fetch() error {
 	}
 }
 
-const invalidateBufferByte = '***REMOVED***' // invalid starting character for JSON grammar
+const invalidateBufferByte = '#' // invalid starting character for JSON grammar
 
 // invalidatePreviousRead invalidates buffers returned by Peek and Read calls
 // so that the first byte is an invalid character.

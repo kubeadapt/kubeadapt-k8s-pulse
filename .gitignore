@@ -1,4 +1,4 @@
-***REMOVED*** Binaries
+# Binaries
 bin/
 *.exe
 *.dll
@@ -8,26 +8,25 @@ ebpf-agent
 agent
 ebpf-agent.tar
 
-***REMOVED*** BPF compiled objects (but keep pre-generated bindings for CI)
+# BPF compiled objects
+# NOTE: All .o files are generated in CI, not committed to repo
+# This ensures consistent builds for both IPv4-only and IPv6 variants
 *.o
-***REMOVED*** Exception: pre-generated BPF bindings ARE committed (required for CI build)
-!internal/bpf/*_bpfel.o
-!internal/bpf/*_bpfeb.o
 bpf/output/
 
-***REMOVED*** Test binaries
+# Test binaries
 *.test
 
-***REMOVED*** Coverage files
+# Coverage files
 *.out
 coverage.html
 coverage.txt
 *.cov
 
-***REMOVED*** Dependency directories
-***REMOVED*** vendor/ - committed for reproducible CI builds
+# Dependency directories
+# vendor/ - committed for reproducible CI builds
 
-***REMOVED*** IDE directories
+# IDE directories
 .idea/
 .vscode/
 *.swp
@@ -35,23 +34,23 @@ coverage.txt
 *~
 .DS_Store
 
-***REMOVED*** Environment files
+# Environment files
 .env
 .env.local
 .env.*.local
 
-***REMOVED*** Debug files
+# Debug files
 *.log
 debug
 
-***REMOVED*** Temporary files
+# Temporary files
 tmp/
 temp/
 *.tmp
 
-***REMOVED*** Docker volumes
+# Docker volumes
 prometheus-data/
 grafana-data/
 
-***REMOVED*** Air (live reload) temp files
+# Air (live reload) temp files
 .air.toml.tmp

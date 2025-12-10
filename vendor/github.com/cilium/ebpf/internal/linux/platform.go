@@ -8,7 +8,7 @@ import (
 // the linux kernel.
 //
 // Based on https://github.com/golang/go/blob/master/src/go/build/syslist.go
-// and https://github.com/libbpf/libbpf/blob/master/src/libbpf.c***REMOVED***L10047
+// and https://github.com/libbpf/libbpf/blob/master/src/libbpf.c#L10047
 func PlatformPrefix() string {
 	switch runtime.GOARCH {
 	case "386":

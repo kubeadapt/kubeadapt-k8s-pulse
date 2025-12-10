@@ -122,18 +122,18 @@ func makeUnions(extensions map[string]interface{}) ([]schema.Union, error) {
 	if iunions, ok := extensions["x-kubernetes-unions"]; ok {
 		unions, ok := iunions.([]interface{})
 		if !ok {
-			return nil, fmt.Errorf(`"x-kubernetes-unions" should be a list, got %***REMOVED***v`, unions)
+			return nil, fmt.Errorf(`"x-kubernetes-unions" should be a list, got %#v`, unions)
 		}
 		for _, iunion := range unions {
 			union, ok := iunion.(map[interface{}]interface{})
 			if !ok {
-				return nil, fmt.Errorf(`"x-kubernetes-unions" items should be a map of string to unions, got %***REMOVED***v`, iunion)
+				return nil, fmt.Errorf(`"x-kubernetes-unions" items should be a map of string to unions, got %#v`, iunion)
 			}
 			unionMap := map[string]interface{}{}
 			for k, v := range union {
 				key, ok := k.(string)
 				if !ok {
-					return nil, fmt.Errorf(`"x-kubernetes-unions" has non-string key: %***REMOVED***v`, k)
+					return nil, fmt.Errorf(`"x-kubernetes-unions" has non-string key: %#v`, k)
 				}
 				unionMap[key] = v
 			}
@@ -173,7 +173,7 @@ func makeUnion(extensions map[string]interface{}) (schema.Union, error) {
 	if idiscriminator, ok := extensions["discriminator"]; ok {
 		discriminator, ok := idiscriminator.(string)
 		if !ok {
-			return schema.Union{}, fmt.Errorf(`"discriminator" must be a string, got: %***REMOVED***v`, idiscriminator)
+			return schema.Union{}, fmt.Errorf(`"discriminator" must be a string, got: %#v`, idiscriminator)
 		}
 		union.Discriminator = &discriminator
 	}
@@ -181,14 +181,14 @@ func makeUnion(extensions map[string]interface{}) (schema.Union, error) {
 	if ifields, ok := extensions["fields-to-discriminateBy"]; ok {
 		fields, ok := ifields.(map[interface{}]interface{})
 		if !ok {
-			return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy" must be a map[string]string, got: %***REMOVED***v`, ifields)
+			return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy" must be a map[string]string, got: %#v`, ifields)
 		}
 		// Needs sorted keys by field.
 		keys := []string{}
 		for ifield := range fields {
 			field, ok := ifield.(string)
 			if !ok {
-				return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy": field must be a string, got: %***REMOVED***v`, ifield)
+				return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy": field must be a string, got: %#v`, ifield)
 			}
 			keys = append(keys, field)
 
@@ -199,7 +199,7 @@ func makeUnion(extensions map[string]interface{}) (schema.Union, error) {
 			value := fields[field]
 			discriminated, ok := value.(string)
 			if !ok {
-				return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy"/%v: value must be a string, got: %***REMOVED***v`, field, value)
+				return schema.Union{}, fmt.Errorf(`"fields-to-discriminateBy"/%v: value must be a string, got: %#v`, field, value)
 			}
 			union.Fields = append(union.Fields, schema.UnionField{
 				FieldName:          field,
@@ -282,7 +282,7 @@ func getListElementRelationship(ext map[string]any) (schema.ElementRelationship,
 
 			keyNames, ok := toStringSlice(keys)
 			if !ok {
-				return schema.Associative, nil, fmt.Errorf("uninterpreted map keys: %***REMOVED***v", keys)
+				return schema.Associative, nil, fmt.Errorf("uninterpreted map keys: %#v", keys)
 			}
 
 			return schema.Associative, keyNames, nil
@@ -296,7 +296,7 @@ func getListElementRelationship(ext map[string]any) (schema.ElementRelationship,
 				keyName, ok := key.(string)
 
 				if !ok {
-					return schema.Associative, nil, fmt.Errorf("uninterpreted merge key: %***REMOVED***v", key)
+					return schema.Associative, nil, fmt.Errorf("uninterpreted merge key: %#v", key)
 				}
 
 				return schema.Associative, []string{keyName}, nil

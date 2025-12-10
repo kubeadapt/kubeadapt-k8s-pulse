@@ -142,7 +142,7 @@ const (
 )
 
 // This limits the max nesting depth to prevent stack overflow.
-// This is permitted by https://tools.ietf.org/html/rfc7159***REMOVED***section-9
+// This is permitted by https://tools.ietf.org/html/rfc7159#section-9
 const maxNestingDepth = 10000
 
 // reset prepares the scanner for use.

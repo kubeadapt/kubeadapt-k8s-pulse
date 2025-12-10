@@ -1,16 +1,16 @@
-***REMOVED*** Copyright 2013-2023 The Cobra Authors
-***REMOVED***
-***REMOVED*** Licensed under the Apache License, Version 2.0 (the "License");
-***REMOVED*** you may not use this file except in compliance with the License.
-***REMOVED*** You may obtain a copy of the License at
-***REMOVED***
-***REMOVED***      http://www.apache.org/licenses/LICENSE-2.0
-***REMOVED***
-***REMOVED*** Unless required by applicable law or agreed to in writing, software
-***REMOVED*** distributed under the License is distributed on an "AS IS" BASIS,
-***REMOVED*** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-***REMOVED*** See the License for the specific language governing permissions and
-***REMOVED*** limitations under the License.
+# Copyright 2013-2023 The Cobra Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 run:
   deadline: 5m
@@ -18,40 +18,40 @@ run:
 linters:
   disable-all: true
   enable:
-    ***REMOVED***- bodyclose
-    ***REMOVED*** - deadcode ! deprecated since v1.49.0; replaced by 'unused'
-    ***REMOVED***- depguard
-    ***REMOVED***- dogsled
-    ***REMOVED***- dupl
+    #- bodyclose
+    # - deadcode ! deprecated since v1.49.0; replaced by 'unused'
+    #- depguard
+    #- dogsled
+    #- dupl
     - errcheck
-    ***REMOVED***- exhaustive
-    ***REMOVED***- funlen
-    ***REMOVED***- gochecknoinits
+    #- exhaustive
+    #- funlen
+    #- gochecknoinits
     - goconst
     - gocritic
-    ***REMOVED***- gocyclo
+    #- gocyclo
     - gofmt
     - goimports
-    ***REMOVED***- gomnd
-    ***REMOVED***- goprintffuncname
+    #- gomnd
+    #- goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    ***REMOVED***- lll
+    #- lll
     - misspell
-    ***REMOVED***- nakedret
-    ***REMOVED***- noctx
+    #- nakedret
+    #- noctx
     - nolintlint
-    ***REMOVED***- rowserrcheck
-    ***REMOVED***- scopelint
+    #- rowserrcheck
+    #- scopelint
     - staticcheck
-    ***REMOVED***- structcheck ! deprecated since v1.49.0; replaced by 'unused'
+    #- structcheck ! deprecated since v1.49.0; replaced by 'unused'
     - stylecheck
-    ***REMOVED***- typecheck
+    #- typecheck
     - unconvert
-    ***REMOVED***- unparam
+    #- unparam
     - unused
-    ***REMOVED*** - varcheck ! deprecated since v1.49.0; replaced by 'unused'
-    ***REMOVED***- whitespace
+    # - varcheck ! deprecated since v1.49.0; replaced by 'unused'
+    #- whitespace
   fast: false

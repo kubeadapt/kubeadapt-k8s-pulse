@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// RequestBody describes a single request body, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***requestBodyObject
+// RequestBody describes a single request body, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#requestBodyObject
 //
 // Note that this struct is actually a thin wrapper around RequestBodyProps to make it referable and extensible
 type RequestBody struct {
@@ -82,7 +82,7 @@ func (r *RequestBody) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RequestBodyProps describes a single request body, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***requestBodyObject
+// RequestBodyProps describes a single request body, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#requestBodyObject
 type RequestBodyProps struct {
 	// Description holds a brief description of the request body
 	Description string `json:"description,omitempty"`

@@ -102,7 +102,7 @@ func (p *parser) peek() yaml_event_type_t {
 	}
 	// It's curious choice from the underlying API to generally return a
 	// positive result on success, but on this case return true in an error
-	// scenario. This was the source of bugs in the past (issue ***REMOVED***666).
+	// scenario. This was the source of bugs in the past (issue #666).
 	if !yaml_parser_parse(&p.parser, &p.event) || p.parser.error != yaml_NO_ERROR {
 		p.fail()
 	}
@@ -773,7 +773,7 @@ func (d *decoder) mapping(n *Node, out reflect.Value) (good bool) {
 			for j := i + 2; j < l; j += 2 {
 				nj := n.Content[j]
 				if ni.Kind == nj.Kind && ni.Value == nj.Value {
-					d.terrors = append(d.terrors, fmt.Sprintf("line %d: mapping key %***REMOVED***v already defined at line %d", nj.Line, nj.Value, ni.Line))
+					d.terrors = append(d.terrors, fmt.Sprintf("line %d: mapping key %#v already defined at line %d", nj.Line, nj.Value, ni.Line))
 				}
 			}
 		}
@@ -842,7 +842,7 @@ func (d *decoder) mapping(n *Node, out reflect.Value) (good bool) {
 				kkind = k.Elem().Kind()
 			}
 			if kkind == reflect.Map || kkind == reflect.Slice {
-				failf("invalid map key: %***REMOVED***v", k.Interface())
+				failf("invalid map key: %#v", k.Interface())
 			}
 			e := reflect.New(et).Elem()
 			if d.unmarshal(n.Content[i+1], e) || n.Content[i+1].ShortTag() == nullTag && (mapIsNew || !out.MapIndex(k).IsValid()) {

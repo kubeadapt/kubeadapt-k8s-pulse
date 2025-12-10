@@ -707,7 +707,7 @@ func (sc *serverConn) HeaderEncoder() (*hpack.Encoder, *bytes.Buffer) {
 
 func (sc *serverConn) state(streamID uint32) (streamState, *stream) {
 	sc.serveG.check()
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-5.1
+	// http://tools.ietf.org/html/rfc7540#section-5.1
 	if st, ok := sc.streams[streamID]; ok {
 		return st.state, st
 	}
@@ -1955,7 +1955,7 @@ func (sc *serverConn) processGoAway(f *GoAwayFrame) error {
 		sc.vlogf("http2: received GOAWAY %+v, starting graceful shutdown", f)
 	}
 	sc.startGracefulShutdownInternal()
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-6.8
+	// http://tools.ietf.org/html/rfc7540#section-6.8
 	// We should not create any new streams, which means we should disable push.
 	sc.pushEnabled = false
 	return nil
@@ -2016,7 +2016,7 @@ func (st *stream) onWriteTimeout() {
 func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 	sc.serveG.check()
 	id := f.StreamID
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-5.1.1
+	// http://tools.ietf.org/html/rfc7540#section-5.1.1
 	// Streams initiated by a client MUST use odd-numbered stream
 	// identifiers. [...] An endpoint that receives an unexpected
 	// stream identifier MUST respond with a connection error
@@ -2058,7 +2058,7 @@ func (sc *serverConn) processHeaders(f *MetaHeadersFrame) error {
 		sc.idleTimer.Stop()
 	}
 
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-5.1.2
+	// http://tools.ietf.org/html/rfc7540#section-5.1.2
 	// [...] Endpoints MUST NOT exceed the limit set by their peer. An
 	// endpoint that receives a HEADERS frame that causes their
 	// advertised concurrent stream limit to be exceeded MUST treat
@@ -2780,8 +2780,8 @@ func (rws *responseWriterState) writeChunk(p []byte) (n int, err error) {
 // or known before the header is written, the normal Go trailers mechanism
 // is preferred:
 //
-//	https://golang.org/pkg/net/http/***REMOVED***ResponseWriter
-//	https://golang.org/pkg/net/http/***REMOVED***example_ResponseWriter_trailers
+//	https://golang.org/pkg/net/http/#ResponseWriter
+//	https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
 const TrailerPrefix = "Trailer:"
 
 // promoteUndeclaredTrailers permits http.Handlers to set trailers
@@ -2944,7 +2944,7 @@ func checkWriteHeaderCode(code int) {
 	// Issue 22880: require valid WriteHeader status codes.
 	// For now we only enforce that it's three digits.
 	// In the future we might block things over 599 (600 and above aren't defined
-	// at http://httpwg.org/specs/rfc7231.html***REMOVED***status.codes).
+	// at http://httpwg.org/specs/rfc7231.html#status.codes).
 	// But for now any three digits.
 	//
 	// We used to send "HTTP/1.1 000 0" on the wire in responses but there's
@@ -3074,7 +3074,7 @@ func (w *responseWriter) Push(target string, opts *http.PushOptions) error {
 	sc.serveG.checkNotOn()
 
 	// No recursive pushes: "PUSH_PROMISE frames MUST only be sent on a peer-initiated stream."
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-6.6
+	// http://tools.ietf.org/html/rfc7540#section-6.6
 	if st.isPushed() {
 		return ErrRecursivePush
 	}
@@ -3120,7 +3120,7 @@ func (w *responseWriter) Push(target string, opts *http.PushOptions) error {
 		}
 		// These headers are meaningful only if the request has a body,
 		// but PUSH_PROMISE requests cannot have a body.
-		// http://tools.ietf.org/html/rfc7540***REMOVED***section-8.2
+		// http://tools.ietf.org/html/rfc7540#section-8.2
 		// Also disallow Host, since the promised URL must be absolute.
 		if asciiEqualFold(k, "content-length") ||
 			asciiEqualFold(k, "content-encoding") ||
@@ -3137,7 +3137,7 @@ func (w *responseWriter) Push(target string, opts *http.PushOptions) error {
 
 	// The RFC effectively limits promised requests to GET and HEAD:
 	// "Promised requests MUST be cacheable [GET, HEAD, or POST], and MUST be safe [GET or HEAD]"
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-8.2
+	// http://tools.ietf.org/html/rfc7540#section-8.2
 	if opts.Method != "GET" && opts.Method != "HEAD" {
 		return fmt.Errorf("method %q must be GET or HEAD", opts.Method)
 	}
@@ -3180,7 +3180,7 @@ type startPushRequest struct {
 func (sc *serverConn) startPush(msg *startPushRequest) {
 	sc.serveG.check()
 
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-6.6.
+	// http://tools.ietf.org/html/rfc7540#section-6.6.
 	// PUSH_PROMISE frames MUST only be sent on a peer-initiated stream that
 	// is in either the "open" or "half-closed (remote)" state.
 	if msg.parent.state != stateOpen && msg.parent.state != stateHalfClosedRemote {
@@ -3189,7 +3189,7 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 		return
 	}
 
-	// http://tools.ietf.org/html/rfc7540***REMOVED***section-6.6.
+	// http://tools.ietf.org/html/rfc7540#section-6.6.
 	if !sc.pushEnabled {
 		msg.done <- http.ErrNotSupported
 		return
@@ -3206,12 +3206,12 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 		if !sc.pushEnabled {
 			return 0, http.ErrNotSupported
 		}
-		// http://tools.ietf.org/html/rfc7540***REMOVED***section-6.5.2.
+		// http://tools.ietf.org/html/rfc7540#section-6.5.2.
 		if sc.curPushedStreams+1 > sc.clientMaxStreams {
 			return 0, ErrPushLimitReached
 		}
 
-		// http://tools.ietf.org/html/rfc7540***REMOVED***section-5.1.1.
+		// http://tools.ietf.org/html/rfc7540#section-5.1.1.
 		// Streams initiated by the server MUST use even-numbered identifiers.
 		// A server that is unable to establish a new stream identifier can send a GOAWAY
 		// frame so that the client is forced to open a new connection for new streams.
@@ -3222,7 +3222,7 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 		sc.maxPushPromiseID += 2
 		promisedID := sc.maxPushPromiseID
 
-		// http://tools.ietf.org/html/rfc7540***REMOVED***section-8.2.
+		// http://tools.ietf.org/html/rfc7540#section-8.2.
 		// Strictly speaking, the new stream should start in "reserved (local)", then
 		// transition to "half closed (remote)" after sending the initial HEADERS, but
 		// we start in "half closed (remote)" for simplicity.
@@ -3258,7 +3258,7 @@ func (sc *serverConn) startPush(msg *startPushRequest) {
 	})
 }
 
-// foreachHeaderElement splits v according to the "***REMOVED***rule" construction
+// foreachHeaderElement splits v according to the "#rule" construction
 // in RFC 7230 section 7 and calls fn for each non-empty element.
 func foreachHeaderElement(v string, fn func(string)) {
 	v = textproto.TrimString(v)
@@ -3276,7 +3276,7 @@ func foreachHeaderElement(v string, fn func(string)) {
 	}
 }
 
-// From http://httpwg.org/specs/rfc7540.html***REMOVED***rfc.section.8.1.2.2
+// From http://httpwg.org/specs/rfc7540.html#rfc.section.8.1.2.2
 var connHeaders = []string{
 	"Connection",
 	"Keep-Alive",

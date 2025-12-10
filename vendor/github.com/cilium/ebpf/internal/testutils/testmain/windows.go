@@ -61,7 +61,7 @@ type traceSession struct {
 
 // newTraceSession starts a trace log for eBPF for Windows related events.
 //
-// * https://github.com/microsoft/ebpf-for-windows/blob/main/docs/GettingStarted.md***REMOVED***using-tracing
+// * https://github.com/microsoft/ebpf-for-windows/blob/main/docs/GettingStarted.md#using-tracing
 // * https://devblogs.microsoft.com/performance-diagnostics/controlling-the-event-session-name-with-the-instance-name/ and
 func newTraceSession() (*traceSession, error) {
 	def := filepath.Join(os.Getenv("ProgramFiles"), "ebpf-for-windows\\ebpfforwindows.wprp")
@@ -173,7 +173,7 @@ func summariseWPRTrace(r io.Reader, w io.Writer) error {
 		}
 
 		flag := " "
-		// See https://learn.microsoft.com/en-us/windows/win32/api/traceloggingprovider/nf-traceloggingprovider-tracelogginglevel***REMOVED***remarks
+		// See https://learn.microsoft.com/en-us/windows/win32/api/traceloggingprovider/nf-traceloggingprovider-tracelogginglevel#remarks
 		if event.System.Level > 0 && event.System.Level <= 3 {
 			flag = "!"
 		}

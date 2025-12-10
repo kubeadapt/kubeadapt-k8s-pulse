@@ -492,7 +492,7 @@ func UnmarshalJSONEnum(m map[string]int32, data []byte, enumName string) (int32,
 	// Old style: enums are ints.
 	var val int32
 	if err := json.Unmarshal(data, &val); err != nil {
-		return 0, fmt.Errorf("cannot unmarshal %***REMOVED***q into enum %s", data, enumName)
+		return 0, fmt.Errorf("cannot unmarshal %#q into enum %s", data, enumName)
 	}
 	return val, nil
 }
@@ -900,7 +900,7 @@ func fieldDefault(ft reflect.Type, prop *Properties) (sf *scalarField, nestedMes
 func mapKeys(vs []reflect.Value) sort.Interface {
 	s := mapKeySorter{vs: vs}
 
-	// Type specialization per https://developers.google.com/protocol-buffers/docs/proto***REMOVED***maps.
+	// Type specialization per https://developers.google.com/protocol-buffers/docs/proto#maps.
 	if len(vs) == 0 {
 		return s
 	}

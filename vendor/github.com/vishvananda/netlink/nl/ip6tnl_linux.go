@@ -1,7 +1,7 @@
 package nl
 
-// id's of route attribute from https://elixir.bootlin.com/linux/v5.17.3/source/include/uapi/linux/lwtunnel.h***REMOVED***L38
-// the value's size are specified in https://elixir.bootlin.com/linux/v5.17.3/source/net/ipv4/ip_tunnel_core.c***REMOVED***L928
+// id's of route attribute from https://elixir.bootlin.com/linux/v5.17.3/source/include/uapi/linux/lwtunnel.h#L38
+// the value's size are specified in https://elixir.bootlin.com/linux/v5.17.3/source/net/ipv4/ip_tunnel_core.c#L928
 
 const (
 	LWTUNNEL_IP6_UNSPEC = iota

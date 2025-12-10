@@ -351,7 +351,7 @@ const (
 
 // isBadCipher reports whether the cipher is blacklisted by the HTTP/2 spec.
 // References:
-// https://tools.ietf.org/html/rfc7540***REMOVED***appendix-A
+// https://tools.ietf.org/html/rfc7540#appendix-A
 // Reject cipher suites from Appendix A.
 // "This list includes those cipher suites that do not
 // offer an ephemeral key exchange and those that are

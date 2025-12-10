@@ -112,7 +112,7 @@ type hybiFrameReaderFactory struct {
 
 // NewFrameReader reads a frame header from the connection, and creates new reader for the frame.
 // See Section 5.2 Base Framing protocol for detail.
-// http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-17***REMOVED***section-5.2
+// http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-17#section-5.2
 func (buf hybiFrameReaderFactory) NewFrameReader() (frame frameReader, err error) {
 	hybiFrame := new(hybiFrameReader)
 	frame = hybiFrame

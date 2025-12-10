@@ -1,10 +1,10 @@
-***REMOVED*** Contributing to Go
+# Contributing to Go
 
 Go is an open source project.
 
 It is the work of hundreds of contributors. We appreciate your help!
 
-***REMOVED******REMOVED*** Filing issues
+## Filing issues
 
 When [filing an issue](https://github.com/golang/oauth2/issues), make sure to answer these five questions:
 
@@ -17,7 +17,7 @@ When [filing an issue](https://github.com/golang/oauth2/issues), make sure to an
 General questions should go to the [golang-nuts mailing list](https://groups.google.com/group/golang-nuts) instead of the issue tracker.
 The gophers there will answer or ask you to file an issue if you've tripped over a bug.
 
-***REMOVED******REMOVED*** Contributing code
+## Contributing code
 
 Please read the [Contribution Guidelines](https://golang.org/doc/contribute.html)
 before sending patches.

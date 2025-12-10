@@ -50,7 +50,7 @@ type SpdyRoundTripper struct {
 	//to the remote server.
 	tlsConfig *tls.Config
 
-	/* TODO according to http://golang.org/pkg/net/http/***REMOVED***RoundTripper, a RoundTripper
+	/* TODO according to http://golang.org/pkg/net/http/#RoundTripper, a RoundTripper
 	   must be safe for use by multiple concurrent goroutines. If this is absolutely
 	   necessary, we could keep a map from http.Request to net.Conn. In practice,
 	   a client will create an http.Client, set the transport to a new insteace of

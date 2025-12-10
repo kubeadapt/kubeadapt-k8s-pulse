@@ -34,7 +34,7 @@ const (
 )
 
 func writePreamble(buf io.StringWriter, name string) {
-	WriteStringAndCheck(buf, fmt.Sprintf("***REMOVED*** bash completion for %-36s -*- shell-script -*-\n", name))
+	WriteStringAndCheck(buf, fmt.Sprintf("# bash completion for %-36s -*- shell-script -*-\n", name))
 	WriteStringAndCheck(buf, fmt.Sprintf(`
 __%[1]s_debug()
 {
@@ -43,8 +43,8 @@ __%[1]s_debug()
     fi
 }
 
-***REMOVED*** Homebrew on Macs have version 1.3 of bash-completion which doesn't include
-***REMOVED*** _init_completion. This is a very minimal version of that function.
+# Homebrew on Macs have version 1.3 of bash-completion which doesn't include
+# _init_completion. This is a very minimal version of that function.
 __%[1]s_init_completion()
 {
     COMPREPLY=()
@@ -74,7 +74,7 @@ __%[1]s_contains_word()
 
 __%[1]s_handle_go_custom_completion()
 {
-    __%[1]s_debug "${FUNCNAME[0]}: cur is ${cur}, words[*] is ${words[*]}, ***REMOVED***words[@] is ${***REMOVED***words[@]}"
+    __%[1]s_debug "${FUNCNAME[0]}: cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}"
 
     local shellCompDirectiveError=%[3]d
     local shellCompDirectiveNoSpace=%[4]d
@@ -84,40 +84,40 @@ __%[1]s_handle_go_custom_completion()
 
     local out requestComp lastParam lastChar comp directive args
 
-    ***REMOVED*** Prepare the command to request completions for the program.
-    ***REMOVED*** Calling ${words[0]} instead of directly %[1]s allows handling aliases
+    # Prepare the command to request completions for the program.
+    # Calling ${words[0]} instead of directly %[1]s allows handling aliases
     args=("${words[@]:1}")
-    ***REMOVED*** Disable ActiveHelp which is not supported for bash completion v1
+    # Disable ActiveHelp which is not supported for bash completion v1
     requestComp="%[8]s=0 ${words[0]} %[2]s ${args[*]}"
 
-    lastParam=${words[$((${***REMOVED***words[@]}-1))]}
-    lastChar=${lastParam:$((${***REMOVED***lastParam}-1)):1}
+    lastParam=${words[$((${#words[@]}-1))]}
+    lastChar=${lastParam:$((${#lastParam}-1)):1}
     __%[1]s_debug "${FUNCNAME[0]}: lastParam ${lastParam}, lastChar ${lastChar}"
 
     if [ -z "${cur}" ] && [ "${lastChar}" != "=" ]; then
-        ***REMOVED*** If the last parameter is complete (there is a space following it)
-        ***REMOVED*** We add an extra empty parameter so we can indicate this to the go method.
+        # If the last parameter is complete (there is a space following it)
+        # We add an extra empty parameter so we can indicate this to the go method.
         __%[1]s_debug "${FUNCNAME[0]}: Adding extra empty parameter"
         requestComp="${requestComp} \"\""
     fi
 
     __%[1]s_debug "${FUNCNAME[0]}: calling ${requestComp}"
-    ***REMOVED*** Use eval to handle any environment variables and such
+    # Use eval to handle any environment variables and such
     out=$(eval "${requestComp}" 2>/dev/null)
 
-    ***REMOVED*** Extract the directive integer at the very end of the output following a colon (:)
-    directive=${out***REMOVED******REMOVED****:}
-    ***REMOVED*** Remove the directive
+    # Extract the directive integer at the very end of the output following a colon (:)
+    directive=${out##*:}
+    # Remove the directive
     out=${out%%:*}
     if [ "${directive}" = "${out}" ]; then
-        ***REMOVED*** There is not directive specified
+        # There is not directive specified
         directive=0
     fi
     __%[1]s_debug "${FUNCNAME[0]}: the completion directive is: ${directive}"
     __%[1]s_debug "${FUNCNAME[0]}: the completions are: ${out}"
 
     if [ $((directive & shellCompDirectiveError)) -ne 0 ]; then
-        ***REMOVED*** Error code.  No completion.
+        # Error code.  No completion.
         __%[1]s_debug "${FUNCNAME[0]}: received error from custom completion go code"
         return
     else
@@ -136,10 +136,10 @@ __%[1]s_handle_go_custom_completion()
     fi
 
     if [ $((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
-        ***REMOVED*** File extension filtering
+        # File extension filtering
         local fullFilter filter filteringCmd
-        ***REMOVED*** Do not use quotes around the $out variable or else newline
-        ***REMOVED*** characters will be kept.
+        # Do not use quotes around the $out variable or else newline
+        # characters will be kept.
         for filter in ${out}; do
             fullFilter+="$filter|"
         done
@@ -148,9 +148,9 @@ __%[1]s_handle_go_custom_completion()
         __%[1]s_debug "File filtering command: $filteringCmd"
         $filteringCmd
     elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
-        ***REMOVED*** File completion for directories only
+        # File completion for directories only
         local subdir
-        ***REMOVED*** Use printf to strip any trailing newline
+        # Use printf to strip any trailing newline
         subdir=$(printf "%%s" "${out}")
         if [ -n "$subdir" ]; then
             __%[1]s_debug "Listing directories in $subdir"
@@ -176,7 +176,7 @@ __%[1]s_handle_reply()
                 compopt -o nospace
             fi
             local allflags
-            if [ ${***REMOVED***must_have_one_flag[@]} -ne 0 ]; then
+            if [ ${#must_have_one_flag[@]} -ne 0 ]; then
                 allflags=("${must_have_one_flag[@]}")
             else
                 allflags=("${flags[*]} ${two_word_flags[*]}")
@@ -188,7 +188,7 @@ __%[1]s_handle_reply()
                 [[ "${COMPREPLY[0]}" == *= ]] || compopt +o nospace
             fi
 
-            ***REMOVED*** complete after --flag=abc
+            # complete after --flag=abc
             if [[ $cur == *=* ]]; then
                 if [[ $(type -t compopt) = "builtin" ]]; then
                     compopt +o nospace
@@ -200,25 +200,25 @@ __%[1]s_handle_reply()
                 COMPREPLY=()
                 if [[ ${index} -ge 0 ]]; then
                     PREFIX=""
-                    cur="${cur***REMOVED****=}"
+                    cur="${cur#*=}"
                     ${flags_completion[${index}]}
                     if [ -n "${ZSH_VERSION:-}" ]; then
-                        ***REMOVED*** zsh completion needs --flag= prefix
-                        eval "COMPREPLY=( \"\${COMPREPLY[@]/***REMOVED***/${flag}=}\" )"
+                        # zsh completion needs --flag= prefix
+                        eval "COMPREPLY=( \"\${COMPREPLY[@]/#/${flag}=}\" )"
                     fi
                 fi
             fi
 
             if [[ -z "${flag_parsing_disabled}" ]]; then
-                ***REMOVED*** If flag parsing is enabled, we have completed the flags and can return.
-                ***REMOVED*** If flag parsing is disabled, we may not know all (or any) of the flags, so we fallthrough
-                ***REMOVED*** to possibly call handle_go_custom_completion.
+                # If flag parsing is enabled, we have completed the flags and can return.
+                # If flag parsing is disabled, we may not know all (or any) of the flags, so we fallthrough
+                # to possibly call handle_go_custom_completion.
                 return 0;
             fi
             ;;
     esac
 
-    ***REMOVED*** check if we are handling a flag with special work handling
+    # check if we are handling a flag with special work handling
     local index
     __%[1]s_index_of_word "${prev}" "${flags_with_completion[@]}"
     if [[ ${index} -ge 0 ]]; then
@@ -226,55 +226,55 @@ __%[1]s_handle_reply()
         return
     fi
 
-    ***REMOVED*** we are parsing a flag and don't have a special handler, no completion
+    # we are parsing a flag and don't have a special handler, no completion
     if [[ ${cur} != "${words[cword]}" ]]; then
         return
     fi
 
     local completions
     completions=("${commands[@]}")
-    if [[ ${***REMOVED***must_have_one_noun[@]} -ne 0 ]]; then
+    if [[ ${#must_have_one_noun[@]} -ne 0 ]]; then
         completions+=("${must_have_one_noun[@]}")
     elif [[ -n "${has_completion_function}" ]]; then
-        ***REMOVED*** if a go completion function is provided, defer to that function
+        # if a go completion function is provided, defer to that function
         __%[1]s_handle_go_custom_completion
     fi
-    if [[ ${***REMOVED***must_have_one_flag[@]} -ne 0 ]]; then
+    if [[ ${#must_have_one_flag[@]} -ne 0 ]]; then
         completions+=("${must_have_one_flag[@]}")
     fi
     while IFS='' read -r comp; do
         COMPREPLY+=("$comp")
     done < <(compgen -W "${completions[*]}" -- "$cur")
 
-    if [[ ${***REMOVED***COMPREPLY[@]} -eq 0 && ${***REMOVED***noun_aliases[@]} -gt 0 && ${***REMOVED***must_have_one_noun[@]} -ne 0 ]]; then
+    if [[ ${#COMPREPLY[@]} -eq 0 && ${#noun_aliases[@]} -gt 0 && ${#must_have_one_noun[@]} -ne 0 ]]; then
         while IFS='' read -r comp; do
             COMPREPLY+=("$comp")
         done < <(compgen -W "${noun_aliases[*]}" -- "$cur")
     fi
 
-    if [[ ${***REMOVED***COMPREPLY[@]} -eq 0 ]]; then
+    if [[ ${#COMPREPLY[@]} -eq 0 ]]; then
         if declare -F __%[1]s_custom_func >/dev/null; then
-            ***REMOVED*** try command name qualified custom func
+            # try command name qualified custom func
             __%[1]s_custom_func
         else
-            ***REMOVED*** otherwise fall back to unqualified for compatibility
+            # otherwise fall back to unqualified for compatibility
             declare -F __custom_func >/dev/null && __custom_func
         fi
     fi
 
-    ***REMOVED*** available in bash-completion >= 2, not always present on macOS
+    # available in bash-completion >= 2, not always present on macOS
     if declare -F __ltrim_colon_completions >/dev/null; then
         __ltrim_colon_completions "$cur"
     fi
 
-    ***REMOVED*** If there is only 1 completion and it is a flag with an = it will be completed
-    ***REMOVED*** but we don't want a space after the =
-    if [[ "${***REMOVED***COMPREPLY[@]}" -eq "1" ]] && [[ $(type -t compopt) = "builtin" ]] && [[ "${COMPREPLY[0]}" == --*= ]]; then
+    # If there is only 1 completion and it is a flag with an = it will be completed
+    # but we don't want a space after the =
+    if [[ "${#COMPREPLY[@]}" -eq "1" ]] && [[ $(type -t compopt) = "builtin" ]] && [[ "${COMPREPLY[0]}" == --*= ]]; then
        compopt -o nospace
     fi
 }
 
-***REMOVED*** The arguments should be in the form "ext1|ext2|extn"
+# The arguments should be in the form "ext1|ext2|extn"
 __%[1]s_handle_filename_extension_flag()
 {
     local ext="$1"
@@ -291,42 +291,42 @@ __%[1]s_handle_flag()
 {
     __%[1]s_debug "${FUNCNAME[0]}: c is $c words[c] is ${words[c]}"
 
-    ***REMOVED*** if a command required a flag, and we found it, unset must_have_one_flag()
+    # if a command required a flag, and we found it, unset must_have_one_flag()
     local flagname=${words[c]}
     local flagvalue=""
-    ***REMOVED*** if the word contained an =
+    # if the word contained an =
     if [[ ${words[c]} == *"="* ]]; then
-        flagvalue=${flagname***REMOVED****=} ***REMOVED*** take in as flagvalue after the =
-        flagname=${flagname%%=*} ***REMOVED*** strip everything after the =
-        flagname="${flagname}=" ***REMOVED*** but put the = back
+        flagvalue=${flagname#*=} # take in as flagvalue after the =
+        flagname=${flagname%%=*} # strip everything after the =
+        flagname="${flagname}=" # but put the = back
     fi
     __%[1]s_debug "${FUNCNAME[0]}: looking for ${flagname}"
     if __%[1]s_contains_word "${flagname}" "${must_have_one_flag[@]}"; then
         must_have_one_flag=()
     fi
 
-    ***REMOVED*** if you set a flag which only applies to this command, don't show subcommands
+    # if you set a flag which only applies to this command, don't show subcommands
     if __%[1]s_contains_word "${flagname}" "${local_nonpersistent_flags[@]}"; then
       commands=()
     fi
 
-    ***REMOVED*** keep flag value with flagname as flaghash
-    ***REMOVED*** flaghash variable is an associative array which is only supported in bash > 3.
+    # keep flag value with flagname as flaghash
+    # flaghash variable is an associative array which is only supported in bash > 3.
     if [[ -z "${BASH_VERSION:-}" || "${BASH_VERSINFO[0]:-}" -gt 3 ]]; then
         if [ -n "${flagvalue}" ] ; then
             flaghash[${flagname}]=${flagvalue}
         elif [ -n "${words[ $((c+1)) ]}" ] ; then
             flaghash[${flagname}]=${words[ $((c+1)) ]}
         else
-            flaghash[${flagname}]="true" ***REMOVED*** pad "true" for bool flag
+            flaghash[${flagname}]="true" # pad "true" for bool flag
         fi
     fi
 
-    ***REMOVED*** skip the argument to a two word flag
+    # skip the argument to a two word flag
     if [[ ${words[c]} != *"="* ]] && __%[1]s_contains_word "${words[c]}" "${two_word_flags[@]}"; then
         __%[1]s_debug "${FUNCNAME[0]}: found a flag ${words[c]}, skip the next argument"
         c=$((c+1))
-        ***REMOVED*** if we are looking for a flags value, don't show commands
+        # if we are looking for a flags value, don't show commands
         if [[ $c -eq $cword ]]; then
             commands=()
         fi
@@ -383,7 +383,7 @@ __%[1]s_handle_word()
     elif [[ $c -eq 0 ]]; then
         __%[1]s_handle_command
     elif __%[1]s_contains_word "${words[c]}" "${command_aliases[@]}"; then
-        ***REMOVED*** aliashash variable is an associative array which is only supported in bash > 3.
+        # aliashash variable is an associative array which is only supported in bash > 3.
         if [[ -z "${BASH_VERSION:-}" || "${BASH_VERSINFO[0]:-}" -gt 3 ]]; then
             words[c]=${aliashash[${words[c]}]}
             __%[1]s_handle_command
@@ -441,7 +441,7 @@ else
 fi
 
 `, name, name, name, name))
-	WriteStringAndCheck(buf, "***REMOVED*** ex: ts=4 sw=4 et filetype=sh\n")
+	WriteStringAndCheck(buf, "# ex: ts=4 sw=4 et filetype=sh\n")
 }
 
 func writeCommands(buf io.StringWriter, cmd *Command) {

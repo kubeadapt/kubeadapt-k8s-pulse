@@ -165,7 +165,7 @@ func (v *GaugeVec) WithLabelValuesChecked(lvs ...string) (GaugeMetric, error) {
 // (which means it will never be exposed externally nor consumed), the metric will exist in memory
 // for perpetuity (i.e. throughout application lifecycle).
 //
-// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/gauge.go***REMOVED***L190-L208
+// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/gauge.go#L190-L208
 //
 // In contrast, the Vec behavior in this package is that member extraction before registration
 // returns a permanent noop object.

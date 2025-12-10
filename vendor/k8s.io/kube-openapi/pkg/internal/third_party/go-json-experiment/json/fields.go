@@ -51,7 +51,7 @@ func makeStructFields(root reflect.Type) (structFields, *SemanticError) {
 	// This follows the same rules as selecting a field on embedded structs
 	// where the shallowest field takes precedence. If more than one field
 	// exists at the shallowest depth, then the selection is illegal.
-	// See https://go.dev/ref/spec***REMOVED***Selectors.
+	// See https://go.dev/ref/spec#Selectors.
 	ambiguous := new(structField)
 
 	// Setup a queue for a breath-first search.

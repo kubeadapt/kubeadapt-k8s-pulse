@@ -26,13 +26,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.25'
-          cache: true  ***REMOVED*** Enable Go module caching
+          cache: true  # Enable Go module caching
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      ***REMOVED*** Build BPF generator image with GitHub Actions cache
-      ***REMOVED*** This cached image will be reused across all PR checks and runs
+      # Build BPF generator image with GitHub Actions cache
+      # This cached image will be reused across all PR checks and runs
       - name: Build BPF generator image (with cache)
         uses: docker/build-push-action@v5
         with:
@@ -43,57 +43,61 @@ jobs:
           cache-to: type=gha,mode=max
           load: true
 
-      ***REMOVED*** Run linting in the generator container for consistency
+      # Generate BPF binaries before running tests
+      # Since .o files are no longer committed to repo, we generate them in CI
+      - name: Generate BPF binaries
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make generate-native
+
+      # Run linting in the generator container for consistency
       - name: Run lint (Go + C code)
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             make lint
 
-      ***REMOVED*** Run unit tests in the generator container
-      ***REMOVED*** --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
+      # Run unit tests in the generator container
+      # --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
       - name: Run unit tests
         run: |
           docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             make test
 
-      ***REMOVED*** Run tests with race detector (catches concurrency bugs)
-      ***REMOVED*** --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
+      # Run tests with race detector (catches concurrency bugs)
+      # --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
       - name: Run unit tests with race detector
         run: |
           docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             bash -c "go test -race -mod vendor ./internal/... ./cmd/..."
 
-      ***REMOVED*** Generate test coverage report
+      # Generate test coverage report
       - name: Generate coverage report
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             make test-coverage
 
-      ***REMOVED*** Exclude generated code from coverage
+      # Exclude generated code from coverage
       - name: Exclude generated code from coverage
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace \
             ebpf-generator:latest \
             make cov-exclude-generated
 
-      ***REMOVED*** Verify that BPF code generation is up to date
-      ***REMOVED*** This ensures no one forgot to run `make generate` after changing C code
-      - name: Check clean generate
-        run: |
-          docker run --rm -v $(pwd):/workspace -w /workspace \
-            ebpf-generator:latest \
-            bash -c "git config --global --add safe.directory /workspace && make generate-native && git add -A && git diff HEAD --exit-code"
+      # NOTE: "Check clean generate" step removed
+      # BPF binaries (.o files) are now generated in CI during build, not committed to repo
+      # This ensures consistent builds with IPv4+IPv6 dual-stack support
 
-      ***REMOVED*** Verify that go.mod and go.sum are in sync
-      ***REMOVED*** Catches dependency drift and ensures reproducible builds
+      # Verify that go.mod and go.sum are in sync
+      # Catches dependency drift and ensures reproducible builds
       - name: Check clean vendors
         run: make check-vendors
 
-      ***REMOVED*** Upload coverage to Codecov
+      # Upload coverage to Codecov
       - name: Report coverage
         uses: codecov/codecov-action@v4
         with:

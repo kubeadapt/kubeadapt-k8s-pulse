@@ -12,7 +12,7 @@ import (
 // This implementation is a port based on the reference implementation found at:
 // https://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/
 //
-// described in Unicode Bidirectional Algorithm (UAX ***REMOVED***9).
+// described in Unicode Bidirectional Algorithm (UAX #9).
 //
 // Input:
 // There are two levels of input to the algorithm, since clients may prefer to

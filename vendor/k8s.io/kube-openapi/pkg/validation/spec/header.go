@@ -33,7 +33,7 @@ type HeaderProps struct {
 
 // Header describes a header for a response of the API
 //
-// For more information: http://goo.gl/8us55a***REMOVED***headerObject
+// For more information: http://goo.gl/8us55a#headerObject
 type Header struct {
 	CommonValidations
 	SimpleSchema

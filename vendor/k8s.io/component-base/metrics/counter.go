@@ -199,7 +199,7 @@ func (v *CounterVec) initializeDeprecatedMetric() {
 // (which means it will never be exposed externally nor consumed), the metric will exist in memory
 // for perpetuity (i.e. throughout application lifecycle).
 //
-// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/counter.go***REMOVED***L179-L197
+// For reference: https://github.com/prometheus/client_golang/blob/v0.9.2/prometheus/counter.go#L179-L197
 //
 // In contrast, the Vec behavior in this package is that member extraction before registration
 // returns a permanent noop object.

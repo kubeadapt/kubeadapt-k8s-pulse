@@ -30,8 +30,8 @@ limitations under the License.
 // Example client session:
 //
 //	CONNECT http://server.com with subprotocol "channel.k8s.io"
-//	WRITE []byte{0, 102, 111, 111, 10} ***REMOVED*** send "foo\n" on channel 0 (STDIN)
-//	READ  []byte{1, 10}                ***REMOVED*** receive "\n" on channel 1 (STDOUT)
+//	WRITE []byte{0, 102, 111, 111, 10} # send "foo\n" on channel 0 (STDIN)
+//	READ  []byte{1, 10}                # receive "\n" on channel 1 (STDOUT)
 //	CLOSE
 //
 // "v2.channel.k8s.io"
@@ -63,7 +63,7 @@ limitations under the License.
 // Example client session:
 //
 //	CONNECT http://server.com with subprotocol "v5.channel.k8s.io"
-//	WRITE []byte{0, 102, 111, 111, 10} ***REMOVED*** send "foo\n" on channel 0 (STDIN)
-//	WRITE []byte{255, 0}               ***REMOVED*** send CLOSE signal (STDIN)
+//	WRITE []byte{0, 102, 111, 111, 10} # send "foo\n" on channel 0 (STDIN)
+//	WRITE []byte{255, 0}               # send CLOSE signal (STDIN)
 //	CLOSE
 package wsstream // import "k8s.io/apimachinery/pkg/util/httpstream/wsstream"

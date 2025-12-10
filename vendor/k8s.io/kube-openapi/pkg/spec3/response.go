@@ -190,7 +190,7 @@ func (r *Responses) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.
 	}
 }
 
-// Response describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***responseObject
+// Response describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#responseObject
 //
 // Note that this struct is actually a thin wrapper around ResponseProps to make it referable and extensible
 type Response struct {
@@ -263,7 +263,7 @@ func (r *Response) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.D
 	return nil
 }
 
-// ResponseProps describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***responseObject
+// ResponseProps describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#responseObject
 type ResponseProps struct {
 	// Description holds a short description of the response
 	Description string `json:"description,omitempty"`
@@ -275,7 +275,7 @@ type ResponseProps struct {
 	Links map[string]*Link `json:"links,omitempty"`
 }
 
-// Link represents a possible design-time link for a response, more at https://swagger.io/specification/***REMOVED***link-object
+// Link represents a possible design-time link for a response, more at https://swagger.io/specification/#link-object
 type Link struct {
 	spec.Refable
 	LinkProps
@@ -347,7 +347,7 @@ func (l *Link) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decod
 	return nil
 }
 
-// LinkProps describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***responseObject
+// LinkProps describes a single response from an API Operation, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#responseObject
 type LinkProps struct {
 	// OperationId is the name of an existing, resolvable OAS operation
 	OperationId string `json:"operationId,omitempty"`

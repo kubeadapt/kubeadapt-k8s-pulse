@@ -177,7 +177,7 @@ func (c *RESTClient) GetRateLimiter() flowcontrol.RateLimiter {
 
 // readExpBackoffConfig handles the internal logic of determining what the
 // backoff policy is.  By default if no information is available, NoBackoff.
-// TODO Generalize this see ***REMOVED***17727 .
+// TODO Generalize this see #17727 .
 func readExpBackoffConfig() BackoffManager {
 	backoffBase := os.Getenv(envBackoffBase)
 	backoffDuration := os.Getenv(envBackoffDuration)
@@ -298,7 +298,7 @@ func (p *requestClientContentConfigProvider) UnsupportedMediaType(requestContent
 
 	// This could be extended to consider the Content-Encoding request header, the Accept and
 	// Accept-Encoding response headers, the request method, and URI (as mentioned in
-	// https://www.rfc-editor.org/rfc/rfc9110.html***REMOVED***section-15.5.16). The request Content-Type
+	// https://www.rfc-editor.org/rfc/rfc9110.html#section-15.5.16). The request Content-Type
 	// header is sufficient to implement a blanket CBOR fallback mechanism.
 	requestContentType, _, _ = mime.ParseMediaType(requestContentType)
 	switch requestContentType {

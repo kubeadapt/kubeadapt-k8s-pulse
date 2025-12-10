@@ -34,7 +34,7 @@ func (f Formatter) KVFormat(b *bytes.Buffer, k, v interface{}) {
 
 	b.WriteByte(' ')
 	// Keys are assumed to be well-formed according to
-	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/migration-to-structured-logging.md***REMOVED***name-arguments
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/migration-to-structured-logging.md#name-arguments
 	// for the sake of performance. Keys with spaces,
 	// special characters, etc. will break parsing.
 	if sK, ok := k.(string); ok {
@@ -49,7 +49,7 @@ func (f Formatter) KVFormat(b *bytes.Buffer, k, v interface{}) {
 	// come first because that is then faster in the common
 	// cases. In Kubernetes, ObjectRef (a Stringer) is more common
 	// than plain strings
-	// (https://github.com/kubernetes/kubernetes/pull/106594***REMOVED***issuecomment-975526235).
+	// (https://github.com/kubernetes/kubernetes/pull/106594#issuecomment-975526235).
 	switch v := v.(type) {
 	case textWriter:
 		writeTextWriterValue(b, v)

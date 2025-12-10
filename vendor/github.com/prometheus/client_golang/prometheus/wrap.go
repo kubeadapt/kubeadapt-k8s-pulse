@@ -34,7 +34,7 @@ import (
 // WrapRegistererWith provides a way to add fixed labels to a subset of
 // Collectors. It should not be used to add fixed labels to all metrics
 // exposed. See also
-// https://prometheus.io/docs/instrumenting/writing_exporters/***REMOVED***target-labels-not-static-scraped-labels
+// https://prometheus.io/docs/instrumenting/writing_exporters/#target-labels-not-static-scraped-labels
 //
 // Conflicts between Collectors registered through the original Registerer with
 // Collectors registered through the wrapping Registerer will still be

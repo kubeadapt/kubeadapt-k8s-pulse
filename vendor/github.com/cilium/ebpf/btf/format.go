@@ -54,7 +54,7 @@ func (gf *GoFormatter) enumIdentifier(name, element string) string {
 
 // writeTypeDecl outputs a declaration of the given type.
 //
-// It encodes https://golang.org/ref/spec***REMOVED***Type_declarations:
+// It encodes https://golang.org/ref/spec#Type_declarations:
 //
 //	type foo struct { _ structs.HostLayout; bar uint32; }
 //	type bar int32
@@ -92,7 +92,7 @@ func (gf *GoFormatter) writeTypeDecl(name string, typ Type) error {
 
 // writeType outputs the name of a named type or a literal describing the type.
 //
-// It encodes https://golang.org/ref/spec***REMOVED***Types.
+// It encodes https://golang.org/ref/spec#Types.
 //
 //	foo                  (if foo is a named type)
 //	uint32
@@ -112,7 +112,7 @@ func (gf *GoFormatter) writeType(typ Type, depth int) error {
 //
 // The function ignores named types.
 //
-// It encodes https://golang.org/ref/spec***REMOVED***TypeLit.
+// It encodes https://golang.org/ref/spec#TypeLit.
 //
 //	struct { _ structs.HostLayout; bar uint32; }
 //	uint32

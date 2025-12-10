@@ -366,7 +366,7 @@ func (s *serializer) Decode(data []byte, gvk *schema.GroupVersionKind, into runt
 // RFC 8949 Section 3.4.6 "Self-Described CBOR", encloses all output from the encoder, has no
 // special semantics, and is used as a magic number to recognize CBOR-encoded data items.
 //
-// See https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***name-self-described-cbor.
+// See https://www.rfc-editor.org/rfc/rfc8949.html#name-self-described-cbor.
 var selfDescribedCBOR = []byte{0xd9, 0xd9, 0xf7}
 
 func (s *serializer) RecognizesData(data []byte) (ok, unknown bool, err error) {

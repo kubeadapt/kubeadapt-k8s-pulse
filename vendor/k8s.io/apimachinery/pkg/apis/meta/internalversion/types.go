@@ -45,13 +45,13 @@ type ListOptions struct {
 	// this field is ignored.
 	AllowWatchBookmarks bool
 	// resourceVersion sets a constraint on what resource versions a request may be served from.
-	// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 	// details.
 	ResourceVersion string
 	// resourceVersionMatch determines how resourceVersion is applied to list calls.
 	// It is highly recommended that resourceVersionMatch be set for list calls where
 	// resourceVersion is set.
-	// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 	// details.
 	ResourceVersionMatch metav1.ResourceVersionMatch
 

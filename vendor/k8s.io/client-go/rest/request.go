@@ -603,7 +603,7 @@ func (r Request) finalURLTemplate() url.URL {
 	} else {
 		// this should not happen that the only two possibilities are /api... and /apis..., just want to put an
 		// outlet here in case more API groups are added in future if ever possible:
-		// https://kubernetes.io/docs/concepts/overview/kubernetes-api/***REMOVED***api-groups
+		// https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-groups
 		// if a wrong API groups name is encountered, return the {prefix} for url.Path
 		u.Path = "/{prefix}"
 		u.RawQuery = ""
@@ -890,11 +890,11 @@ func (r WatchListResult) Into(obj runtime.Object) error {
 }
 
 // WatchList establishes a stream to get a consistent snapshot of data
-// from the server as described in https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/3157-watch-list***REMOVED***proposal
+// from the server as described in https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/3157-watch-list#proposal
 //
 // Note that the watchlist requires properly setting the ListOptions
 // otherwise it just establishes a regular watch with the server.
-// Check the documentation https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***streaming-lists
+// Check the documentation https://kubernetes.io/docs/reference/using-api/api-concepts/#streaming-lists
 // to see what parameters are currently required.
 func (r *Request) WatchList(ctx context.Context) WatchListResult {
 	if r.body == nil {
@@ -904,7 +904,7 @@ func (r *Request) WatchList(ctx context.Context) WatchListResult {
 	if !clientfeatures.FeatureGates().Enabled(clientfeatures.WatchListClient) {
 		return WatchListResult{err: fmt.Errorf("%q feature gate is not enabled", clientfeatures.WatchListClient)}
 	}
-	// TODO(***REMOVED***115478): consider validating request parameters (i.e sendInitialEvents).
+	// TODO(#115478): consider validating request parameters (i.e sendInitialEvents).
 	//  Most users use the generated client, which handles the proper setting of parameters.
 	//  We don't have validation for other methods (e.g., the Watch)
 	//  thus, for symmetry, we haven't added additional checks for the WatchList method.
@@ -935,7 +935,7 @@ func (r *Request) handleWatchList(ctx context.Context, w watch.Interface, negoti
 			}
 			meta, err := meta.Accessor(event.Object)
 			if err != nil {
-				return WatchListResult{err: fmt.Errorf("failed to parse watch event: %***REMOVED***v", event)}
+				return WatchListResult{err: fmt.Errorf("failed to parse watch event: %#v", event)}
 			}
 
 			switch event.Type {
@@ -945,7 +945,7 @@ func (r *Request) handleWatchList(ctx context.Context, w watch.Interface, negoti
 				// in such cases, return an error which can trigger fallback logic.
 				key := objectKeyFromMeta(meta)
 				if len(lastKey) > 0 && lastKey > key {
-					return WatchListResult{err: fmt.Errorf("cannot add the obj (%***REMOVED***v) with the key = %s, as it violates the ordering guarantees provided by the watchlist feature in beta phase, lastInsertedKey was = %s", event.Object, key, lastKey)}
+					return WatchListResult{err: fmt.Errorf("cannot add the obj (%#v) with the key = %s, as it violates the ordering guarantees provided by the watchlist feature in beta phase, lastInsertedKey was = %s", event.Object, key, lastKey)}
 				}
 				items = append(items, event.Object)
 				lastKey = key
@@ -963,7 +963,7 @@ func (r *Request) handleWatchList(ctx context.Context, w watch.Interface, negoti
 					}
 				}
 			default:
-				return WatchListResult{err: fmt.Errorf("unexpected watch event %***REMOVED***v, expected to only receive watch.Added and watch.Bookmark events", event)}
+				return WatchListResult{err: fmt.Errorf("unexpected watch event %#v, expected to only receive watch.Added and watch.Bookmark events", event)}
 			}
 		}
 	}
@@ -1227,7 +1227,7 @@ func (r *Request) request(ctx context.Context, fn func(*http.Request, *http.Resp
 		}
 		resp, err := client.Do(req)
 		// The value -1 or a value of 0 with a non-nil Body indicates that the length is unknown.
-		// https://pkg.go.dev/net/http***REMOVED***Request
+		// https://pkg.go.dev/net/http#Request
 		if req.ContentLength >= 0 && !(req.Body != nil && req.ContentLength == 0) {
 			metrics.RequestSize.Observe(ctx, r.verb, r.URL().Host, float64(req.ContentLength))
 		}
@@ -1323,7 +1323,7 @@ func (r *Request) transformResponse(ctx context.Context, resp *http.Response, re
 			// 2. Apiserver sends back the headers and then part of the body
 			// 3. Apiserver closes connection.
 			// 4. client-go should catch this and return an error.
-			klog.V(2).Infof("Stream error %***REMOVED***v when reading response body, may be caused by closed connection.", err)
+			klog.V(2).Infof("Stream error %#v when reading response body, may be caused by closed connection.", err)
 			streamErr := fmt.Errorf("stream error when reading response body, may be caused by closed connection. Please retry. Original error: %w", err)
 			return Result{
 				err: streamErr,

@@ -721,7 +721,7 @@ func (s *Connection) shutdown(closeTimeout time.Duration) {
 	go func() {
 		s.streamCond.L.Lock()
 		for len(s.streams) > 0 {
-			debugMessage("Streams opened: %d, %***REMOVED***v", len(s.streams), s.streams)
+			debugMessage("Streams opened: %d, %#v", len(s.streams), s.streams)
 			s.streamCond.Wait()
 		}
 		s.streamCond.L.Unlock()

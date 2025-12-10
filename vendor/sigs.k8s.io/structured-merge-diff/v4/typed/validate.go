@@ -100,7 +100,7 @@ func validateScalar(t *schema.Scalar, v value.Value, prefix string) (errs Valida
 		}
 	case schema.String:
 		if !v.IsString() {
-			return errorf("%vexpected string, got %***REMOVED***v", prefix, v)
+			return errorf("%vexpected string, got %#v", prefix, v)
 		}
 	case schema.Boolean:
 		if !v.IsBool() {

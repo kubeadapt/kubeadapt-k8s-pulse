@@ -1,8 +1,8 @@
-***REMOVED***!/bin/bash
+#!/bin/bash
 set -eu -o pipefail
 
-***REMOVED*** Small convenience script for running the tests with various combinations of
-***REMOVED*** arch/tags. This assumes we're running on amd64 and have qemu available.
+# Small convenience script for running the tests with various combinations of
+# arch/tags. This assumes we're running on amd64 and have qemu available.
 
 go test ./...
 go test -tags purego ./...

@@ -1,6 +1,6 @@
 linters:
   disable-all: true
-  enable: ***REMOVED*** sorted alphabetical
+  enable: # sorted alphabetical
     - gofmt
     - misspell
     - revive

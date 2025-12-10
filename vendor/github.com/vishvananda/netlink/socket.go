@@ -41,7 +41,7 @@ type UnixSocket struct {
 // does not feature “State” information.
 type XDPSocket struct {
 	// xdp_diag_msg
-	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L21
+	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L21
 	Family uint8
 	Type   uint8
 	pad    uint16
@@ -51,7 +51,7 @@ type XDPSocket struct {
 
 type XDPInfo struct {
 	// XDP_DIAG_INFO/xdp_diag_info
-	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L51
+	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L51
 	Ifindex uint32
 	QueueID uint32
 
@@ -59,7 +59,7 @@ type XDPInfo struct {
 	UID uint32
 
 	// XDP_RX_RING
-	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L56
+	// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L56
 	RxRingEntries             uint32
 	TxRingEntries             uint32
 	UmemFillRingEntries       uint32
@@ -78,7 +78,7 @@ const (
 
 // XDPDiagUmem describes the umem attached to an XDP socket.
 //
-// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L62
+// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L62
 type XDPDiagUmem struct {
 	Size      uint64
 	ID        uint32
@@ -93,7 +93,7 @@ type XDPDiagUmem struct {
 
 // XDPDiagStats contains ring statistics for an XDP socket.
 //
-// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L74
+// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L74
 type XDPDiagStats struct {
 	RxDropped     uint64
 	RxInvalid     uint64

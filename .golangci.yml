@@ -1,5 +1,5 @@
-***REMOVED*** golangci-lint configuration for eBPF Agent
-***REMOVED*** Compatible with golangci-lint v1.x
+# golangci-lint configuration for eBPF Agent
+# Compatible with golangci-lint v1.x
 
 run:
   timeout: 5m
@@ -20,7 +20,7 @@ issues:
   max-same-issues: 0
 
   exclude-rules:
-    ***REMOVED*** Exclude all linters for generated BPF code
+    # Exclude all linters for generated BPF code
     - path: "_bpfe[lb]\\.go"
       linters:
         - govet
@@ -29,7 +29,7 @@ issues:
         - unused
         - ineffassign
 
-    ***REMOVED*** Allow unsafe and complex code in BPF loader
+    # Allow unsafe and complex code in BPF loader
     - path: "internal/bpf/"
       linters:
         - gosec
@@ -37,7 +37,7 @@ issues:
         - cyclop
         - errcheck
 
-    ***REMOVED*** Test files have different requirements
+    # Test files have different requirements
     - path: "_test\\.go"
       linters:
         - errcheck
@@ -46,19 +46,19 @@ issues:
         - funlen
         - dupl
 
-    ***REMOVED*** E2E test helpers and internal system
+    # E2E test helpers and internal system
     - path: "test/e2e/"
       linters:
         - errcheck
         - goconst
         - unused
 
-    ***REMOVED*** Internal system utilities (patch version parsing is optional)
+    # Internal system utilities (patch version parsing is optional)
     - path: "internal/system/"
       linters:
         - errcheck
 
-    ***REMOVED*** Temporarily exclude unit tests that need API updates
+    # Temporarily exclude unit tests that need API updates
     - path: "test/unit/"
       linters:
         - govet
@@ -70,23 +70,23 @@ issues:
 linters:
   disable-all: true
   enable:
-    ***REMOVED*** Critical linters (must-have)
+    # Critical linters (must-have)
     - govet
     - errcheck
     - staticcheck
     - unused
     - ineffassign
 
-    ***REMOVED*** Code quality
+    # Code quality
     - misspell
     - goconst
     - unconvert
     - whitespace
 
-    ***REMOVED*** Bug detection
+    # Bug detection
     - bodyclose
 
-    ***REMOVED*** Formatting
+    # Formatting
     - gofmt
     - goimports
 

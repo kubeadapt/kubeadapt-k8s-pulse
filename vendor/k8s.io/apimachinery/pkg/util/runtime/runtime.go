@@ -118,7 +118,7 @@ func logPanic(ctx context.Context, r interface{}) {
 	if _, ok := r.(string); ok {
 		logger.Error(nil, "Observed a panic", "panic", r, "stacktrace", string(stacktrace))
 	} else {
-		logger.Error(nil, "Observed a panic", "panic", fmt.Sprintf("%v", r), "panicGoValue", fmt.Sprintf("%***REMOVED***v", r), "stacktrace", string(stacktrace))
+		logger.Error(nil, "Observed a panic", "panic", fmt.Sprintf("%v", r), "panicGoValue", fmt.Sprintf("%#v", r), "stacktrace", string(stacktrace))
 	}
 }
 

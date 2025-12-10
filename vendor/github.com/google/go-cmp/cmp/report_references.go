@@ -252,7 +252,7 @@ func resolveReferences(s textNode) {
 }
 
 func formatReference(id uint) string {
-	return fmt.Sprintf("ref***REMOVED***%d", id)
+	return fmt.Sprintf("ref#%d", id)
 }
 
 func updateReferencePrefix(prefix, ref string) string {

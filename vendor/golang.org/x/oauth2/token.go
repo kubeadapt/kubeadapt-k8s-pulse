@@ -183,7 +183,7 @@ func retrieveToken(ctx context.Context, c *Config, v url.Values) (*Token, error)
 
 // RetrieveError is the error returned when the token endpoint returns a
 // non-2XX HTTP status code or populates RFC 6749's 'error' parameter.
-// https://datatracker.ietf.org/doc/html/rfc6749***REMOVED***section-5.2
+// https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
 type RetrieveError struct {
 	Response *http.Response
 	// Body is the body that was consumed by reading Response.Body.

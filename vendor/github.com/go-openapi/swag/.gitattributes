@@ -1,2 +1,2 @@
-***REMOVED*** gofmt always uses LF, whereas Git uses CRLF on Windows.
+# gofmt always uses LF, whereas Git uses CRLF on Windows.
 *.go text eol=lf

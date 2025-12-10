@@ -755,7 +755,7 @@ func typeMarshaler(t reflect.Type, tags []string, nozero, oneof bool) (sizer, ma
 			}
 			return makeStdBytesValueMarshaler(getMarshalInfo(t))
 		default:
-			panic(fmt.Sprintf("unknown wktpointer type %***REMOVED***v", t))
+			panic(fmt.Sprintf("unknown wktpointer type %#v", t))
 		}
 	}
 

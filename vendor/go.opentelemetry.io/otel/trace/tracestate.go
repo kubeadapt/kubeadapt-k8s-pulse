@@ -44,7 +44,7 @@ func checkValueLast(v byte) bool {
 //	nblk-chr = %x21-2B / %x2D-3C / %x3E-7E
 //	chr      = %x20 / nblk-chr
 //
-// see https://www.w3.org/TR/trace-context-1/***REMOVED***value
+// see https://www.w3.org/TR/trace-context-1/#value
 func checkValue(val string) bool {
 	n := len(val)
 	if n == 0 || n > 256 {
@@ -117,7 +117,7 @@ func checkKeyTenant(key string, n int) bool {
 //	system-id = lcalpha (0*13( lcalpha / DIGIT / "_" / "-"/ "*" / "/" ))
 //	lcalpha    = %x61-7A ; a-z
 //
-// see https://www.w3.org/TR/trace-context-1/***REMOVED***tracestate-header.
+// see https://www.w3.org/TR/trace-context-1/#tracestate-header.
 func checkKey(key string) bool {
 	tenant, system, ok := strings.Cut(key, "@")
 	if !ok {

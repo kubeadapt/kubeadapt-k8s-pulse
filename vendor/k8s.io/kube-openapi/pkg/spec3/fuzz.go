@@ -114,17 +114,17 @@ var OpenAPIV3FuzzFuncs []interface{} = []interface{}{
 	func(v *spec.Ref, c fuzz.Continue) {
 		switch c.Intn(7) {
 		case 0:
-			*v = spec.MustCreateRef("***REMOVED***/components/schemas/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/schemas/" + randAlphanumString())
 		case 1:
-			*v = spec.MustCreateRef("***REMOVED***/components/responses/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/responses/" + randAlphanumString())
 		case 2:
-			*v = spec.MustCreateRef("***REMOVED***/components/headers/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/headers/" + randAlphanumString())
 		case 3:
-			*v = spec.MustCreateRef("***REMOVED***/components/securitySchemes/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/securitySchemes/" + randAlphanumString())
 		case 5:
-			*v = spec.MustCreateRef("***REMOVED***/components/parameters/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/parameters/" + randAlphanumString())
 		case 6:
-			*v = spec.MustCreateRef("***REMOVED***/components/requestBodies/" + randAlphanumString())
+			*v = spec.MustCreateRef("#/components/requestBodies/" + randAlphanumString())
 		}
 	},
 	func(v *Parameter, c fuzz.Continue) {

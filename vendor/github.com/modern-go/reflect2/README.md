@@ -1,4 +1,4 @@
-***REMOVED*** reflect2
+# reflect2
 
 [![Sourcegraph](https://sourcegraph.com/github.com/modern-go/reflect2/-/badge.svg)](https://sourcegraph.com/github.com/modern-go/reflect2?badge)
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/modern-go/reflect2)
@@ -17,7 +17,7 @@ reflect api that avoids runtime reflect.Value cost
 This package is designed for low level libraries to optimize reflection performance.
 General application should still use reflect standard library.
 
-***REMOVED*** reflect2.TypeByName
+# reflect2.TypeByName
 
 ```go
 // given package is github.com/your/awesome-package
@@ -31,7 +31,7 @@ reflect2.TypeByName("awesome-package.MyStruct")
 // it will be eliminated by compiler, so we can not get it in runtime
 ```
 
-***REMOVED*** reflect2 get/set interface{}
+# reflect2 get/set interface{}
 
 ```go
 valType := reflect2.TypeOf(1)
@@ -43,7 +43,7 @@ valType.Set(&i, &j)
 
 to get set `type`, always use its pointer `*type`
 
-***REMOVED*** reflect2 get/set unsafe.Pointer
+# reflect2 get/set unsafe.Pointer
 
 ```go
 valType := reflect2.TypeOf(1)
@@ -55,14 +55,14 @@ valType.UnsafeSet(unsafe.Pointer(&i), unsafe.Pointer(&j))
 
 to get set `type`, always use its pointer `*type`
 
-***REMOVED*** benchmark
+# benchmark
 
 Benchmark is not necessary for this package. It does nothing actually.
 As it is just a thin wrapper to make go runtime public. 
 Both `reflect2` and `reflect` call same function 
 provided by `runtime` package exposed by go language.
 
-***REMOVED*** unsafe safety
+# unsafe safety
 
 Instead of casting `[]byte` to `sliceHeader` in your application using unsafe.
 We can use reflect2 instead. This way, if `sliceHeader` changes in the future,

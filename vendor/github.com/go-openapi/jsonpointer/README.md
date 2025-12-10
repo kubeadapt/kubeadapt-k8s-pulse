@@ -1,4 +1,4 @@
-***REMOVED*** gojsonpointer [![Build Status](https://github.com/go-openapi/jsonpointer/actions/workflows/go-test.yml/badge.svg)](https://github.com/go-openapi/jsonpointer/actions?query=workflow%3A"go+test") [![codecov](https://codecov.io/gh/go-openapi/jsonpointer/branch/master/graph/badge.svg)](https://codecov.io/gh/go-openapi/jsonpointer)
+# gojsonpointer [![Build Status](https://github.com/go-openapi/jsonpointer/actions/workflows/go-test.yml/badge.svg)](https://github.com/go-openapi/jsonpointer/actions?query=workflow%3A"go+test") [![codecov](https://codecov.io/gh/go-openapi/jsonpointer/branch/master/graph/badge.svg)](https://codecov.io/gh/go-openapi/jsonpointer)
 
 [![Slack Status](https://slackin.goswagger.io/badge.svg)](https://slackin.goswagger.io)
 [![license](http://img.shields.io/badge/license-Apache%20v2-orange.svg)](https://raw.githubusercontent.com/go-openapi/jsonpointer/master/LICENSE)
@@ -7,13 +7,13 @@
 
 An implementation of JSON Pointer - Go language
 
-***REMOVED******REMOVED*** Status
+## Status
 Completed YES
 
 Tested YES
 
-***REMOVED******REMOVED*** References
+## References
 http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-07
 
-***REMOVED******REMOVED******REMOVED*** Note
+### Note
 The 4.Evaluation part of the previous reference, starting with 'If the currently referenced value is a JSON array, the reference token MUST contain either...' is not implemented.

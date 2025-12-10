@@ -1,4 +1,4 @@
-***REMOVED*** Extensions
+# Extensions
 
 **Extension Support is experimental.**
 

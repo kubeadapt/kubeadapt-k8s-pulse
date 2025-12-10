@@ -154,9 +154,9 @@ func SetAuthURLParam(key, value string) AuthCodeOption {
 // To protect against CSRF attacks, opts should include a PKCE challenge
 // (S256ChallengeOption). Not all servers support PKCE. An alternative is to
 // generate a random state parameter and verify it after exchange.
-// See https://datatracker.ietf.org/doc/html/rfc6749***REMOVED***section-10.12 (predating
+// See https://datatracker.ietf.org/doc/html/rfc6749#section-10.12 (predating
 // PKCE), https://www.oauth.com/oauth2-servers/pkce/ and
-// https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-09.html***REMOVED***name-cross-site-request-forgery (describing both approaches)
+// https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-09.html#name-cross-site-request-forgery (describing both approaches)
 func (c *Config) AuthCodeURL(state string, opts ...AuthCodeOption) string {
 	var buf bytes.Buffer
 	buf.WriteString(c.Endpoint.AuthURL)
@@ -192,7 +192,7 @@ func (c *Config) AuthCodeURL(state string, opts ...AuthCodeOption) string {
 // degree of trust between the resource owner and the client (e.g., the client
 // is part of the device operating system or a highly privileged application),
 // and when other authorization grant types are not available."
-// See https://tools.ietf.org/html/rfc6749***REMOVED***section-4.3 for more info.
+// See https://tools.ietf.org/html/rfc6749#section-4.3 for more info.
 //
 // The provided context optionally controls which HTTP client is used. See the HTTPClient variable.
 func (c *Config) PasswordCredentialsToken(ctx context.Context, username, password string) (*Token, error) {

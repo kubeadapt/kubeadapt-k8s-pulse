@@ -50,7 +50,7 @@ linters:
     - ireturn
     - forcetypeassert
     - cyclop
-    ***REMOVED*** deprecated linters
+    # deprecated linters
     - deadcode
     - interfacer
     - scopelint

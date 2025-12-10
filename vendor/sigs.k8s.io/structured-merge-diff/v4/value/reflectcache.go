@@ -183,7 +183,7 @@ func (e TypeReflectCacheEntry) CanConvertToUnstructured() bool {
 
 // ToUnstructured converts the provided value to unstructured and returns it.
 func (e TypeReflectCacheEntry) ToUnstructured(sv reflect.Value) (interface{}, error) {
-	// This is based on https://github.com/kubernetes/kubernetes/blob/82c9e5c814eb7acc6cc0a090c057294d0667ad66/staging/src/k8s.io/apimachinery/pkg/runtime/converter.go***REMOVED***L505
+	// This is based on https://github.com/kubernetes/kubernetes/blob/82c9e5c814eb7acc6cc0a090c057294d0667ad66/staging/src/k8s.io/apimachinery/pkg/runtime/converter.go#L505
 	// and is intended to replace it.
 
 	// Check if the object is a nil pointer.

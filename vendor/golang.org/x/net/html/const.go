@@ -6,7 +6,7 @@ package html
 
 // Section 12.2.4.2 of the HTML5 specification says "The following elements
 // have varying levels of special parsing rules".
-// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***the-stack-of-open-elements
+// https://html.spec.whatwg.org/multipage/syntax.html#the-stack-of-open-elements
 var isSpecialElementMap = map[string]bool{
 	"address":    true,
 	"applet":     true,

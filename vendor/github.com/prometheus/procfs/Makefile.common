@@ -1,28 +1,28 @@
-***REMOVED*** Copyright 2018 The Prometheus Authors
-***REMOVED*** Licensed under the Apache License, Version 2.0 (the "License");
-***REMOVED*** you may not use this file except in compliance with the License.
-***REMOVED*** You may obtain a copy of the License at
-***REMOVED***
-***REMOVED*** http://www.apache.org/licenses/LICENSE-2.0
-***REMOVED***
-***REMOVED*** Unless required by applicable law or agreed to in writing, software
-***REMOVED*** distributed under the License is distributed on an "AS IS" BASIS,
-***REMOVED*** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-***REMOVED*** See the License for the specific language governing permissions and
-***REMOVED*** limitations under the License.
+# Copyright 2018 The Prometheus Authors
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
-***REMOVED*** A common Makefile that includes rules to be reused in different prometheus projects.
-***REMOVED*** !!! Open PRs only against the prometheus/prometheus/Makefile.common repository!
+# A common Makefile that includes rules to be reused in different prometheus projects.
+# !!! Open PRs only against the prometheus/prometheus/Makefile.common repository!
 
-***REMOVED*** Example usage :
-***REMOVED*** Create the main Makefile in the root project directory.
-***REMOVED*** include Makefile.common
-***REMOVED*** customTarget:
-***REMOVED*** 	@echo ">> Running customTarget"
-***REMOVED***
+# Example usage :
+# Create the main Makefile in the root project directory.
+# include Makefile.common
+# customTarget:
+# 	@echo ">> Running customTarget"
+#
 
-***REMOVED*** Ensure GOBIN is not set during build so that promu is installed to the correct path
+# Ensure GOBIN is not set during build so that promu is installed to the correct path
 unexport GOBIN
 
 GO           ?= go
@@ -62,12 +62,12 @@ SKIP_GOLANGCI_LINT :=
 GOLANGCI_LINT :=
 GOLANGCI_LINT_OPTS ?=
 GOLANGCI_LINT_VERSION ?= v1.59.0
-***REMOVED*** golangci-lint only supports linux, darwin and windows platforms on i386/amd64/arm64.
-***REMOVED*** windows isn't included here because of the path separator being different.
+# golangci-lint only supports linux, darwin and windows platforms on i386/amd64/arm64.
+# windows isn't included here because of the path separator being different.
 ifeq ($(GOHOSTOS),$(filter $(GOHOSTOS),linux darwin))
 	ifeq ($(GOHOSTARCH),$(filter $(GOHOSTARCH),amd64 i386 arm64))
-		***REMOVED*** If we're in CI and there is an Actions file, that means the linter
-		***REMOVED*** is being run in Actions, so we don't need to run it here.
+		# If we're in CI and there is an Actions file, that means the linter
+		# is being run in Actions, so we don't need to run it here.
 		ifneq (,$(SKIP_GOLANGCI_LINT))
 			GOLANGCI_LINT :=
 		else ifeq (,$(CIRCLE_JOB))
@@ -95,14 +95,14 @@ SANITIZED_DOCKER_IMAGE_TAG := $(subst +,-,$(DOCKER_IMAGE_TAG))
 
 ifeq ($(GOHOSTARCH),amd64)
         ifeq ($(GOHOSTOS),$(filter $(GOHOSTOS),linux freebsd darwin windows))
-                ***REMOVED*** Only supported on amd64
+                # Only supported on amd64
                 test-flags := -race
         endif
 endif
 
-***REMOVED*** This rule is used to forward a target like "build" to "common-build".  This
-***REMOVED*** allows a new "build" target to be defined in a Makefile which includes this
-***REMOVED*** one and override "common-build" without override warnings.
+# This rule is used to forward a target like "build" to "common-build".  This
+# allows a new "build" target to be defined in a Makefile which includes this
+# one and override "common-build" without override warnings.
 %: common-% ;
 
 .PHONY: common-all
@@ -188,7 +188,7 @@ else
 	yamllint .
 endif
 
-***REMOVED*** For backward-compatibility.
+# For backward-compatibility.
 .PHONY: common-staticcheck
 common-staticcheck: lint
 

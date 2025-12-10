@@ -1,4 +1,4 @@
-***REMOVED*** :zap: zap
+# :zap: zap
 
 
 <div align="center">
@@ -11,13 +11,13 @@ Blazing fast, structured, leveled logging in Go.
 
 </div>
 
-***REMOVED******REMOVED*** Installation
+## Installation
 
 `go get -u go.uber.org/zap`
 
 Note that zap only supports the two most recent minor versions of Go.
 
-***REMOVED******REMOVED*** Quick Start
+## Quick Start
 
 In contexts where performance is nice, but not critical, use the
 `SugaredLogger`. It's 4-10x faster than other structured logging
@@ -53,7 +53,7 @@ logger.Info("failed to fetch URL",
 
 See the [documentation][doc] and [FAQ](FAQ.md) for more details.
 
-***REMOVED******REMOVED*** Performance
+## Performance
 
 For applications that log in the hot path, reflection-based serialization and
 string formatting are prohibitively expensive &mdash; they're CPU-intensive
@@ -69,7 +69,7 @@ allocation and when they'd prefer a more familiar, loosely typed API.
 As measured by its own [benchmarking suite][], not only is zap more performant
 than comparable structured logging packages &mdash; it's also faster than the
 standard library. Like all benchmarks, take these with a grain of salt.<sup
-id="anchor-versions">[1](***REMOVED***footnote-versions)</sup>
+id="anchor-versions">[1](#footnote-versions)</sup>
 
 Log a message and 10 fields:
 
@@ -114,13 +114,13 @@ Log a static string, without any context or `printf`-style templating:
 | logrus | 1439 ns/op | +2184% | 23 allocs/op
 | log15 | 2069 ns/op | +3184% | 20 allocs/op
 
-***REMOVED******REMOVED*** Development Status: Stable
+## Development Status: Stable
 
 All APIs are finalized, and no breaking changes will be made in the 1.x series
 of releases. Users of semver-aware dependency management systems should pin
 zap to `^1`.
 
-***REMOVED******REMOVED*** Contributing
+## Contributing
 
 We encourage and support an active, healthy community of contributors &mdash;
 including you! Details are in the [contribution guide](CONTRIBUTING.md) and
@@ -136,7 +136,7 @@ Released under the [MIT License](LICENSE).
 
 <sup id="footnote-versions">1</sup> In particular, keep in mind that we may be
 benchmarking against slightly older versions of other packages. Versions are
-pinned in the [benchmarks/go.mod][] file. [↩](***REMOVED***anchor-versions)
+pinned in the [benchmarks/go.mod][] file. [↩](#anchor-versions)
 
 [doc-img]: https://pkg.go.dev/badge/go.uber.org/zap
 [doc]: https://pkg.go.dev/go.uber.org/zap

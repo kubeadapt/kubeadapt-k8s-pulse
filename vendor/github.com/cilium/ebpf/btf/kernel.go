@@ -164,7 +164,7 @@ func findVMLinux() (*os.File, error) {
 	}
 
 	// use same list of locations as libbpf
-	// https://github.com/libbpf/libbpf/blob/9a3a42608dbe3731256a5682a125ac1e23bced8f/src/btf.c***REMOVED***L3114-L3122
+	// https://github.com/libbpf/libbpf/blob/9a3a42608dbe3731256a5682a125ac1e23bced8f/src/btf.c#L3114-L3122
 	locations := []string{
 		"/boot/vmlinux-%s",
 		"/lib/modules/%s/vmlinux-%[1]s",

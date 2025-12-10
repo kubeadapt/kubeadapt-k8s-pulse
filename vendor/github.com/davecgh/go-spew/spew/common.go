@@ -244,7 +244,7 @@ func newValuesSorter(values []reflect.Value, cs *ConfigState) sort.Interface {
 	if vs.strings == nil && cs.SpewKeys {
 		vs.strings = make([]string, len(values))
 		for i := range vs.values {
-			vs.strings[i] = Sprintf("%***REMOVED***v", vs.values[i].Interface())
+			vs.strings[i] = Sprintf("%#v", vs.values[i].Interface())
 		}
 	}
 	return vs

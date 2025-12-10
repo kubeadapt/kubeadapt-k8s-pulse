@@ -1,6 +1,6 @@
-***REMOVED*** See the OWNERS docs at https://go.k8s.io/owners
+# See the OWNERS docs at https://go.k8s.io/owners
 
-***REMOVED*** approval on api packages bubbles to api-approvers
+# approval on api packages bubbles to api-approvers
 reviewers:
   - sig-auth-authenticators-approvers
   - sig-auth-authenticators-reviewers

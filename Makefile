@@ -1,7 +1,7 @@
-***REMOVED*** KubeAdapt eBPF Agent Makefile
-***REMOVED*** Production-ready Makefile with macOS support for BPF development
+# KubeAdapt eBPF Agent Makefile
+# Production-ready Makefile with macOS support for BPF development
 
-***REMOVED*** Variables
+# Variables
 BINARY_NAME := ebpf-agent
 DOCKER_IMAGE := kubeadapt/ebpf-agent
 VERSION ?= latest
@@ -9,12 +9,12 @@ GO := go
 DOCKER := docker
 KUBECTL := kubectl
 
-***REMOVED*** OS Detection
+# OS Detection
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 ifeq ($(OS),Darwin)
     IS_MACOS := 1
-    ***REMOVED*** Use Docker for BPF compilation on macOS
+    # Use Docker for BPF compilation on macOS
     BPF_COMPILE_METHOD := docker
 else
     IS_MACOS := 0
@@ -22,42 +22,37 @@ else
     CLANG := clang
 endif
 
-***REMOVED*** Directories
+# Directories
 CMD_DIR := ./cmd/agent
 BPF_DIR := ./bpf
 BUILD_DIR := ./bin
 INTERNAL_BPF_DIR := ./internal/bpf
 
-***REMOVED*** Build flags
+# Build flags
 LDFLAGS := -ldflags "-X main.Version=$(VERSION) -X main.BuildTime=$(shell date -u '+%Y-%m-%d_%H:%M:%S')"
 GO_BUILD_FLAGS := -v
 BPF_CFLAGS := -O2 -Wall -Werror
-***REMOVED*** Disable IPv6 support for kernel 5.10 compatibility
-***REMOVED*** The BPF verifier on kernel 5.10 has stricter bounds checking that rejects
-***REMOVED*** IPv6 extension header parsing. IPv6 works on kernel 5.15+.
-***REMOVED*** To enable IPv6 (requires kernel 5.15+): unset DISABLE_IPV6 or remove this flag
-BPF_CFLAGS += -DDISABLE_IPV6
-***REMOVED*** Allow overriding BPF map size via environment variable (for overflow testing)
+# Allow overriding BPF map size via environment variable (for overflow testing)
 ifdef BPF_MAP_SIZE
 BPF_CFLAGS += -DBPF_MAP_SIZE=$(BPF_MAP_SIZE)
 endif
 
-***REMOVED*** Docker build container for macOS BPF compilation
+# Docker build container for macOS BPF compilation
 BPF_BUILDER_IMAGE := kubeadapt/bpf-builder:latest
 
-***REMOVED*** Color output
+# Color output
 RED := \033[0;31m
 GREEN := \033[0;32m
 YELLOW := \033[1;33m
-NC := \033[0m ***REMOVED*** No Color
+NC := \033[0m # No Color
 
-***REMOVED*** Targets
-.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated check-vendors test-integration-docker test-docker test-e2e test-e2e-ci docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
+# Targets
+.PHONY: all init deps install-clang-format generate generate-docker generate-native build build-for-e2e clean test test-coverage cov-exclude-generated check-vendors test-integration-docker test-docker test-e2e test-e2e-ci test-e2e-ci-nobpf docker-build docker-build-dev verify-dev-tools docker-info docker-buildx docker-push deploy undeploy run run-local dev help
 
-***REMOVED*** Default target
+# Default target
 all: build
 
-***REMOVED*** Help target with categorized commands
+# Help target with categorized commands
 help:
 	@echo "$(GREEN)KubeAdapt eBPF Agent Makefile$(NC)"
 	@echo ""
@@ -107,7 +102,7 @@ help:
 	@echo "  ✓ Run agent locally: $(GREEN)make run-local$(NC)"
 	@echo "  ✓ LLVM/clang-format auto-installed via Homebrew"
 
-***REMOVED*** Initialize development environment
+# Initialize development environment
 init:
 	@echo "$(GREEN)Initializing development environment...$(NC)"
 ifdef IS_MACOS
@@ -125,7 +120,7 @@ endif
 	@$(MAKE) deps
 	@echo "$(GREEN)Initialization complete!$(NC)"
 
-***REMOVED*** Install Go development tools
+# Install Go development tools
 deps:
 	@echo "$(GREEN)Installing Go dependencies...$(NC)"
 	@$(GO) mod download
@@ -141,7 +136,7 @@ deps:
 	@which clang-format > /dev/null || (echo "$(YELLOW)clang-format not found. Installing...$(NC)" && $(MAKE) install-clang-format)
 	@echo "$(GREEN)Dependencies installed$(NC)"
 
-***REMOVED*** Install clang-format (OS-aware)
+# Install clang-format (OS-aware)
 install-clang-format:
 ifdef IS_MACOS
 	@echo "$(GREEN)Installing clang-format via Homebrew...$(NC)"
@@ -155,7 +150,7 @@ else
 	@echo "$(GREEN)clang-format installed successfully$(NC)"
 endif
 
-***REMOVED*** Build BPF builder Docker image for macOS
+# Build BPF builder Docker image for macOS
 build-bpf-builder:
 	@echo "$(GREEN)Building BPF builder container...$(NC)"
 	@if [ -f Dockerfile.bpf-builder ]; then \
@@ -168,11 +163,11 @@ build-bpf-builder:
 	fi
 	@echo "$(GREEN)BPF builder container ready$(NC)"
 
-***REMOVED*** Auto-detect OS and generate BPF code appropriately
-***REMOVED*** NOTE: Generated BPF files are committed to the repo for CI reproducibility
-***REMOVED*** Only run this when you modify bpf/*.c files - NOT for every build
-***REMOVED*** For development: `make dev` uses pre-generated files for faster hot reload
-***REMOVED*** NOTE: Using TC (Traffic Control) hooks for accurate packet-level billing metrics
+# Auto-detect OS and generate BPF code appropriately
+# NOTE: Generated BPF files are committed to the repo for CI reproducibility
+# Only run this when you modify bpf/*.c files - NOT for every build
+# For development: `make dev` uses pre-generated files for faster hot reload
+# NOTE: Using TC (Traffic Control) hooks for accurate packet-level billing metrics
 generate:
 ifdef IS_MACOS
 	@echo "$(YELLOW)macOS detected - using Docker for BPF generation$(NC)"
@@ -182,8 +177,8 @@ else
 	@$(MAKE) generate-native
 endif
 
-***REMOVED*** Generate BPF code using Docker (for macOS)
-***REMOVED*** Uses TC (Traffic Control) hooks for accurate cloud billing metrics
+# Generate BPF code using Docker (for macOS)
+# Uses TC (Traffic Control) hooks for accurate cloud billing metrics
 generate-docker: build-bpf-builder
 	@echo "$(GREEN)Generating TC BPF code in Docker container...$(NC)"
 ifdef BPF_MAP_SIZE
@@ -201,8 +196,8 @@ endif
 				network ../../bpf/network_monitor_tc.c"
 	@echo "$(GREEN)TC BPF code generation complete$(NC)"
 
-***REMOVED*** Generate BPF code natively (for Linux)
-***REMOVED*** Uses TC (Traffic Control) hooks for accurate cloud billing metrics
+# Generate BPF code natively (for Linux)
+# Uses TC (Traffic Control) hooks for accurate cloud billing metrics
 generate-native:
 	@echo "$(GREEN)Generating TC BPF code natively...$(NC)"
 	@cd $(INTERNAL_BPF_DIR) && \
@@ -212,24 +207,24 @@ generate-native:
 			network ../../bpf/network_monitor_tc.c
 	@echo "$(GREEN)TC BPF code generation complete$(NC)"
 
-***REMOVED*** Build the binary
-***REMOVED*** NOTE: Skips 'generate' - BPF files are pre-generated and committed
-***REMOVED*** Run 'make generate' manually only when you change bpf/*.c files
+# Build the binary
+# NOTE: Skips 'generate' - BPF files are pre-generated and committed
+# Run 'make generate' manually only when you change bpf/*.c files
 build: lint
 	@echo "$(GREEN)Building $(BINARY_NAME)...$(NC)"
 	@mkdir -p $(BUILD_DIR)
 	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
 	@echo "$(GREEN)Binary built: $(BUILD_DIR)/$(BINARY_NAME)$(NC)"
 
-***REMOVED*** Run tests (including co-located tests)
+# Run tests (including co-located tests)
 test: lint
 	@echo "$(GREEN)Running unit tests...$(NC)"
 	@$(GO) test -v -race -coverprofile=coverage.out ./internal/... ./cmd/...
 	@echo "$(GREEN)Test coverage report:$(NC)"
 	@$(GO) tool cover -func=coverage.out | tail -1
 
-***REMOVED*** Check that go.mod and go.sum are in sync (for CI verification)
-***REMOVED*** Catches dependency drift before merge
+# Check that go.mod and go.sum are in sync (for CI verification)
+# Catches dependency drift before merge
 check-vendors:
 	@echo "$(GREEN)Checking go.mod and go.sum are in sync...$(NC)"
 	@$(GO) mod tidy
@@ -237,7 +232,7 @@ check-vendors:
 		(echo "$(RED)go.mod or go.sum is out of sync. Run 'go mod tidy' locally.$(NC)" && exit 1)
 	@echo "$(GREEN)✓ Dependencies are in sync$(NC)"
 
-***REMOVED*** Exclude generated code from coverage report
+# Exclude generated code from coverage report
 cov-exclude-generated:
 	@echo "$(GREEN)Excluding generated code from coverage...$(NC)"
 	@grep -vE "(/cmd/)|(bpf_bpfe)|(/test/)|(/internal/bpf/)" coverage.out > coverage.clean.out || true
@@ -246,14 +241,15 @@ cov-exclude-generated:
 		echo "$(GREEN)Generated code excluded from coverage$(NC)"; \
 	fi
 
-***REMOVED*** Generate detailed test coverage report
+# Generate detailed test coverage report
 test-coverage: test cov-exclude-generated
 	@echo "$(GREEN)Generating HTML coverage report...$(NC)"
 	@$(GO) tool cover -html=coverage.out -o coverage.html
 	@echo "$(GREEN)Coverage report generated: coverage.html$(NC)"
 	@echo "$(YELLOW)Open with: open coverage.html (macOS) or xdg-open coverage.html (Linux)$(NC)"
 
-***REMOVED*** Run BPF integration tests in Docker
+# Run BPF integration tests in Docker
+# First generates BPF binaries, then runs tests
 test-integration-docker:
 	@echo "$(GREEN)Running BPF integration tests in Docker...$(NC)"
 	@$(DOCKER) run --rm \
@@ -261,12 +257,12 @@ test-integration-docker:
 		-v $(shell pwd):/workspace \
 		-w /workspace \
 		$(BPF_BUILDER_IMAGE) \
-		bash -c "go test -v -tags integration ./test/integration/..."
+		bash -c "make generate-native && go test -v -tags integration ./test/integration/..."
 
-***REMOVED*** Backward compatibility alias
+# Backward compatibility alias
 test-docker: test-integration-docker
 
-***REMOVED*** Run integration tests (requires root on Linux)
+# Run integration tests (requires root on Linux)
 test-integration:
 ifdef IS_MACOS
 	@echo "$(YELLOW)Running integration tests in Docker (macOS)...$(NC)"
@@ -276,8 +272,8 @@ else
 	@sudo $(GO) test -v -tags integration ./test/integration/...
 endif
 
-***REMOVED*** Run overflow integration tests with small BPF map (200 entries)
-***REMOVED*** This target recompiles BPF code with BPF_MAP_SIZE=200 and tests overflow handling
+# Run overflow integration tests with small BPF map (200 entries)
+# This target recompiles BPF code with BPF_MAP_SIZE=200 and tests overflow handling
 test-integration-overflow:
 	@echo "$(YELLOW)Running overflow integration tests (BPF_MAP_SIZE=200)...$(NC)"
 	@echo "$(YELLOW)This will recompile BPF code with a small map size$(NC)"
@@ -292,17 +288,17 @@ endif
 	@$(MAKE) generate
 	@echo "$(GREEN)Original BPF code restored (default configuration)$(NC)"
 
-***REMOVED*** Build Docker image for E2E tests (native architecture for proper eBPF functionality)
-***REMOVED*** NOTE: Builds for host architecture to avoid Rosetta emulation issues with perf_event_open syscalls
-***REMOVED*** On M-series Macs, this builds arm64 which matches Kind nodes running on aarch64
-***REMOVED*** NOTE: Tar creation removed - Kind loads directly from Docker registry (faster, no disk space waste)
-***REMOVED*** If tar is needed (edge cases), run: docker save -o ebpf-agent.tar localhost/ebpf-agent:test
-***REMOVED***
-***REMOVED*** E2E TESTING OPTIMIZATION:
-***REMOVED*** - Uses BPF_MAP_SIZE=1000 (smaller than production 100K) to enable overflow testing
-***REMOVED*** - 1000-entry map allows overflow tests with reasonable traffic generation (~500 requests)
-***REMOVED*** - Tests the overflow mechanism without needing separate test-e2e-overflow command
-***REMOVED*** - Production still uses 100K default (see bpf/network_monitor_tc.c)
+# Build Docker image for E2E tests (native architecture for proper eBPF functionality)
+# NOTE: Builds for host architecture to avoid Rosetta emulation issues with perf_event_open syscalls
+# On M-series Macs, this builds arm64 which matches Kind nodes running on aarch64
+# NOTE: Tar creation removed - Kind loads directly from Docker registry (faster, no disk space waste)
+# If tar is needed (edge cases), run: docker save -o ebpf-agent.tar localhost/ebpf-agent:test
+#
+# E2E TESTING OPTIMIZATION:
+# - Uses BPF_MAP_SIZE=1000 (smaller than production 100K) to enable overflow testing
+# - 1000-entry map allows overflow tests with reasonable traffic generation (~500 requests)
+# - Tests the overflow mechanism without needing separate test-e2e-overflow command
+# - Production still uses 100K default (see bpf/network_monitor_tc.c)
 build-for-e2e: lint
 	@echo "$(YELLOW)Generating BPF code for E2E tests (BPF_MAP_SIZE=1000)...$(NC)"
 	@BPF_MAP_SIZE=1000 $(MAKE) generate
@@ -315,10 +311,10 @@ build-for-e2e: lint
 	@echo "$(GREEN)E2E image built for native architecture: $(ARCH)$(NC)"
 	@echo "$(YELLOW)Image available in local Docker registry: localhost/ebpf-agent:test$(NC)"
 
-***REMOVED*** Run E2E tests with Kind cluster (Local development)
-***REMOVED*** NOTE: Builds for native architecture to avoid Rosetta eBPF kprobe issues on M-series Macs
-***REMOVED*** NOTE: Uses BPF_MAP_SIZE=1000 for overflow testing (build-for-e2e compiles with this)
-***REMOVED*** NOTE: Restores production BPF code after tests (keeps working directory clean)
+# Run E2E tests with Kind cluster (Local development)
+# NOTE: Builds for native architecture to avoid Rosetta eBPF kprobe issues on M-series Macs
+# NOTE: Uses BPF_MAP_SIZE=1000 for overflow testing (build-for-e2e compiles with this)
+# NOTE: Restores production BPF code after tests (keeps working directory clean)
 .ONESHELL:
 test-e2e: build-for-e2e
 	@echo "$(GREEN)Running E2E tests with Kind cluster (BPF_MAP_SIZE=1000)...$(NC)"
@@ -330,9 +326,9 @@ test-e2e: build-for-e2e
 	@$(MAKE) generate
 	@echo "$(GREEN)Original BPF code restored (BPF_MAP_SIZE=100000)$(NC)"
 
-***REMOVED*** Run E2E tests for CI/CD (NO restoration of BPF code)
-***REMOVED*** NOTE: CI environments are stateless - each job starts with clean checkout
-***REMOVED*** NOTE: Restoration is unnecessary and wastes 2-3 minutes of CI time
+# Run E2E tests for CI/CD (NO restoration of BPF code)
+# NOTE: CI environments are stateless - each job starts with clean checkout
+# NOTE: Restoration is unnecessary and wastes 2-3 minutes of CI time
 .ONESHELL:
 test-e2e-ci: build-for-e2e
 	@echo "$(GREEN)Running E2E tests in CI (BPF_MAP_SIZE=1000)...$(NC)"
@@ -341,8 +337,24 @@ test-e2e-ci: build-for-e2e
 	@$(GO) test -p 1 -timeout 60m -v ./test/e2e/...
 	@echo "$(GREEN)E2E tests complete (CI - no restoration needed)$(NC)"
 
+# Run E2E tests for CI/CD (BPF binaries pre-generated by workflow)
+# NOTE: This target expects BPF .o files to already exist (generated by CI workflow)
+# NOTE: Skips BPF generation step - workflow handles this with Docker container
+.ONESHELL:
+test-e2e-ci-nobpf: lint
+	@echo "$(GREEN)Building E2E test binary (BPF pre-generated)...$(NC)"
+	@mkdir -p $(BUILD_DIR)
+	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
+	@echo "$(YELLOW)Building agent Docker image for E2E tests...$(NC)"
+	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/ebpf-agent:test -f Dockerfile .
+	@echo "$(GREEN)E2E image built$(NC)"
+	@$(GO) clean -testcache
+	@echo "$(GREEN)Running E2E tests (timeout: 60m)...$(NC)"
+	@$(GO) test -p 1 -timeout 60m -v ./test/e2e/...
+	@echo "$(GREEN)E2E tests complete$(NC)"
 
-***REMOVED*** Lint the code (Go and C)
+
+# Lint the code (Go and C)
 lint:
 	@echo "$(GREEN)Running Go linters...$(NC)"
 	@which golangci-lint > /dev/null || (echo "$(RED)golangci-lint not found. Installing...$(NC)" && $(MAKE) deps)
@@ -351,7 +363,7 @@ lint:
 	@find ./bpf -type f -name "*.[ch]" | xargs clang-format --dry-run --Werror 2>/dev/null || echo "$(YELLOW)clang-format not found, skipping C code linting$(NC)"
 	@echo "$(GREEN)Linting complete$(NC)"
 
-***REMOVED*** Format code (Go and C)
+# Format code (Go and C)
 fmt:
 	@echo "$(GREEN)Formatting Go code...$(NC)"
 	@$(GO) fmt ./...
@@ -362,22 +374,22 @@ fmt:
 	@find ./bpf -type f -name "*.[ch]" | xargs clang-format -i --Werror 2>/dev/null || echo "$(YELLOW)clang-format not found, skipping C code formatting$(NC)"
 	@echo "$(GREEN)Formatting complete$(NC)"
 
-***REMOVED*** Build Docker image (single arch for local testing)
-***REMOVED*** Uses pre-generated BPF files (no generate needed)
+# Build Docker image (single arch for local testing)
+# Uses pre-generated BPF files (no generate needed)
 docker-build:
 	@echo "$(GREEN)Building Docker image for local platform...$(NC)"
 	@$(DOCKER) build -t $(DOCKER_IMAGE):$(VERSION) -f Dockerfile .
 	@$(DOCKER) tag $(DOCKER_IMAGE):$(VERSION) $(DOCKER_IMAGE):latest
 	@echo "$(GREEN)Docker image built: $(DOCKER_IMAGE):$(VERSION)$(NC)"
 
-***REMOVED*** Build development Docker image with debugging tools
+# Build development Docker image with debugging tools
 docker-build-dev:
 	@echo "$(GREEN)Building development Docker image...$(NC)"
 	@$(DOCKER) build -t $(DOCKER_IMAGE):dev -f Dockerfile.dev .
 	@echo "$(GREEN)Development image built: $(DOCKER_IMAGE):dev$(NC)"
 	@echo "$(YELLOW)Image includes: bpftool, tcpdump, netstat, strace for debugging$(NC)"
 
-***REMOVED*** Verify development tools are installed
+# Verify development tools are installed
 verify-dev-tools: docker-build-dev
 	@echo "$(GREEN)Verifying debug tools in development image...$(NC)"
 	@echo "$(YELLOW)Testing bpftool...$(NC)"
@@ -390,7 +402,7 @@ verify-dev-tools: docker-build-dev
 	@$(DOCKER) run --rm $(DOCKER_IMAGE):dev strace --version 2>&1 | head -1
 	@echo "$(GREEN)✓ All debug tools verified!$(NC)"
 
-***REMOVED*** Show Docker image information and sizes
+# Show Docker image information and sizes
 docker-info:
 	@echo "$(GREEN)Docker Image Information$(NC)"
 	@echo ""
@@ -408,7 +420,7 @@ docker-info:
 	@echo "  Development: ~350-400 MB (full tooling)"
 	@echo "  BPF Builder: ~800-900 MB (compilation tools)"
 
-***REMOVED*** Build multi-arch Docker images (amd64 + arm64)
+# Build multi-arch Docker images (amd64 + arm64)
 docker-buildx:
 	@echo "$(GREEN)Building multi-arch Docker images (amd64 + arm64)...$(NC)"
 	@$(DOCKER) buildx create --use --name kubeadapt-builder 2>/dev/null || $(DOCKER) buildx use kubeadapt-builder
@@ -420,24 +432,24 @@ docker-buildx:
 		-f Dockerfile .
 	@echo "$(GREEN)Multi-arch Docker images built and pushed$(NC)"
 
-***REMOVED*** Push Docker image
+# Push Docker image
 docker-push:
 	@echo "$(GREEN)Pushing Docker image...$(NC)"
 	@$(DOCKER) push $(DOCKER_IMAGE):$(VERSION)
 	@$(DOCKER) push $(DOCKER_IMAGE):latest
 	@echo "$(GREEN)Docker image pushed$(NC)"
 
-***REMOVED*** Deploy to Kubernetes (use Helm chart from kubeadapt-helm repository)
-***REMOVED*** Example: helm upgrade --install ebpf-agent ./charts/ebpf-agent -n kubeadapt-system
+# Deploy to Kubernetes (use Helm chart from kubeadapt-helm repository)
+# Example: helm upgrade --install ebpf-agent ./charts/ebpf-agent -n kubeadapt-system
 deploy:
 	@echo "$(YELLOW)Kubernetes manifests moved to kubeadapt-helm repository$(NC)"
 	@echo "$(YELLOW)Use: helm upgrade --install ebpf-agent <chart-path> -n kubeadapt-system$(NC)"
 
-***REMOVED*** Remove from Kubernetes (use Helm)
+# Remove from Kubernetes (use Helm)
 undeploy:
 	@echo "$(YELLOW)Use: helm uninstall ebpf-agent -n kubeadapt-system$(NC)"
 
-***REMOVED*** Run locally (requires root on Linux, uses Docker on macOS)
+# Run locally (requires root on Linux, uses Docker on macOS)
 run: build
 ifdef IS_MACOS
 	@echo "$(YELLOW)macOS detected - use 'make run-local' to run with Docker$(NC)"
@@ -446,12 +458,12 @@ else
 	@sudo $(BUILD_DIR)/$(BINARY_NAME)
 endif
 
-***REMOVED*** Run locally with docker-compose (works on all platforms)
+# Run locally with docker-compose (works on all platforms)
 run-local:
 	@echo "$(GREEN)Starting local environment with docker-compose...$(NC)"
 	@$(DOCKER) compose up --build
 
-***REMOVED*** Development mode with live reload and full debugging features
+# Development mode with live reload and full debugging features
 dev:
 ifdef IS_MACOS
 	@echo "$(GREEN)Starting development mode with Docker (full debugging enabled)...$(NC)"
@@ -487,9 +499,9 @@ else
 	 sudo -E air -c .air.toml
 endif
 
-***REMOVED*** Development mode with bridge networking (macOS browser access)
-***REMOVED*** This mode uses bridge networking to allow port mapping for localhost access
-***REMOVED*** Trade-off: Cannot test disabled filter mode (requires host network mode)
+# Development mode with bridge networking (macOS browser access)
+# This mode uses bridge networking to allow port mapping for localhost access
+# Trade-off: Cannot test disabled filter mode (requires host network mode)
 dev-bridge:
 ifdef IS_MACOS
 	@echo "$(GREEN)Starting development mode with bridge networking (macOS browser access)...$(NC)"
@@ -514,8 +526,8 @@ else
 	@$(DOCKER) compose --profile dev-bridge up ebpf-dev-bridge
 endif
 
-***REMOVED*** Development mode with disabled filter mode (tracks systemd processes)
-***REMOVED*** Requires host networking mode to capture host process traffic
+# Development mode with disabled filter mode (tracks systemd processes)
+# Requires host networking mode to capture host process traffic
 dev-disabled:
 ifdef IS_MACOS
 	@echo "$(GREEN)Starting development mode with DISABLED filter mode...$(NC)"
@@ -545,7 +557,7 @@ else
 	 sudo -E air -c .air.toml
 endif
 
-***REMOVED*** Clean build artifacts
+# Clean build artifacts
 clean:
 	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
 	@rm -rf $(BUILD_DIR)
@@ -556,7 +568,7 @@ clean:
 	@rm -f ebpf-agent.tar
 	@echo "$(GREEN)Clean complete$(NC)"
 
-***REMOVED*** Check kernel compatibility (Linux only)
+# Check kernel compatibility (Linux only)
 check-kernel:
 ifdef IS_MACOS
 	@echo "$(YELLOW)Kernel check not applicable on macOS$(NC)"
@@ -571,12 +583,12 @@ else
 	@capsh --print 2>/dev/null | grep -q cap_sys_admin && echo "CAP_SYS_ADMIN present" || echo "CAP_SYS_ADMIN missing"
 endif
 
-***REMOVED*** Show current metrics (when running)
+# Show current metrics (when running)
 metrics:
 	@echo "$(GREEN)Fetching metrics from local agent...$(NC)"
 	@curl -s localhost:9090/metrics | grep kubeadapt_ || echo "$(YELLOW)No metrics found - is the agent running?$(NC)"
 
-***REMOVED*** Debug BPF maps (requires root on Linux)
+# Debug BPF maps (requires root on Linux)
 debug-maps:
 ifdef IS_MACOS
 	@echo "$(YELLOW)BPF debugging not available on macOS$(NC)"
@@ -588,15 +600,15 @@ else
 	@sudo bpftool map list 2>/dev/null | grep container || echo "No maps found"
 endif
 
-***REMOVED*** Tail agent logs from Kubernetes
+# Tail agent logs from Kubernetes
 logs:
 	@$(KUBECTL) logs -n kubeadapt-system -l app=kubeadapt-ebpf-agent -f --tail=100
 
-***REMOVED*** Port forward for local debugging
+# Port forward for local debugging
 port-forward:
 	@$(KUBECTL) port-forward -n kubeadapt-system daemonset/kubeadapt-ebpf-agent 9090:9090
 
-***REMOVED*** Version information
+# Version information
 version:
 	@echo "$(GREEN)eBPF Agent Version Information$(NC)"
 	@echo "  Agent Version: $(VERSION)"
@@ -609,7 +621,7 @@ else
 	@echo "  Kernel Version: $(shell uname -r)"
 endif
 
-***REMOVED*** Quick start for new developers
+# Quick start for new developers
 quickstart: init generate build
 	@echo ""
 	@echo "$(GREEN)════════════════════════════════════════════$(NC)"

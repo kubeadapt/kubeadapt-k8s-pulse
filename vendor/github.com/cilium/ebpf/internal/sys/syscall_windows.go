@@ -20,7 +20,7 @@ import (
 func BPF(cmd Cmd, attr unsafe.Pointer, size uintptr) (uintptr, error) {
 	// On Linux we need to guard against preemption by the profiler here. On
 	// Windows it seems like a cgocall may not be preempted:
-	// https://github.com/golang/go/blob/8b51146c698bcfcc2c2b73fa9390db5230f2ce0a/src/runtime/os_windows.go***REMOVED***L1240-L1246
+	// https://github.com/golang/go/blob/8b51146c698bcfcc2c2b73fa9390db5230f2ce0a/src/runtime/os_windows.go#L1240-L1246
 
 	addr, err := efw.BPF.Find()
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 )
 
 // Mirrors MAX_RESOLVE_DEPTH in libbpf.
-// https://github.com/libbpf/libbpf/blob/e26b84dc330c9644c07428c271ab491b0f01f4e1/src/btf.c***REMOVED***L761
+// https://github.com/libbpf/libbpf/blob/e26b84dc330c9644c07428c271ab491b0f01f4e1/src/btf.c#L761
 const maxResolveDepth = 32
 
 // TypeID identifies a type in a BTF section.
@@ -30,7 +30,7 @@ type TypeID = sys.TypeID
 //	b := &Int{Size: 1}
 //	a != b
 //
-// [Go specification]: https://go.dev/ref/spec***REMOVED***Comparison_operators
+// [Go specification]: https://go.dev/ref/spec#Comparison_operators
 type Type interface {
 	// Type can be formatted using the %s and %v verbs. %s outputs only the
 	// identity of the type, without any detail. %v outputs additional detail.
@@ -107,7 +107,7 @@ func (ie IntEncoding) String() string {
 
 // Int is an integer of a given length.
 //
-// See https://www.kernel.org/doc/html/latest/bpf/btf.html***REMOVED***btf-kind-int
+// See https://www.kernel.org/doc/html/latest/bpf/btf.html#btf-kind-int
 type Int struct {
 	Name string
 
@@ -855,7 +855,7 @@ func formatType(f fmt.State, verb rune, t formattableType, extra ...interface{})
 
 	if f.Flag('+') {
 		// Output address if requested.
-		fmt.Fprintf(f, ":%***REMOVED***p", t)
+		fmt.Fprintf(f, ":%#p", t)
 	}
 
 	if verb == 's' {

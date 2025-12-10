@@ -26,7 +26,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// Example https://swagger.io/specification/***REMOVED***example-object
+// Example https://swagger.io/specification/#example-object
 
 type Example struct {
 	spec.Refable

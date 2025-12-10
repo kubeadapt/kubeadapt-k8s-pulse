@@ -71,8 +71,8 @@ type unmarshalInfo struct {
 	// 1 = completely initialized
 	initialized     int32
 	lock            sync.Mutex                    // prevents double initialization
-	dense           []unmarshalFieldInfo          // fields indexed by tag ***REMOVED***
-	sparse          map[uint64]unmarshalFieldInfo // fields indexed by tag ***REMOVED***
+	dense           []unmarshalFieldInfo          // fields indexed by tag #
+	sparse          map[uint64]unmarshalFieldInfo // fields indexed by tag #
 	reqFields       []string                      // names of required fields
 	reqMask         uint64                        // 1<<len(reqFields)-1
 	unrecognized    field                         // offset of []byte to put unrecognized data (or invalidField if we should throw it away)
@@ -438,7 +438,7 @@ func (u *unmarshalInfo) computeUnmarshalInfo() {
 }
 
 // setTag stores the unmarshal information for the given tag.
-// tag = tag ***REMOVED*** for field
+// tag = tag # for field
 // field/unmarshal = unmarshal info for that field.
 // reqMask = if required, bitmask for field position in required field list. 0 otherwise.
 // name = short name of the field.
@@ -653,7 +653,7 @@ func typeUnmarshaler(t reflect.Type, tags string) unmarshaler {
 			}
 			return makeStdBytesValueUnmarshaler(getUnmarshalInfo(t), name)
 		default:
-			panic(fmt.Sprintf("unknown wktpointer type %***REMOVED***v", t))
+			panic(fmt.Sprintf("unknown wktpointer type %#v", t))
 		}
 	}
 
@@ -1949,7 +1949,7 @@ func makeUnmarshalMap(f *reflect.StructField) unmarshaler {
 		r := b[x:] // unused data to return
 		b = b[:x]  // data for map entry
 
-		// Note: we could use ***REMOVED***keys * ***REMOVED***values ~= 200 functions
+		// Note: we could use #keys * #values ~= 200 functions
 		// to do map decoding without reflection. Probably not worth it.
 		// Maps will be somewhat slow. Oh well.
 

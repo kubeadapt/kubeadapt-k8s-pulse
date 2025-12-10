@@ -6,7 +6,7 @@ import (
 )
 
 // Functions to traverse a cyclic graph of types. The below was very useful:
-// https://eli.thegreenplace.net/2015/directed-graph-traversal-orderings-and-applications-to-data-flow-analysis/***REMOVED***post-order-and-reverse-post-order
+// https://eli.thegreenplace.net/2015/directed-graph-traversal-orderings-and-applications-to-data-flow-analysis/#post-order-and-reverse-post-order
 
 // postorder yields all types reachable from root in post order.
 func postorder(root Type, visited map[Type]struct{}) iter.Seq[Type] {

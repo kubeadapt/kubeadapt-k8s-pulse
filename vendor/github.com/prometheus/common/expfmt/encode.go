@@ -34,7 +34,7 @@ type Encoder interface {
 }
 
 // Closer is implemented by Encoders that need to be closed to finalize
-// encoding. (For example, OpenMetrics needs a final `***REMOVED*** EOF` line.)
+// encoding. (For example, OpenMetrics needs a final `# EOF` line.)
 //
 // Note that all Encoder implementations returned from this package implement
 // Closer, too, even if the Close call is a no-op. This happens in preparation

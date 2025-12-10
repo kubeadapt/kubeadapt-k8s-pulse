@@ -52,7 +52,7 @@ a default.
 		// ...
 	}
 
-***REMOVED*** API Implementations
+# API Implementations
 
 This package does not conform to the standard Go versioning policy; all of its
 interfaces may have methods added to them without a package major version bump.

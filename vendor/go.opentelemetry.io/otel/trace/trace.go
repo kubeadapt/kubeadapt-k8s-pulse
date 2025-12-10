@@ -87,7 +87,7 @@ func (s SpanID) String() string {
 
 // TraceIDFromHex returns a TraceID from a hex string if it is compliant with
 // the W3C trace-context specification.  See more at
-// https://www.w3.org/TR/trace-context/***REMOVED***trace-id
+// https://www.w3.org/TR/trace-context/#trace-id
 // nolint:revive // revive complains about stutter of `trace.TraceIDFromHex`.
 func TraceIDFromHex(h string) (TraceID, error) {
 	t := TraceID{}
@@ -107,7 +107,7 @@ func TraceIDFromHex(h string) (TraceID, error) {
 
 // SpanIDFromHex returns a SpanID from a hex string if it is compliant
 // with the w3c trace-context specification.
-// See more at https://www.w3.org/TR/trace-context/***REMOVED***parent-id
+// See more at https://www.w3.org/TR/trace-context/#parent-id
 func SpanIDFromHex(h string) (SpanID, error) {
 	s := SpanID{}
 	if len(h) != 16 {
@@ -424,7 +424,7 @@ func LinkFromContext(ctx context.Context, attrs ...attribute.KeyValue) Link {
 type SpanKind int
 
 // As a convenience, these match the proto definition, see
-// https://github.com/open-telemetry/opentelemetry-proto/blob/30d237e1ff3ab7aa50e0922b5bebdd93505090af/opentelemetry/proto/trace/v1/trace.proto***REMOVED***L101-L129
+// https://github.com/open-telemetry/opentelemetry-proto/blob/30d237e1ff3ab7aa50e0922b5bebdd93505090af/opentelemetry/proto/trace/v1/trace.proto#L101-L129
 //
 // The unspecified value is not a valid `SpanKind`. Use `ValidateSpanKind()`
 // to coerce a span kind to a valid value.
@@ -530,7 +530,7 @@ type Tracer interface {
 //
 // Commonly, instrumentation code will accept a TracerProvider implementation
 // at runtime from its users or it can simply use the globally registered one
-// (see https://pkg.go.dev/go.opentelemetry.io/otel***REMOVED***GetTracerProvider).
+// (see https://pkg.go.dev/go.opentelemetry.io/otel#GetTracerProvider).
 //
 // Warning: Methods may be added to this interface in minor releases. See
 // package documentation on API implementation for information on how to set

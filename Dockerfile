@@ -1,16 +1,77 @@
-***REMOVED*** Multi-stage build for eBPF agent
-***REMOVED*** Supports multi-arch: linux/amd64, linux/arm64
+# Multi-stage build for eBPF agent
+# Supports multi-arch: linux/amd64, linux/arm64
+#
+# Stage 1: Generate BPF binaries (using bpf-builder toolchain)
+# Stage 2: Build Go binary
+# Stage 3: Minimal runtime image
 
-***REMOVED*** Build stage - use native platform for faster compilation
+# ==============================================================================
+# Stage 1: BPF Generation
+# ==============================================================================
+# Generate BPF binaries for BOTH architectures (amd64 + arm64)
+# Uses BUILDPLATFORM to run only once - bpf2go cross-compiles for all targets
+# This stage uses the same toolchain as Dockerfile.bpf-builder
+FROM --platform=$BUILDPLATFORM golang:1.25-bookworm AS bpf-generator
+
+# Build arguments
+ARG BUILDPLATFORM
+ARG LLVM_VERSION=14
+ARG BPF2GO_VERSION=v0.19.0
+
+# Install BPF compilation dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get install -y --no-install-recommends \
+    -o Dpkg::Options::="--force-confnew" \
+    clang-${LLVM_VERSION} \
+    llvm-${LLVM_VERSION} \
+    libbpf-dev \
+    libelf-dev \
+    linux-libc-dev \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create versioned symlinks for clang tools
+RUN ln -sf /usr/bin/clang-${LLVM_VERSION} /usr/bin/clang && \
+    ln -sf /usr/bin/llvm-strip-${LLVM_VERSION} /usr/bin/llvm-strip
+
+# Fix asm/types.h not found issue
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+        ln -sf /usr/include/x86_64-linux-gnu/asm /usr/include/asm; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+        ln -sf /usr/include/aarch64-linux-gnu/asm /usr/include/asm; \
+    fi
+
+# Set up Go environment
+ENV GOPATH="/go"
+ENV PATH="${GOPATH}/bin:/usr/local/go/bin:${PATH}"
+
+# Install bpf2go
+RUN go install github.com/cilium/ebpf/cmd/bpf2go@${BPF2GO_VERSION}
+
+WORKDIR /build
+
+# Copy only what's needed for BPF generation
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY bpf/ ./bpf/
+COPY internal/bpf/*.go ./internal/bpf/
+
+# Generate BPF binaries (IPv4 + IPv6 dual-stack, kernel 5.10+ compatible)
+RUN cd internal/bpf && \
+    bpf2go -go-package bpf -cc clang \
+        -cflags "-O2 -Wall -Werror" \
+        -target amd64,arm64 \
+        network ../../bpf/network_monitor_tc.c
+
+# ==============================================================================
+# Stage 2: Go Build
+# ==============================================================================
 FROM --platform=$BUILDPLATFORM golang:1.25-bookworm AS builder
 
-***REMOVED*** Declare buildx automatic platform variables
 ARG TARGETOS
 ARG TARGETARCH
-ARG BUILDPLATFORM
 
-***REMOVED*** Install minimal build dependencies
-***REMOVED*** Note: We don't need clang/llvm/libbpf because BPF bindings are pre-generated
 RUN apt-get update && apt-get install -y \
     git \
     ca-certificates \
@@ -18,27 +79,28 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /build
 
-***REMOVED*** Download Go dependencies first (better caching)
+# Download Go dependencies first (better caching)
 COPY go.mod go.sum ./
 RUN go mod download
 
-***REMOVED*** Copy source code
+# Copy source code
 COPY . .
 
-***REMOVED*** Note: BPF bindings are pre-generated in internal/bpf/ directory
-***REMOVED*** They include network_x86_bpfel.go, network_arm64_bpfel.go and .o files
-***REMOVED*** To regenerate, run: make generate on the host
+# Copy generated BPF binaries from bpf-generator stage
+COPY --from=bpf-generator /build/internal/bpf/network_*.go ./internal/bpf/
+COPY --from=bpf-generator /build/internal/bpf/network_*.o ./internal/bpf/
 
-***REMOVED*** Build the Go binary for target platform
+# Build the Go binary for target platform
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-w -s -X main.Version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev') -X main.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -o ebpf-agent \
     cmd/agent/main.go
 
-***REMOVED*** Runtime stage - minimal image with root access for BPF
+# ==============================================================================
+# Stage 3: Runtime
+# ==============================================================================
 FROM debian:bookworm-slim
 
-***REMOVED*** Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     iproute2 \
@@ -47,28 +109,20 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-***REMOVED*** Copy binary from builder
+# Copy binary from builder
 COPY --from=builder /build/ebpf-agent /usr/local/bin/ebpf-agent
 
-***REMOVED*** Create necessary directories
+# Create necessary directories
 RUN mkdir -p /sys/fs/bpf
 
-***REMOVED*** Note: BPF operations require root privileges
-***REMOVED*** The container MUST run with:
-***REMOVED*** - privileged: true OR
-***REMOVED*** - capabilities: CAP_SYS_ADMIN, CAP_NET_ADMIN, CAP_BPF, CAP_PERFMON
-***REMOVED*** These are set via SecurityContext in Kubernetes deployment
-
-***REMOVED*** Expose metrics port
+# Expose metrics port
 EXPOSE 9090
 
-***REMOVED*** Health check
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:9090/health || exit 1
 
-***REMOVED*** Run as root (required for BPF operations)
-***REMOVED*** Security is enforced at the container runtime level via capabilities
+# Run as root (required for BPF operations)
 USER root
 
-***REMOVED*** Set entrypoint
 ENTRYPOINT ["/usr/local/bin/ebpf-agent"]

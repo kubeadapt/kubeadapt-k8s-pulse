@@ -11,7 +11,7 @@ type RawMessage []byte
 // Unmarshal adapts to json/encoding Unmarshal API
 //
 // Unmarshal parses the JSON-encoded data and stores the result in the value pointed to by v.
-// Refer to https://godoc.org/encoding/json***REMOVED***Unmarshal for more information
+// Refer to https://godoc.org/encoding/json#Unmarshal for more information
 func Unmarshal(data []byte, v interface{}) error {
 	return ConfigDefault.Unmarshal(data, v)
 }
@@ -29,7 +29,7 @@ func Get(data []byte, path ...interface{}) Any {
 // Marshal adapts to json/encoding Marshal API
 //
 // Marshal returns the JSON encoding of v, adapts to json/encoding Marshal API
-// Refer to https://godoc.org/encoding/json***REMOVED***Marshal for more information
+// Refer to https://godoc.org/encoding/json#Marshal for more information
 func Marshal(v interface{}) ([]byte, error) {
 	return ConfigDefault.Marshal(v)
 }
@@ -49,7 +49,7 @@ func MarshalToString(v interface{}) (string, error) {
 // NewDecoder returns a new decoder that reads from r.
 //
 // Instead of a json/encoding Decoder, an Decoder is returned
-// Refer to https://godoc.org/encoding/json***REMOVED***NewDecoder for more information
+// Refer to https://godoc.org/encoding/json#NewDecoder for more information
 func NewDecoder(reader io.Reader) *Decoder {
 	return ConfigDefault.NewDecoder(reader)
 }

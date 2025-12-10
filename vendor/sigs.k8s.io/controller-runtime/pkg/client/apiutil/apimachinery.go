@@ -44,7 +44,7 @@ var (
 func init() {
 	// Currently only enabled for built-in resources which are guaranteed to implement Protocol Buffers.
 	// For custom resources, CRDs can not support Protocol Buffers but Aggregated API can.
-	// See doc: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/***REMOVED***advanced-features-and-flexibility
+	// See doc: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#advanced-features-and-flexibility
 	if err := clientgoscheme.AddToScheme(protobufScheme); err != nil {
 		panic(err)
 	}

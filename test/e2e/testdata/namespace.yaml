@@ -1,4 +1,4 @@
-***REMOVED*** KubeAdapt eBPF Agent Namespace for E2E Tests
+# KubeAdapt eBPF Agent Namespace for E2E Tests
 apiVersion: v1
 kind: Namespace
 metadata:

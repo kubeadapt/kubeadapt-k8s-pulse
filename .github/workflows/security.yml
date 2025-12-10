@@ -54,6 +54,52 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
+  # Container image security scanning
+  pr-container-scan:
+    name: Container Image Scan (PR)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test image for scanning
+        run: |
+          docker build -t ebpf-agent:scan-test .
+
+      - name: Scan container image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ebpf-agent:scan-test'
+          scan-type: 'image'
+          format: 'sarif'
+          output: 'trivy-image.sarif'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
+
+      - name: Upload container scan results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-image.sarif'
+          category: 'container-image-scan'
+
+      - name: Scan container image (table output for PR comment)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ebpf-agent:scan-test'
+          scan-type: 'image'
+          format: 'table'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+        continue-on-error: true
+
   pr-codeql:
     name: CodeQL Analysis (PR - Quick)
     if: github.event_name == 'pull_request'

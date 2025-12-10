@@ -59,7 +59,7 @@ type Summary interface {
 	// usually positive or zero. Negative observations are accepted but
 	// prevent current versions of Prometheus from properly detecting
 	// counter resets in the sum of observations. See
-	// https://prometheus.io/docs/practices/histograms/***REMOVED***count-and-sum-of-observations
+	// https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
 	// for details.
 	Observe(float64)
 }
@@ -115,7 +115,7 @@ type SummaryOpts struct {
 	// better covered by target labels set by the scraping Prometheus
 	// server, or by one specific metric (e.g. a build_info or a
 	// machine_role metric). See also
-	// https://prometheus.io/docs/instrumenting/writing_exporters/***REMOVED***target-labels-not-static-scraped-labels
+	// https://prometheus.io/docs/instrumenting/writing_exporters/#target-labels-not-static-scraped-labels
 	ConstLabels Labels
 
 	// Objectives defines the quantile rank estimates with their respective
@@ -418,7 +418,7 @@ type summaryCounts struct {
 	// sumBits contains the bits of the float64 representing the sum of all
 	// observations. sumBits and count have to go first in the struct to
 	// guarantee alignment for atomic operations.
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	sumBits uint64
 	count   uint64
 }
@@ -439,7 +439,7 @@ type noObjectivesSummary struct {
 	// be merged into the new hot before releasing writeMtx.
 
 	// Fields with atomic access first! See alignment constraint:
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	countAndHotIdx uint64
 
 	selfCollector
@@ -449,7 +449,7 @@ type noObjectivesSummary struct {
 	// Two counts, one is "hot" for lock-free observations, the other is
 	// "cold" for writing out a dto.Metric. It has to be an array of
 	// pointers to guarantee 64bit alignment of the histogramCounts, see
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG.
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG.
 	counts [2]*summaryCounts
 
 	labelPairs []*dto.LabelPair

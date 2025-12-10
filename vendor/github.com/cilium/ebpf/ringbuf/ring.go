@@ -102,7 +102,7 @@ func (rr *ringReader) readRecord(rec *Record) error {
 		// read the len field of the header atomically to ensure a happens before
 		// relationship with the xchg in the kernel. Without this we may see len
 		// without BPF_RINGBUF_BUSY_BIT before the written data is visible.
-		// See https://github.com/torvalds/linux/blob/v6.8/kernel/bpf/ringbuf.c***REMOVED***L484
+		// See https://github.com/torvalds/linux/blob/v6.8/kernel/bpf/ringbuf.c#L484
 		start := cons & rr.mask
 		len := atomic.LoadUint32((*uint32)((unsafe.Pointer)(&rr.ring[start])))
 		header := ringbufHeader{Len: len}

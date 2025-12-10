@@ -1,24 +1,24 @@
-***REMOVED*** OSX leaves these everywhere on SMB shares
+# OSX leaves these everywhere on SMB shares
 ._*
 
-***REMOVED*** Eclipse files
+# Eclipse files
 .classpath
 .project
 .settings/**
 
-***REMOVED*** Idea files
+# Idea files
 .idea/**
 .idea/
 
-***REMOVED*** Emacs save files
+# Emacs save files
 *~
 
-***REMOVED*** Vim-related files
+# Vim-related files
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 *.un~
 Session.vim
 .netrwhist
 
-***REMOVED*** Go test binaries
+# Go test binaries
 *.test

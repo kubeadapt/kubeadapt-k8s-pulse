@@ -1,7 +1,7 @@
-***REMOVED***!/bin/sh
-***REMOVED*** Copyright 2009 The Go Authors. All rights reserved.
-***REMOVED*** Use of this source code is governed by a BSD-style
-***REMOVED*** license that can be found in the LICENSE file.
+#!/bin/sh
+# Copyright 2009 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 COMMAND="mksysnum_plan9.sh $@"
 
@@ -14,8 +14,8 @@ package plan9
 const(
 EOF
 
-SP='[ 	]' ***REMOVED*** space or tab
-sed "s/^***REMOVED***define${SP}\\([A-Z0-9_][A-Z0-9_]*\\)${SP}${SP}*\\([0-9][0-9]*\\)/SYS_\\1=\\2/g" \
+SP='[ 	]' # space or tab
+sed "s/^#define${SP}\\([A-Z0-9_][A-Z0-9_]*\\)${SP}${SP}*\\([0-9][0-9]*\\)/SYS_\\1=\\2/g" \
 	< $1 | grep -v SYS__
 
 cat <<EOF

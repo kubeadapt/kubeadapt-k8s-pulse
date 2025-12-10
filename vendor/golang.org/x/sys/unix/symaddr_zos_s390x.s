@@ -4,7 +4,7 @@
 
 //go:build zos && s390x && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //  provide the address of function variable to be fixed up.
 

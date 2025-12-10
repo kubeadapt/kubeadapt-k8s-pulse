@@ -79,7 +79,7 @@ func UnmarshalJSONEnum(m map[string]int32, data []byte, enumName string) (int32,
 	// Old style: enums are ints.
 	var val int32
 	if err := json.Unmarshal(data, &val); err != nil {
-		return 0, fmt.Errorf("cannot unmarshal %***REMOVED***q into enum %s", data, enumName)
+		return 0, fmt.Errorf("cannot unmarshal %#q into enum %s", data, enumName)
 	}
 	return val, nil
 }

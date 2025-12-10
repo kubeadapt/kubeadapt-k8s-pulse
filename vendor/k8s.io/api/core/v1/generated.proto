@@ -38,13 +38,13 @@ option go_package = "k8s.io/api/core/v1";
 // ownership management and SELinux relabeling.
 message AWSElasticBlockStoreVolumeSource {
   // volumeID is unique ID of the persistent disk resource in AWS (Amazon EBS volume).
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***awselasticblockstore
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   optional string volumeID = 1;
 
   // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***awselasticblockstore
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 2;
@@ -57,7 +57,7 @@ message AWSElasticBlockStoreVolumeSource {
   optional int32 partition = 3;
 
   // readOnly value true will force the readOnly setting in VolumeMounts.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***awselasticblockstore
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   // +optional
   optional bool readOnly = 4;
 }
@@ -183,7 +183,7 @@ message AzureFileVolumeSource {
 // Binding ties one object to another; for example, a pod is bound to a node by a scheduler.
 message Binding {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -305,7 +305,7 @@ message Capabilities {
 // Cephfs volumes do not support ownership management or SELinux relabeling.
 message CephFSPersistentVolumeSource {
   // monitors is Required: Monitors is a collection of Ceph monitors
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +listType=atomic
   repeated string monitors = 1;
 
@@ -314,23 +314,23 @@ message CephFSPersistentVolumeSource {
   optional string path = 2;
 
   // user is Optional: User is the rados user name, default is admin
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional string user = 3;
 
   // secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional string secretFile = 4;
 
   // secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional SecretReference secretRef = 5;
 
   // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional bool readOnly = 6;
 }
@@ -339,7 +339,7 @@ message CephFSPersistentVolumeSource {
 // Cephfs volumes do not support ownership management or SELinux relabeling.
 message CephFSVolumeSource {
   // monitors is Required: Monitors is a collection of Ceph monitors
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +listType=atomic
   repeated string monitors = 1;
 
@@ -348,23 +348,23 @@ message CephFSVolumeSource {
   optional string path = 2;
 
   // user is optional: User is the rados user name, default is admin
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional string user = 3;
 
   // secretFile is Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional string secretFile = 4;
 
   // secretRef is Optional: SecretRef is reference to the authentication secret for User, default is empty.
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional LocalObjectReference secretRef = 5;
 
   // readOnly is Optional: Defaults to false (read/write). ReadOnly here will force
   // the ReadOnly setting in VolumeMounts.
-  // More info: https://examples.k8s.io/volumes/cephfs/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
   // +optional
   optional bool readOnly = 6;
 }
@@ -493,7 +493,7 @@ message ComponentCondition {
 // Deprecated: This API is deprecated in v1.19+
 message ComponentStatus {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -510,7 +510,7 @@ message ComponentStatus {
 // Deprecated: This API is deprecated in v1.19+
 message ComponentStatusList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -521,7 +521,7 @@ message ComponentStatusList {
 // ConfigMap holds configuration data for pods to consume.
 message ConfigMap {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -581,7 +581,7 @@ message ConfigMapKeySelector {
 
 // ConfigMapList is a resource containing a list of ConfigMap objects.
 message ConfigMapList {
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -697,7 +697,7 @@ message Container {
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
-  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/***REMOVED***running-a-command-in-a-shell
+  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   // +optional
   // +listType=atomic
   repeated string command = 3;
@@ -709,7 +709,7 @@ message Container {
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
-  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/***REMOVED***running-a-command-in-a-shell
+  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   // +optional
   // +listType=atomic
   repeated string args = 4;
@@ -806,14 +806,14 @@ message Container {
   // Periodic probe of container liveness.
   // Container will be restarted if the probe fails.
   // Cannot be updated.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***container-probes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   // +optional
   optional Probe livenessProbe = 10;
 
   // Periodic probe of container service readiness.
   // Container will be removed from service endpoints if the probe fails.
   // Cannot be updated.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***container-probes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   // +optional
   optional Probe readinessProbe = 11;
 
@@ -823,7 +823,7 @@ message Container {
   // This can be used to provide different probe parameters at the beginning of a Pod's lifecycle,
   // when it might take a long time to load data or warm a cache, than during steady-state operation.
   // This cannot be updated.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***container-probes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   // +optional
   optional Probe startupProbe = 22;
 
@@ -856,7 +856,7 @@ message Container {
   // One of Always, Never, IfNotPresent.
   // Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
   // Cannot be updated.
-  // More info: https://kubernetes.io/docs/concepts/containers/images***REMOVED***updating-images
+  // More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
   // +optional
   optional string imagePullPolicy = 14;
 
@@ -1179,7 +1179,7 @@ message EmptyDirVolumeSource {
   // medium represents what type of storage medium should back this directory.
   // The default is "" which means to use the node's default medium.
   // Must be an empty string (default) or Memory.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***emptydir
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
   // +optional
   optional string medium = 1;
 
@@ -1188,7 +1188,7 @@ message EmptyDirVolumeSource {
   // The maximum usage on memory medium EmptyDir would be the minimum value between
   // the SizeLimit specified here and the sum of memory limits of all containers in a pod.
   // The default is nil which means that the limit is undefined.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***emptydir
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
   // +optional
   optional .k8s.io.apimachinery.pkg.api.resource.Quantity sizeLimit = 2;
 }
@@ -1242,7 +1242,7 @@ message EndpointPort {
   // RFC-6335 and https://www.iana.org/assignments/service-names).
   //
   // * Kubernetes-defined prefixed names:
-  //   * 'kubernetes.io/h2c' - HTTP/2 prior knowledge over cleartext as described in https://www.rfc-editor.org/rfc/rfc9113.html***REMOVED***name-starting-http-2-with-prior-
+  //   * 'kubernetes.io/h2c' - HTTP/2 prior knowledge over cleartext as described in https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
   //   * 'kubernetes.io/ws'  - WebSocket over cleartext as described in https://www.rfc-editor.org/rfc/rfc6455
   //   * 'kubernetes.io/wss' - WebSocket over TLS as described in https://www.rfc-editor.org/rfc/rfc6455
   //
@@ -1300,7 +1300,7 @@ message EndpointSubset {
 // 	]
 message Endpoints {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -1319,7 +1319,7 @@ message Endpoints {
 // EndpointsList is a list of endpoints.
 message EndpointsList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -1430,7 +1430,7 @@ message EphemeralContainerCommon {
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
-  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/***REMOVED***running-a-command-in-a-shell
+  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   // +optional
   // +listType=atomic
   repeated string command = 3;
@@ -1442,7 +1442,7 @@ message EphemeralContainerCommon {
   // to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
   // produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
   // of whether the variable exists or not. Cannot be updated.
-  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/***REMOVED***running-a-command-in-a-shell
+  // More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
   // +optional
   // +listType=atomic
   repeated string args = 4;
@@ -1558,7 +1558,7 @@ message EphemeralContainerCommon {
   // One of Always, Never, IfNotPresent.
   // Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
   // Cannot be updated.
-  // More info: https://kubernetes.io/docs/concepts/containers/images***REMOVED***updating-images
+  // More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
   // +optional
   optional string imagePullPolicy = 14;
 
@@ -1623,7 +1623,7 @@ message EphemeralVolumeSource {
 // treated as informative, best-effort, supplemental data.
 message Event {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // The object that this event is about.
@@ -1688,7 +1688,7 @@ message Event {
 // EventList is a list of events.
 message EventList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -1843,13 +1843,13 @@ message FlockerVolumeSource {
 // PDs support ownership management and SELinux relabeling.
 message GCEPersistentDiskVolumeSource {
   // pdName is unique name of the PD resource in GCE. Used to identify the disk in GCE.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   optional string pdName = 1;
 
   // fsType is filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 2;
@@ -1858,13 +1858,13 @@ message GCEPersistentDiskVolumeSource {
   // If omitted, the default is to mount by volume name.
   // Examples: For volume /dev/sda1, you specify the partition as "1".
   // Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty).
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   // +optional
   optional int32 partition = 3;
 
   // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   // +optional
   optional bool readOnly = 4;
 }
@@ -1910,22 +1910,22 @@ message GitRepoVolumeSource {
 // Glusterfs volumes do not support ownership management or SELinux relabeling.
 message GlusterfsPersistentVolumeSource {
   // endpoints is the endpoint name that details Glusterfs topology.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional string endpoints = 1;
 
   // path is the Glusterfs volume path.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional string path = 2;
 
   // readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
   // Defaults to false.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   // +optional
   optional bool readOnly = 3;
 
   // endpointsNamespace is the namespace that contains Glusterfs endpoint.
   // If this field is empty, the EndpointNamespace defaults to the same namespace as the bound PVC.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   // +optional
   optional string endpointsNamespace = 4;
 }
@@ -1934,16 +1934,16 @@ message GlusterfsPersistentVolumeSource {
 // Glusterfs volumes do not support ownership management or SELinux relabeling.
 message GlusterfsVolumeSource {
   // endpoints is the endpoint name that details Glusterfs topology.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional string endpoints = 1;
 
   // path is the Glusterfs volume path.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   optional string path = 2;
 
   // readOnly here will force the Glusterfs volume to be mounted with read-only permissions.
   // Defaults to false.
-  // More info: https://examples.k8s.io/volumes/glusterfs/README.md***REMOVED***create-a-pod
+  // More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
   // +optional
   optional bool readOnly = 3;
 }
@@ -2009,12 +2009,12 @@ message HostIP {
 message HostPathVolumeSource {
   // path of the directory on the host.
   // If the path is a symlink, it will follow the link to the real path.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***hostpath
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   optional string path = 1;
 
   // type for HostPath Volume
   // Defaults to ""
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***hostpath
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   // +optional
   optional string type = 2;
 }
@@ -2042,7 +2042,7 @@ message ISCSIPersistentVolumeSource {
   // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***iscsi
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 5;
@@ -2100,7 +2100,7 @@ message ISCSIVolumeSource {
   // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***iscsi
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 5;
@@ -2183,7 +2183,7 @@ message Lifecycle {
   // PostStart is called immediately after a container is created. If the handler fails,
   // the container is terminated and restarted according to its restart policy.
   // Other management of the container blocks until the hook completes.
-  // More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/***REMOVED***container-hooks
+  // More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
   // +optional
   optional LifecycleHandler postStart = 1;
 
@@ -2195,7 +2195,7 @@ message Lifecycle {
   // container will eventually terminate within the Pod's termination grace
   // period (unless delayed by finalizers). Other management of the container blocks until the hook completes
   // or until the termination grace period is reached.
-  // More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/***REMOVED***container-hooks
+  // More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
   // +optional
   optional LifecycleHandler preStop = 2;
 }
@@ -2226,12 +2226,12 @@ message LifecycleHandler {
 // LimitRange sets resource usage limits for each kind of resource in a Namespace.
 message LimitRange {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the limits enforced.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional LimitRangeSpec spec = 2;
 }
@@ -2265,7 +2265,7 @@ message LimitRangeItem {
 // LimitRangeList is a list of LimitRange items.
 message LimitRangeList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -2298,7 +2298,7 @@ message LinuxContainerUser {
 // List holds a list of objects, which may not be known by the server.
 message List {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -2356,14 +2356,14 @@ message LoadBalancerStatus {
 //     will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control.
 //
 // Instead of using this type, create a locally provided and used type that is well-focused on your reference.
-// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go***REMOVED***L533 .
+// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .
 // +structType=atomic
 message LocalObjectReference {
   // Name of the referent.
   // This field is effectively required, but due to backwards compatibility is
   // allowed to be empty. Instances of this type with an empty value here are
   // almost certainly wrong.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/***REMOVED***names
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   // +optional
   // +default=""
   // +kubebuilder:default=""
@@ -2407,16 +2407,16 @@ message ModifyVolumeStatus {
 // NFS volumes do not support ownership management or SELinux relabeling.
 message NFSVolumeSource {
   // server is the hostname or IP address of the NFS server.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***nfs
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   optional string server = 1;
 
   // path that is exported by the NFS server.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***nfs
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   optional string path = 2;
 
   // readOnly here will force the NFS export to be mounted with read-only permissions.
   // Defaults to false.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***nfs
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   // +optional
   optional bool readOnly = 3;
 }
@@ -2425,17 +2425,17 @@ message NFSVolumeSource {
 // Use of multiple namespaces is optional.
 message Namespace {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the behavior of the Namespace.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional NamespaceSpec spec = 2;
 
   // Status describes the current status of a Namespace.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional NamespaceStatus status = 3;
 }
@@ -2464,7 +2464,7 @@ message NamespaceCondition {
 // NamespaceList is a list of Namespaces.
 message NamespaceList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -2502,19 +2502,19 @@ message NamespaceStatus {
 // Each node will have a unique identifier in the cache (i.e. in etcd).
 message Node {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the behavior of a node.
-  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional NodeSpec spec = 2;
 
   // Most recently observed status of the node.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional NodeStatus status = 3;
 }
@@ -2653,7 +2653,7 @@ message NodeFeatures {
 // NodeList is the whole list of all Nodes which have been registered with master.
 message NodeList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -2758,7 +2758,7 @@ message NodeSpec {
   optional string providerID = 3;
 
   // Unschedulable controls node schedulability of new pods. By default, node is schedulable.
-  // More info: https://kubernetes.io/docs/concepts/nodes/node/***REMOVED***manual-node-administration
+  // More info: https://kubernetes.io/docs/concepts/nodes/node/#manual-node-administration
   // +optional
   optional bool unschedulable = 4;
 
@@ -2780,7 +2780,7 @@ message NodeSpec {
 // NodeStatus is information about the current status of a node.
 message NodeStatus {
   // Capacity represents the total resources of a node.
-  // More info: https://kubernetes.io/docs/reference/node/node-status/***REMOVED***capacity
+  // More info: https://kubernetes.io/docs/reference/node/node-status/#capacity
   // +optional
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1;
 
@@ -2790,13 +2790,13 @@ message NodeStatus {
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> allocatable = 2;
 
   // NodePhase is the recently observed lifecycle phase of the node.
-  // More info: https://kubernetes.io/docs/concepts/nodes/node/***REMOVED***phase
+  // More info: https://kubernetes.io/docs/concepts/nodes/node/#phase
   // The field is never populated, and now is deprecated.
   // +optional
   optional string phase = 3;
 
   // Conditions is an array of current observed node conditions.
-  // More info: https://kubernetes.io/docs/reference/node/node-status/***REMOVED***condition
+  // More info: https://kubernetes.io/docs/reference/node/node-status/#condition
   // +optional
   // +patchMergeKey=type
   // +patchStrategy=merge
@@ -2806,7 +2806,7 @@ message NodeStatus {
 
   // List of addresses reachable to the node.
   // Queried from cloud provider, if available.
-  // More info: https://kubernetes.io/docs/reference/node/node-status/***REMOVED***addresses
+  // More info: https://kubernetes.io/docs/reference/node/node-status/#addresses
   // Note: This field is declared as mergeable, but the merge key is not sufficiently
   // unique, which can cause data corruption when it is merged. Callers should instead
   // use a full-replacement patch. See https://pr.k8s.io/79391 for an example.
@@ -2826,7 +2826,7 @@ message NodeStatus {
   optional NodeDaemonEndpoints daemonEndpoints = 6;
 
   // Set of ids/uuids to uniquely identify the node.
-  // More info: https://kubernetes.io/docs/reference/node/node-status/***REMOVED***info
+  // More info: https://kubernetes.io/docs/reference/node/node-status/#info
   // +optional
   optional NodeSystemInfo nodeInfo = 7;
 
@@ -2925,12 +2925,12 @@ message ObjectFieldSelector {
 //     will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control.
 //
 // Instead of using this type, create a locally provided and used type that is well-focused on your reference.
-// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go***REMOVED***L533 .
+// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +structType=atomic
 message ObjectReference {
   // Kind of the referent.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional string kind = 1;
 
@@ -2940,12 +2940,12 @@ message ObjectReference {
   optional string namespace = 2;
 
   // Name of the referent.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/***REMOVED***names
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   // +optional
   optional string name = 3;
 
   // UID of the referent.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/***REMOVED***uids
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
   // +optional
   optional string uid = 4;
 
@@ -2954,7 +2954,7 @@ message ObjectReference {
   optional string apiVersion = 5;
 
   // Specific resourceVersion to which this reference is made, if any.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***concurrency-control-and-consistency
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
   // +optional
   optional string resourceVersion = 6;
 
@@ -2975,20 +2975,20 @@ message ObjectReference {
 // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
 message PersistentVolume {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // spec defines a specification of a persistent volume owned by the cluster.
   // Provisioned by an administrator.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistent-volumes
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes
   // +optional
   optional PersistentVolumeSpec spec = 2;
 
   // status represents the current information/status for the persistent volume.
   // Populated by the system.
   // Read-only.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistent-volumes
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes
   // +optional
   optional PersistentVolumeStatus status = 3;
 }
@@ -2996,18 +2996,18 @@ message PersistentVolume {
 // PersistentVolumeClaim is a user's request for and claim to a persistent volume
 message PersistentVolumeClaim {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // spec defines the desired characteristics of a volume requested by a pod author.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistentvolumeclaims
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   // +optional
   optional PersistentVolumeClaimSpec spec = 2;
 
   // status represents the current information/status of a persistent volume claim.
   // Read-only.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistentvolumeclaims
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   // +optional
   optional PersistentVolumeClaimStatus status = 3;
 }
@@ -3015,12 +3015,12 @@ message PersistentVolumeClaim {
 // PersistentVolumeClaimCondition contains details about state of pvc
 message PersistentVolumeClaimCondition {
   // Type is the type of the condition.
-  // More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/***REMOVED***:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
+  // More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about
   optional string type = 1;
 
   // Status is the status of the condition.
   // Can be True, False, Unknown.
-  // More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/***REMOVED***:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
+  // More info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required
   optional string status = 2;
 
   // lastProbeTime is the time we probed the condition.
@@ -3045,12 +3045,12 @@ message PersistentVolumeClaimCondition {
 // PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
 message PersistentVolumeClaimList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
   // items is a list of persistent volume claims.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistentvolumeclaims
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   repeated PersistentVolumeClaim items = 2;
 }
 
@@ -3058,7 +3058,7 @@ message PersistentVolumeClaimList {
 // and allows a Source for provider-specific attributes
 message PersistentVolumeClaimSpec {
   // accessModes contains the desired access modes the volume should have.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***access-modes-1
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   // +optional
   // +listType=atomic
   repeated string accessModes = 1;
@@ -3071,7 +3071,7 @@ message PersistentVolumeClaimSpec {
   // If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
   // that are lower than previous value but must still be higher than capacity recorded in the
   // status field of the claim.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***resources
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
   // +optional
   optional VolumeResourceRequirements resources = 2;
 
@@ -3080,7 +3080,7 @@ message PersistentVolumeClaimSpec {
   optional string volumeName = 3;
 
   // storageClassName is the name of the StorageClass required by the claim.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***class-1
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1
   // +optional
   optional string storageClassName = 5;
 
@@ -3150,7 +3150,7 @@ message PersistentVolumeClaimStatus {
   optional string phase = 1;
 
   // accessModes contains the actual access modes the volume backing the PVC has.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***access-modes-1
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1
   // +optional
   // +listType=atomic
   repeated string accessModes = 2;
@@ -3272,7 +3272,7 @@ message PersistentVolumeClaimTemplate {
 // type of volume that is owned by someone else (the system).
 message PersistentVolumeClaimVolumeSource {
   // claimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistentvolumeclaims
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   optional string claimName = 1;
 
   // readOnly Will force the ReadOnly setting in VolumeMounts.
@@ -3284,7 +3284,7 @@ message PersistentVolumeClaimVolumeSource {
 // PersistentVolumeList is a list of PersistentVolume items.
 message PersistentVolumeList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -3300,7 +3300,7 @@ message PersistentVolumeSource {
   // kubelet's host machine and then exposed to the pod. Provisioned by an admin.
   // Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree
   // gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   // +optional
   optional GCEPersistentDiskVolumeSource gcePersistentDisk = 1;
 
@@ -3308,7 +3308,7 @@ message PersistentVolumeSource {
   // kubelet's host machine and then exposed to the pod.
   // Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree
   // awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***awselasticblockstore
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   // +optional
   optional AWSElasticBlockStoreVolumeSource awsElasticBlockStore = 2;
 
@@ -3316,7 +3316,7 @@ message PersistentVolumeSource {
   // Provisioned by a developer or tester.
   // This is useful for single-node development and testing only!
   // On-host storage is not supported in any way and WILL NOT WORK in a multi-node cluster.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***hostpath
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   // +optional
   optional HostPathVolumeSource hostPath = 3;
 
@@ -3328,7 +3328,7 @@ message PersistentVolumeSource {
   optional GlusterfsPersistentVolumeSource glusterfs = 4;
 
   // nfs represents an NFS mount on the host. Provisioned by an admin.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***nfs
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   // +optional
   optional NFSVolumeSource nfs = 5;
 
@@ -3427,7 +3427,7 @@ message PersistentVolumeSource {
 // PersistentVolumeSpec is the specification of a persistent volume.
 message PersistentVolumeSpec {
   // capacity is the description of the persistent volume's resources and capacity.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***capacity
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
   // +optional
   map<string, .k8s.io.apimachinery.pkg.api.resource.Quantity> capacity = 1;
 
@@ -3435,7 +3435,7 @@ message PersistentVolumeSpec {
   optional PersistentVolumeSource persistentVolumeSource = 2;
 
   // accessModes contains all ways the volume can be mounted.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***access-modes
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
   // +optional
   // +listType=atomic
   repeated string accessModes = 3;
@@ -3443,7 +3443,7 @@ message PersistentVolumeSpec {
   // claimRef is part of a bi-directional binding between PersistentVolume and PersistentVolumeClaim.
   // Expected to be non-nil when bound.
   // claim.VolumeName is the authoritative bind between PV and PVC.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***binding
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#binding
   // +optional
   // +structType=granular
   optional ObjectReference claimRef = 4;
@@ -3452,7 +3452,7 @@ message PersistentVolumeSpec {
   // Valid options are Retain (default for manually created PersistentVolumes), Delete (default
   // for dynamically provisioned PersistentVolumes), and Recycle (deprecated).
   // Recycle must be supported by the volume plugin underlying this PersistentVolume.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***reclaiming
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#reclaiming
   // +optional
   optional string persistentVolumeReclaimPolicy = 5;
 
@@ -3463,7 +3463,7 @@ message PersistentVolumeSpec {
 
   // mountOptions is the list of mount options, e.g. ["ro", "soft"]. Not validated - mount will
   // simply fail if one is invalid.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/***REMOVED***mount-options
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#mount-options
   // +optional
   // +listType=atomic
   repeated string mountOptions = 7;
@@ -3493,7 +3493,7 @@ message PersistentVolumeSpec {
 // PersistentVolumeStatus is the current status of a persistent volume.
 message PersistentVolumeStatus {
   // phase indicates if a volume is available, bound to a claim, or released by a claim.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***phase
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#phase
   // +optional
   optional string phase = 1;
 
@@ -3527,12 +3527,12 @@ message PhotonPersistentDiskVolumeSource {
 // by clients and scheduled onto hosts.
 message Pod {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Specification of the desired behavior of the pod.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional PodSpec spec = 2;
 
@@ -3540,7 +3540,7 @@ message Pod {
   // This data may not be up to date.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional PodStatus status = 3;
 }
@@ -3699,12 +3699,12 @@ message PodAttachOptions {
 // PodCondition contains details for the current condition of this pod.
 message PodCondition {
   // Type is the type of the condition.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-conditions
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
   optional string type = 1;
 
   // Status is the status of the condition.
   // Can be True, False, Unknown.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-conditions
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
   optional string status = 2;
 
   // Last time we probed the condition.
@@ -3804,7 +3804,7 @@ message PodIP {
 // PodList is a list of Pods.
 message PodList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -3880,7 +3880,7 @@ message PodLogOptions {
 message PodOS {
   // Name is the name of the operating system. The currently supported values are linux and windows.
   // Additional value may be defined in future and can be one of:
-  // https://github.com/opencontainers/runtime-spec/blob/master/config.md***REMOVED***platform-specific-configuration
+  // https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration
   // Clients should expect to handle additional values and treat unrecognized values in this field as os: null
   optional string name = 1;
 }
@@ -4173,7 +4173,7 @@ message PodSpec {
   // Restart policy for all containers within the pod.
   // One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted.
   // Default to Always.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/***REMOVED***restart-policy
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy
   // +optional
   optional string restartPolicy = 3;
 
@@ -4229,7 +4229,7 @@ message PodSpec {
   // If empty, this pod is a candidate for scheduling by the scheduler defined in schedulerName.
   // Once this field is set, the kubelet for this node becomes responsible for the lifecycle of this pod.
   // This field should not be used to express a desire for the pod to be scheduled on a specific node.
-  // https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/***REMOVED***nodename
+  // https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodename
   // +optional
   optional string nodeName = 10;
 
@@ -4268,7 +4268,7 @@ message PodSpec {
 
   // ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
   // If specified, these secrets will be passed to individual puller implementations for them to use.
-  // More info: https://kubernetes.io/docs/concepts/containers/images***REMOVED***specifying-imagepullsecrets-on-a-pod
+  // More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod
   // +optional
   // +patchMergeKey=name
   // +patchStrategy=merge
@@ -4504,12 +4504,12 @@ message PodStatus {
   // Unknown: For some reason the state of the pod could not be obtained, typically due to an
   // error in communicating with the host of the pod.
   //
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-phase
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
   // +optional
   optional string phase = 1;
 
   // Current service state of pod.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-conditions
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
   // +optional
   // +patchMergeKey=type
   // +patchStrategy=merge
@@ -4581,7 +4581,7 @@ message PodStatus {
   // If a status for a non-existent container is present in the list, or the list has duplicate names,
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/***REMOVED***pod-and-container-status
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
   // +listType=atomic
   repeated ContainerStatus initContainerStatuses = 10;
 
@@ -4592,14 +4592,14 @@ message PodStatus {
   // If a status for a non-existent container is present in the list, or the list has duplicate names,
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-and-container-status
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
   // +optional
   // +listType=atomic
   repeated ContainerStatus containerStatuses = 8;
 
   // The Quality of Service (QOS) classification assigned to the pod based on resource requirements
   // See PodQOSClass type for available QOS classes
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/***REMOVED***quality-of-service-classes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
   // +optional
   optional string qosClass = 9;
 
@@ -4610,7 +4610,7 @@ message PodStatus {
   // If a status for a non-existent container is present in the list, or the list has duplicate names,
   // the behavior of various Kubernetes components is not defined and those statuses might be
   // ignored.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***pod-and-container-status
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
   // +optional
   // +listType=atomic
   repeated ContainerStatus ephemeralContainerStatuses = 13;
@@ -4635,7 +4635,7 @@ message PodStatus {
 // PodStatusResult is a wrapper for PodStatus returned by kubelet that can be encode/decoded
 message PodStatusResult {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -4643,7 +4643,7 @@ message PodStatusResult {
   // This data may not be up to date.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional PodStatus status = 2;
 }
@@ -4651,12 +4651,12 @@ message PodStatusResult {
 // PodTemplate describes a template for creating copies of a predefined pod.
 message PodTemplate {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Template defines the pods that will be created from this pod template.
-  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional PodTemplateSpec template = 2;
 }
@@ -4664,7 +4664,7 @@ message PodTemplate {
 // PodTemplateList is a list of PodTemplates.
 message PodTemplateList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -4675,12 +4675,12 @@ message PodTemplateList {
 // PodTemplateSpec describes the data a pod should have when created from a template
 message PodTemplateSpec {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Specification of the desired behavior of the pod.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional PodSpec spec = 2;
 }
@@ -4768,13 +4768,13 @@ message Probe {
   optional ProbeHandler handler = 1;
 
   // Number of seconds after the container has started before liveness probes are initiated.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***container-probes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   // +optional
   optional int32 initialDelaySeconds = 2;
 
   // Number of seconds after which the probe times out.
   // Defaults to 1 second. Minimum value is 1.
-  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle***REMOVED***container-probes
+  // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   // +optional
   optional int32 timeoutSeconds = 3;
 
@@ -4881,39 +4881,39 @@ message QuobyteVolumeSource {
 // RBD volumes support ownership management and SELinux relabeling.
 message RBDPersistentVolumeSource {
   // monitors is a collection of Ceph monitors.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +listType=atomic
   repeated string monitors = 1;
 
   // image is the rados image name.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string image = 2;
 
   // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***rbd
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 3;
 
   // pool is the rados pool name.
   // Default is rbd.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="rbd"
   optional string pool = 4;
 
   // user is the rados user name.
   // Default is admin.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="admin"
   optional string user = 5;
 
   // keyring is the path to key ring for RBDUser.
   // Default is /etc/ceph/keyring.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="/etc/ceph/keyring"
   optional string keyring = 6;
@@ -4921,13 +4921,13 @@ message RBDPersistentVolumeSource {
   // secretRef is name of the authentication secret for RBDUser. If provided
   // overrides keyring.
   // Default is nil.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   optional SecretReference secretRef = 7;
 
   // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   optional bool readOnly = 8;
 }
@@ -4936,39 +4936,39 @@ message RBDPersistentVolumeSource {
 // RBD volumes support ownership management and SELinux relabeling.
 message RBDVolumeSource {
   // monitors is a collection of Ceph monitors.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +listType=atomic
   repeated string monitors = 1;
 
   // image is the rados image name.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   optional string image = 2;
 
   // fsType is the filesystem type of the volume that you want to mount.
   // Tip: Ensure that the filesystem type is supported by the host operating system.
   // Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***rbd
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd
   // TODO: how do we prevent errors in the filesystem from compromising the machine
   // +optional
   optional string fsType = 3;
 
   // pool is the rados pool name.
   // Default is rbd.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="rbd"
   optional string pool = 4;
 
   // user is the rados user name.
   // Default is admin.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="admin"
   optional string user = 5;
 
   // keyring is the path to key ring for RBDUser.
   // Default is /etc/ceph/keyring.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   // +default="/etc/ceph/keyring"
   optional string keyring = 6;
@@ -4976,13 +4976,13 @@ message RBDVolumeSource {
   // secretRef is name of the authentication secret for RBDUser. If provided
   // overrides keyring.
   // Default is nil.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   optional LocalObjectReference secretRef = 7;
 
   // readOnly here will force the ReadOnly setting in VolumeMounts.
   // Defaults to false.
-  // More info: https://examples.k8s.io/volumes/rbd/README.md***REMOVED***how-to-use-it
+  // More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
   // +optional
   optional bool readOnly = 8;
 }
@@ -4990,7 +4990,7 @@ message RBDVolumeSource {
 // RangeAllocation is not a public type.
 message RangeAllocation {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -5005,12 +5005,12 @@ message RangeAllocation {
 message ReplicationController {
   // If the Labels of a ReplicationController are empty, they are defaulted to
   // be the same as the Pod(s) that the replication controller manages.
-  // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the specification of the desired behavior of the replication controller.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ReplicationControllerSpec spec = 2;
 
@@ -5018,7 +5018,7 @@ message ReplicationController {
   // This data may be out of date by some window of time.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ReplicationControllerStatus status = 3;
 }
@@ -5047,7 +5047,7 @@ message ReplicationControllerCondition {
 // ReplicationControllerList is a collection of replication controllers.
 message ReplicationControllerList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -5061,7 +5061,7 @@ message ReplicationControllerSpec {
   // Replicas is the number of desired replicas.
   // This is a pointer to distinguish between explicit zero and unspecified.
   // Defaults to 1.
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller***REMOVED***what-is-a-replicationcontroller
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#what-is-a-replicationcontroller
   // +optional
   optional int32 replicas = 1;
 
@@ -5075,7 +5075,7 @@ message ReplicationControllerSpec {
   // If Selector is empty, it is defaulted to the labels present on the Pod template.
   // Label keys and values that must match in order to be controlled by this replication
   // controller, if empty defaulted to labels on Pod template.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/***REMOVED***label-selectors
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   // +optional
   // +mapType=atomic
   map<string, string> selector = 2;
@@ -5083,7 +5083,7 @@ message ReplicationControllerSpec {
   // Template is the object that describes the pod that will be created if
   // insufficient replicas are detected. This takes precedence over a TemplateRef.
   // The only allowed template.spec.restartPolicy value is "Always".
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller***REMOVED***pod-template
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
   // +optional
   optional PodTemplateSpec template = 3;
 }
@@ -5092,7 +5092,7 @@ message ReplicationControllerSpec {
 // controller.
 message ReplicationControllerStatus {
   // Replicas is the most recently observed number of replicas.
-  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller***REMOVED***what-is-a-replicationcontroller
+  // More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#what-is-a-replicationcontroller
   optional int32 replicas = 1;
 
   // The number of pods that have labels matching the labels of the pod template of the replication controller.
@@ -5172,17 +5172,17 @@ message ResourceHealth {
 // ResourceQuota sets aggregate quota restrictions enforced per namespace
 message ResourceQuota {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the desired quota.
-  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ResourceQuotaSpec spec = 2;
 
   // Status defines the actual enforced quota and its current usage.
-  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ResourceQuotaStatus status = 3;
 }
@@ -5190,7 +5190,7 @@ message ResourceQuota {
 // ResourceQuotaList is a list of ResourceQuota items.
 message ResourceQuotaList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -5446,7 +5446,7 @@ message SeccompProfile {
 // the Data field must be less than MaxSecretSize bytes.
 message Secret {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -5460,7 +5460,7 @@ message Secret {
   // Data contains the secret data. Each key must consist of alphanumeric
   // characters, '-', '_' or '.'. The serialized form of the secret data is a
   // base64 encoded string, representing the arbitrary (possibly non-string)
-  // data value here. Described in https://tools.ietf.org/html/rfc4648***REMOVED***section-4
+  // data value here. Described in https://tools.ietf.org/html/rfc4648#section-4
   // +optional
   map<string, bytes> data = 2;
 
@@ -5473,7 +5473,7 @@ message Secret {
   map<string, string> stringData = 4;
 
   // Used to facilitate programmatic handling of secret data.
-  // More info: https://kubernetes.io/docs/concepts/configuration/secret/***REMOVED***secret-types
+  // More info: https://kubernetes.io/docs/concepts/configuration/secret/#secret-types
   // +optional
   optional string type = 3;
 }
@@ -5509,7 +5509,7 @@ message SecretKeySelector {
 // SecretList is a list of Secret.
 message SecretList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -5563,7 +5563,7 @@ message SecretReference {
 // Secret volumes support ownership management and SELinux relabeling.
 message SecretVolumeSource {
   // secretName is the name of the secret in the pod's namespace to use.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***secret
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
   // +optional
   optional string secretName = 1;
 
@@ -5700,19 +5700,19 @@ message SerializedReference {
 // will answer requests sent through the proxy.
 message Service {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the behavior of a service.
-  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ServiceSpec spec = 2;
 
   // Most recently observed status of the service.
   // Populated by the system.
   // Read-only.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional ServiceStatus status = 3;
 }
@@ -5723,7 +5723,7 @@ message Service {
 // * a set of secrets
 message ServiceAccount {
   // Standard object's metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -5744,7 +5744,7 @@ message ServiceAccount {
   // ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images
   // in pods that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets
   // can be mounted in the pod, but ImagePullSecrets are only accessed by the kubelet.
-  // More info: https://kubernetes.io/docs/concepts/containers/images/***REMOVED***specifying-imagepullsecrets-on-a-pod
+  // More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
   // +optional
   // +listType=atomic
   repeated LocalObjectReference imagePullSecrets = 3;
@@ -5758,7 +5758,7 @@ message ServiceAccount {
 // ServiceAccountList is a list of ServiceAccount objects
 message ServiceAccountList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -5796,7 +5796,7 @@ message ServiceAccountTokenProjection {
 // ServiceList holds a list of services.
 message ServiceList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 
@@ -5829,7 +5829,7 @@ message ServicePort {
   // RFC-6335 and https://www.iana.org/assignments/service-names).
   //
   // * Kubernetes-defined prefixed names:
-  //   * 'kubernetes.io/h2c' - HTTP/2 prior knowledge over cleartext as described in https://www.rfc-editor.org/rfc/rfc9113.html***REMOVED***name-starting-http-2-with-prior-
+  //   * 'kubernetes.io/h2c' - HTTP/2 prior knowledge over cleartext as described in https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
   //   * 'kubernetes.io/ws'  - WebSocket over cleartext as described in https://www.rfc-editor.org/rfc/rfc6455
   //   * 'kubernetes.io/wss' - WebSocket over TLS as described in https://www.rfc-editor.org/rfc/rfc6455
   //
@@ -5848,7 +5848,7 @@ message ServicePort {
   // of the 'port' field is used (an identity map).
   // This field is ignored for services with clusterIP=None, and should be
   // omitted or set equal to the 'port' field.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***defining-a-service
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
   // +optional
   optional .k8s.io.apimachinery.pkg.util.intstr.IntOrString targetPort = 4;
 
@@ -5860,7 +5860,7 @@ message ServicePort {
   // Service which does not need it, creation will fail. This field will be
   // wiped when updating a Service to no longer need it (e.g. changing type
   // from NodePort to ClusterIP).
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***type-nodeport
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
   // +optional
   optional int32 nodePort = 5;
 }
@@ -5879,7 +5879,7 @@ message ServiceProxyOptions {
 // ServiceSpec describes the attributes that a user creates on a service.
 message ServiceSpec {
   // The list of ports that are exposed by this service.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***virtual-ips-and-service-proxies
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   // +patchMergeKey=port
   // +patchStrategy=merge
   // +listType=map
@@ -5911,7 +5911,7 @@ message ServiceSpec {
   // types ClusterIP, NodePort, and LoadBalancer. If this field is specified
   // when creating a Service of type ExternalName, creation will fail. This
   // field will be wiped when updating a Service to type ExternalName.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***virtual-ips-and-service-proxies
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   // +optional
   optional string clusterIP = 3;
 
@@ -5937,7 +5937,7 @@ message ServiceSpec {
   // This field may hold a maximum of two entries (dual-stack IPs, in either order).
   // These IPs must correspond to the values of the ipFamilies field. Both
   // clusterIPs and ipFamilies are governed by the ipFamilyPolicy field.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***virtual-ips-and-service-proxies
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   // +listType=atomic
   // +optional
   repeated string clusterIPs = 18;
@@ -5957,7 +5957,7 @@ message ServiceSpec {
   // as the clusterIP.
   // "ExternalName" aliases this service to the specified externalName.
   // Several other fields do not apply to ExternalName services.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***publishing-services-service-types
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   // +optional
   optional string type = 4;
 
@@ -5974,7 +5974,7 @@ message ServiceSpec {
   // Enable client IP based session affinity.
   // Must be ClientIP or None.
   // Defaults to None.
-  // More info: https://kubernetes.io/docs/concepts/services-networking/service/***REMOVED***virtual-ips-and-service-proxies
+  // More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   // +optional
   optional string sessionAffinity = 7;
 
@@ -6456,7 +6456,7 @@ message TopologySpreadConstraint {
 //     will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control.
 //
 // Instead of using this type, create a locally provided and used type that is well-focused on your reference.
-// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go***REMOVED***L533 .
+// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .
 // +structType=atomic
 message TypedLocalObjectReference {
   // APIGroup is the group for the resource being referenced.
@@ -6498,7 +6498,7 @@ message TypedObjectReference {
 message Volume {
   // name of the volume.
   // Must be a DNS_LABEL and unique within the pod.
-  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/***REMOVED***names
+  // More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
   optional string name = 1;
 
   // volumeSource represents the location and type of the mounted volume.
@@ -6659,7 +6659,7 @@ message VolumeSource {
   // machine that is directly exposed to the container. This is generally
   // used for system agents or other privileged things that are allowed
   // to see the host machine. Most containers will NOT need this.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***hostpath
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
   // ---
   // TODO(jonesdl) We need to restrict who can use host directory mounts and who can/can not
   // mount host directories as read/write.
@@ -6667,7 +6667,7 @@ message VolumeSource {
   optional HostPathVolumeSource hostPath = 1;
 
   // emptyDir represents a temporary directory that shares a pod's lifetime.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***emptydir
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
   // +optional
   optional EmptyDirVolumeSource emptyDir = 2;
 
@@ -6675,7 +6675,7 @@ message VolumeSource {
   // kubelet's host machine and then exposed to the pod.
   // Deprecated: GCEPersistentDisk is deprecated. All operations for the in-tree
   // gcePersistentDisk type are redirected to the pd.csi.storage.gke.io CSI driver.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***gcepersistentdisk
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
   // +optional
   optional GCEPersistentDiskVolumeSource gcePersistentDisk = 3;
 
@@ -6683,7 +6683,7 @@ message VolumeSource {
   // kubelet's host machine and then exposed to the pod.
   // Deprecated: AWSElasticBlockStore is deprecated. All operations for the in-tree
   // awsElasticBlockStore type are redirected to the ebs.csi.aws.com CSI driver.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***awselasticblockstore
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
   // +optional
   optional AWSElasticBlockStoreVolumeSource awsElasticBlockStore = 4;
 
@@ -6695,12 +6695,12 @@ message VolumeSource {
   optional GitRepoVolumeSource gitRepo = 5;
 
   // secret represents a secret that should populate this volume.
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***secret
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
   // +optional
   optional SecretVolumeSource secret = 6;
 
   // nfs represents an NFS mount on the host that shares a pod's lifetime
-  // More info: https://kubernetes.io/docs/concepts/storage/volumes***REMOVED***nfs
+  // More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs
   // +optional
   optional NFSVolumeSource nfs = 7;
 
@@ -6718,7 +6718,7 @@ message VolumeSource {
 
   // persistentVolumeClaimVolumeSource represents a reference to a
   // PersistentVolumeClaim in the same namespace.
-  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes***REMOVED***persistentvolumeclaims
+  // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   // +optional
   optional PersistentVolumeClaimVolumeSource persistentVolumeClaim = 10;
 

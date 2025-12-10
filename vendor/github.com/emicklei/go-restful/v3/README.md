@@ -19,9 +19,9 @@ REST asks developers to use HTTP methods explicitly and in a way that's consiste
 - PATCH = Update partial content of a resource
 - OPTIONS = Get information about the communication options for the request URI
     
-***REMOVED******REMOVED******REMOVED*** Usage
+### Usage
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Without Go Modules
+#### Without Go Modules
 
 All versions up to `v2.*.*` (on the master) are not supporting Go modules.
 
@@ -31,7 +31,7 @@ import (
 )
 ```
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Using Go Modules
+#### Using Go Modules
 
 As of version `v3.0.0` (on the v3 branch), this package supports Go modules.
 
@@ -41,7 +41,7 @@ import (
 )
 ```
 
-***REMOVED******REMOVED******REMOVED*** Example
+### Example
 
 ```Go
 ws := new(restful.WebService)
@@ -64,16 +64,16 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 	
 [Full API of a UserResource](https://github.com/emicklei/go-restful/blob/v3/examples/user-resource/restful-user-resource.go) 
 		
-***REMOVED******REMOVED******REMOVED*** Features
+### Features
 
-- Routes for request &***REMOVED***8594; function mapping with path parameter (e.g. {id} but also prefix_{var} and {var}_suffix) support
+- Routes for request &#8594; function mapping with path parameter (e.g. {id} but also prefix_{var} and {var}_suffix) support
 - Configurable router:
 	- (default) Fast routing algorithm that allows static elements, [google custom method](https://cloud.google.com/apis/design/custom_methods), regular expressions and dynamic parameters in the URL path (e.g. /resource/name:customVerb, /meetings/{id} or /static/{subpath:*})
 	- Routing algorithm after [JSR311](http://jsr311.java.net/nonav/releases/1.1/spec/spec.html) that is implemented using (but does **not** accept) regular expressions
 - Request API for reading structs from JSON/XML and accessing parameters (path,query,header)
 - Response API for writing structs to JSON/XML and setting headers
 - Customizable encoding using EntityReaderWriter registration
-- Filters for intercepting the request &***REMOVED***8594; response flow on Service or Route level
+- Filters for intercepting the request &#8594; response flow on Service or Route level
 - Request-scoped variables using attributes
 - Containers for WebServices on different HTTP endpoints
 - Content encoding (gzip,deflate) of request and response payloads
@@ -86,7 +86,7 @@ func (u UserResource) findUser(request *restful.Request, response *restful.Respo
 - Customizable gzip/deflate readers and writers using CompressorProvider registration
 - Inject your own http.Handler using the `HttpMiddlewareHandlerToFilter` function
 
-***REMOVED******REMOVED*** How to customize
+## How to customize
 There are several hooks to customize the behavior of the go-restful package.
 
 - Router algorithm
@@ -98,7 +98,7 @@ There are several hooks to customize the behavior of the go-restful package.
 - Use [jsoniter](https://github.com/json-iterator/go) by building this package using a build tag, e.g. `go build -tags=jsoniter .` 
 - Use the package variable `TrimRightSlashEnabled` (default true) to control the behavior of matching routes that end with a slash `/` 
 
-***REMOVED******REMOVED*** Resources
+## Resources
 
 - [Example programs](./examples)
 - [Example posted on blog](http://ernestmicklei.com/2012/11/go-restful-first-working-example/)

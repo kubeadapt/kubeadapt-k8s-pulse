@@ -1062,7 +1062,7 @@ func (v *VrfSlave) SlaveType() string {
 }
 
 // Geneve devices must specify RemoteIP and ID (VNI) on create
-// https://github.com/torvalds/linux/blob/47ec5303d73ea344e84f46660fff693c57641386/drivers/net/geneve.c***REMOVED***L1209-L1223
+// https://github.com/torvalds/linux/blob/47ec5303d73ea344e84f46660fff693c57641386/drivers/net/geneve.c#L1209-L1223
 type Geneve struct {
 	LinkAttrs
 	ID                uint32 // vni
@@ -1179,7 +1179,7 @@ func (ip6tnl *Ip6tnl) Type() string {
 	return "ip6tnl"
 }
 
-// from https://elixir.bootlin.com/linux/v5.15.4/source/include/uapi/linux/if_tunnel.h***REMOVED***L84
+// from https://elixir.bootlin.com/linux/v5.15.4/source/include/uapi/linux/if_tunnel.h#L84
 type TunnelEncapType uint16
 
 const (
@@ -1188,7 +1188,7 @@ const (
 	GUE
 )
 
-// from https://elixir.bootlin.com/linux/v5.15.4/source/include/uapi/linux/if_tunnel.h***REMOVED***L91
+// from https://elixir.bootlin.com/linux/v5.15.4/source/include/uapi/linux/if_tunnel.h#L91
 type TunnelEncapFlag uint16
 
 const (
@@ -1197,7 +1197,7 @@ const (
 	RemCSum                 = 1 << 2
 )
 
-// from https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ip6_tunnel.h***REMOVED***L12
+// from https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ip6_tunnel.h#L12
 type IP6TunnelFlag uint16
 
 const (

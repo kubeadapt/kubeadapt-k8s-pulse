@@ -301,7 +301,7 @@ func NewEvent(args ProbeArgs) (*Event, error) {
 		// Kernels < 4.12 don't support maxactive and therefore auto generate
 		// group and event names from the symbol and offset. The symbol is used
 		// without any sanitization.
-		// See https://elixir.bootlin.com/linux/v4.10/source/kernel/trace/trace_kprobe.c***REMOVED***L712
+		// See https://elixir.bootlin.com/linux/v4.10/source/kernel/trace/trace_kprobe.c#L712
 		event := fmt.Sprintf("kprobes/r_%s_%d", args.Symbol, args.Offset)
 		if err := removeEvent(args.Type, event); err != nil {
 			return nil, fmt.Errorf("failed to remove spurious maxactive event: %s", err)
@@ -366,7 +366,7 @@ func KprobeToken(args ProbeArgs) string {
 	po := args.Symbol
 
 	if args.Offset != 0 {
-		po += fmt.Sprintf("+%***REMOVED***x", args.Offset)
+		po += fmt.Sprintf("+%#x", args.Offset)
 	}
 
 	return po

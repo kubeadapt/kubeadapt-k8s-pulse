@@ -781,7 +781,7 @@ func (c *Command) findNext(next string) *Command {
 	if len(matches) == 1 {
 		// Temporarily disable gosec G602, which produces a false positive.
 		// See https://github.com/securego/gosec/issues/1005.
-		return matches[0] // ***REMOVED***nosec G602
+		return matches[0] // #nosec G602
 	}
 
 	return nil
@@ -1077,7 +1077,7 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	args := c.args
 
-	// Workaround FAIL with "go test -v" or "cobra.test -test.v", see ***REMOVED***155
+	// Workaround FAIL with "go test -v" or "cobra.test -test.v", see #155
 	if c.args == nil && filepath.Base(os.Args[0]) != "cobra.test" {
 		args = os.Args[1:]
 	}
@@ -1262,7 +1262,7 @@ Simply type ` + c.displayName() + ` help [path to command] for full details.`,
 			Run: func(c *Command, args []string) {
 				cmd, _, e := c.Root().Find(args)
 				if cmd == nil || e != nil {
-					c.Printf("Unknown help topic %***REMOVED***q\n", args)
+					c.Printf("Unknown help topic %#q\n", args)
 					CheckErr(c.Root().Usage())
 				} else {
 					cmd.InitDefaultHelpFlag()    // make possible 'help' flag to be shown
@@ -1586,7 +1586,7 @@ func (c *Command) IsAvailableCommand() bool {
 // help topic command; additional help topic command is determined by the
 // fact that it is NOT runnable/hidden/deprecated, and has no sub commands that
 // are runnable/hidden/deprecated.
-// Concrete example: https://github.com/spf13/cobra/issues/393***REMOVED***issuecomment-282741924.
+// Concrete example: https://github.com/spf13/cobra/issues/393#issuecomment-282741924.
 func (c *Command) IsAdditionalHelpTopicCommand() bool {
 	// if a command is runnable, deprecated, or hidden it is not a 'help' command
 	if c.Runnable() || len(c.Deprecated) != 0 || c.Hidden {

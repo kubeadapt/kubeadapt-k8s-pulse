@@ -574,9 +574,9 @@ func boolToUint64(val bool) uint64 {
  *   };
  *
  *   struct sample s = ...;
- *   int x = &s->a;     // encoded as "0:0" (a is field ***REMOVED***0)
- *   int y = &s->b[5];  // encoded as "0:1:0:5" (anon struct is field ***REMOVED***1,
- *                      // b is field ***REMOVED***0 inside anon struct, accessing elem ***REMOVED***5)
+ *   int x = &s->a;     // encoded as "0:0" (a is field #0)
+ *   int y = &s->b[5];  // encoded as "0:1:0:5" (anon struct is field #1,
+ *                      // b is field #0 inside anon struct, accessing elem #5)
  *   int z = &s[10]->b; // encoded as "10:1" (ptr is used as an array)
  */
 type coreAccessor []int

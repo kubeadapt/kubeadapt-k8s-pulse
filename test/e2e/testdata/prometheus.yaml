@@ -1,6 +1,6 @@
-***REMOVED*** Prometheus deployment for E2E testing
-***REMOVED*** This is a minimal Prometheus setup that scrapes the eBPF agent DaemonSet
-***REMOVED*** NOTE: The monitoring namespace is created separately in the Preconditions phase
+# Prometheus deployment for E2E testing
+# This is a minimal Prometheus setup that scrapes the eBPF agent DaemonSet
+# NOTE: The monitoring namespace is created separately in the Preconditions phase
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,7 +13,7 @@ data:
       evaluation_interval: 30s
 
     scrape_configs:
-      ***REMOVED*** Scrape eBPF agent pods
+      # Scrape eBPF agent pods
       - job_name: 'ebpf-agent'
         kubernetes_sd_configs:
           - role: pod
@@ -21,22 +21,22 @@ data:
               names:
                 - kubeadapt-system
         relabel_configs:
-          ***REMOVED*** Only scrape pods with app=kubeadapt-ebpf-agent label
+          # Only scrape pods with app=kubeadapt-ebpf-agent label
           - source_labels: [__meta_kubernetes_pod_label_app]
             regex: kubeadapt-ebpf-agent
             action: keep
-          ***REMOVED*** Use pod IP as target
+          # Use pod IP as target
           - source_labels: [__meta_kubernetes_pod_ip]
             target_label: __address__
             replacement: ${1}:9090
-          ***REMOVED*** Add pod name as label
+          # Add pod name as label
           - source_labels: [__meta_kubernetes_pod_name]
             target_label: pod
-          ***REMOVED*** Add node name as label
+          # Add node name as label
           - source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
 
-      ***REMOVED*** Scrape test pods for verification
+      # Scrape test pods for verification
       - job_name: 'test-pods'
         kubernetes_sd_configs:
           - role: pod
@@ -103,14 +103,14 @@ metadata:
   labels:
     app: prometheus
 spec:
-  ***REMOVED*** NodePort for E2E test access via localhost:30090
-  ***REMOVED*** This follows production eBPF projects's pattern - no kubectl port-forward needed
-  ***REMOVED*** NOTE: Kind cluster extraPortMappings makes this accessible on host
+  # NodePort for E2E test access via localhost:30090
+  # This follows production eBPF projects's pattern - no kubectl port-forward needed
+  # NOTE: Kind cluster extraPortMappings makes this accessible on host
   type: NodePort
   ports:
     - port: 9090
       targetPort: 9090
-      nodePort: 30090  ***REMOVED*** Maps to host via Kind extraPortMappings
+      nodePort: 30090  # Maps to host via Kind extraPortMappings
       name: http
       protocol: TCP
   selector:

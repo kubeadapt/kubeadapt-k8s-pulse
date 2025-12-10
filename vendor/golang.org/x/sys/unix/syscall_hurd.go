@@ -7,7 +7,7 @@
 package unix
 
 /*
-***REMOVED***include <stdint.h>
+#include <stdint.h>
 int ioctl(int, unsigned long int, uintptr_t);
 */
 import "C"

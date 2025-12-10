@@ -310,10 +310,10 @@ func (schema *Schema) ResolveRefs() {
 // This current implementation is very crude and custom for OpenAPI 2.0 schemas.
 // It panics for any pointer that it is unable to resolve.
 func (schema *Schema) resolveJSONPointer(ref string) (result *Schema, err error) {
-	parts := strings.Split(ref, "***REMOVED***")
+	parts := strings.Split(ref, "#")
 	if len(parts) == 2 {
-		documentName := parts[0] + "***REMOVED***"
-		if documentName == "***REMOVED***" && schema.ID != nil {
+		documentName := parts[0] + "#"
+		if documentName == "#" && schema.ID != nil {
 			documentName = *(schema.ID)
 		}
 		path := parts[1]
@@ -383,7 +383,7 @@ func stringptr(input string) (output *string) {
 func (schema *Schema) CopyOfficialSchemaProperty(name string) {
 	*schema.Properties = append(*schema.Properties,
 		NewNamedSchema(name,
-			&Schema{Ref: stringptr("http://json-schema.org/draft-04/schema***REMOVED***/properties/" + name)}))
+			&Schema{Ref: stringptr("http://json-schema.org/draft-04/schema#/properties/" + name)}))
 }
 
 // CopyOfficialSchemaProperties copies named properties from the official JSON Schema definition

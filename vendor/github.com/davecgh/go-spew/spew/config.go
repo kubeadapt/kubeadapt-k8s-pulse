@@ -227,7 +227,7 @@ printing functions.  The formatter is useful for inline printing of smaller data
 types similar to the standard %v format specifier.
 
 The custom formatter only responds to the %v (most compact), %+v (adds pointer
-addresses), %***REMOVED***v (adds types), and %***REMOVED***+v (adds types and pointer addresses) verb
+addresses), %#v (adds types), and %#+v (adds types and pointer addresses) verb
 combinations.  Any other verbs such as %x and %q will be sent to the the
 standard fmt package for formatting.  In addition, the custom formatter ignores
 the width and precision arguments (however they will still work on the format

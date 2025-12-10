@@ -1,4 +1,4 @@
-***REMOVED*** concurrent
+# concurrent
 
 [![Sourcegraph](https://sourcegraph.com/github.com/modern-go/concurrent/-/badge.svg)](https://sourcegraph.com/github.com/modern-go/concurrent?badge)
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/modern-go/concurrent)
@@ -10,7 +10,7 @@
 * concurrent.Map: backport sync.Map for go below 1.9
 * concurrent.Executor: goroutine with explicit ownership and cancellable
 
-***REMOVED*** concurrent.Map
+# concurrent.Map
 
 because sync.Map is only available in go 1.9, we can use concurrent.Map to make code portable
 
@@ -22,7 +22,7 @@ elem, found := m.Load("hello")
 // found will be true
 ```
 
-***REMOVED*** concurrent.Executor
+# concurrent.Executor
 
 ```go
 executor := concurrent.NewUnboundedExecutor()

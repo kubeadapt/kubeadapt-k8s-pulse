@@ -38,7 +38,7 @@ var _ = isCacheKeyComparable[tlsCacheKey]
 // we can then push this type parameter to a comparable check, thus checking these
 // are strictly comparable.
 //
-// Original suggestion from https://github.com/golang/go/issues/56548***REMOVED***issuecomment-1317673963
+// Original suggestion from https://github.com/golang/go/issues/56548#issuecomment-1317673963
 func isCacheKeyComparable[K tlsCacheKey]() {
 	_ = isComparable[K]
 }

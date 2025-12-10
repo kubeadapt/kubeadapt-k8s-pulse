@@ -404,10 +404,10 @@ func (p *Pointer) Offset(document string) (int64, error) {
 					return 0, err
 				}
 			default:
-				return 0, fmt.Errorf("invalid token %***REMOVED***v", tk)
+				return 0, fmt.Errorf("invalid token %#v", tk)
 			}
 		default:
-			return 0, fmt.Errorf("invalid token %***REMOVED***v", tk)
+			return 0, fmt.Errorf("invalid token %#v", tk)
 		}
 	}
 	return offset, nil
@@ -437,7 +437,7 @@ func offsetSingleObject(dec *json.Decoder, decodedToken string) (int64, error) {
 				return offset, nil
 			}
 		default:
-			return 0, fmt.Errorf("invalid token %***REMOVED***v", tk)
+			return 0, fmt.Errorf("invalid token %#v", tk)
 		}
 	}
 	return 0, fmt.Errorf("token reference %q not found", decodedToken)

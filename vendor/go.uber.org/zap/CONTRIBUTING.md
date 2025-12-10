@@ -1,4 +1,4 @@
-***REMOVED*** Contributing
+# Contributing
 
 We'd love your help making zap the very best structured logging library in Go!
 
@@ -12,7 +12,7 @@ Note that you'll need to sign [Uber's Contributor License Agreement][cla]
 before we can accept any of your contributions. If necessary, a bot will remind
 you to accept the CLA when you open your pull request.
 
-***REMOVED******REMOVED*** Setup
+## Setup
 
 [Fork][fork], then clone the repository:
 
@@ -32,7 +32,7 @@ make test
 make lint
 ```
 
-***REMOVED******REMOVED*** Making Changes
+## Making Changes
 
 Start by creating a new branch for your changes:
 

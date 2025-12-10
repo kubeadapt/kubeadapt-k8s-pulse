@@ -60,24 +60,46 @@ jobs:
           go-version: '1.25'
           cache: true
 
-      ***REMOVED*** Install clang-format for C code linting
-      ***REMOVED*** E2E tests run on host (not in container) because Kind cluster needs Docker access
-      ***REMOVED*** make test-e2e-ci -> build-for-e2e -> lint -> requires clang-format
+      # Install clang-format for C code linting
+      # E2E tests run on host (not in container) because Kind cluster needs Docker access
+      # make test-e2e-ci -> build-for-e2e -> lint -> requires clang-format
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y clang-format-14
           sudo ln -sf /usr/bin/clang-format-14 /usr/bin/clang-format
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build BPF builder image (with cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.bpf-builder
+          tags: kubeadapt/bpf-builder:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      # Generate BPF binaries before E2E tests
+      # Uses BPF_MAP_SIZE=1000 for overflow testing
+      - name: Generate BPF binaries for E2E tests
+        run: |
+          docker run --rm -v "$(pwd)":/workspace -w /workspace \
+            -e BPF_MAP_SIZE=1000 \
+            kubeadapt/bpf-builder:latest \
+            make generate-native
+
       - name: Run E2E tests (CI mode - no BPF restoration)
-        run: make test-e2e-ci
-        ***REMOVED*** Makefile target handles:
-        ***REMOVED*** - Building image with BPF_MAP_SIZE=1000 (enables overflow testing)
-        ***REMOVED*** - Creating Kind cluster (requires Docker on host)
-        ***REMOVED*** - Loading image to Kind
-        ***REMOVED*** - Running all E2E tests
-        ***REMOVED*** - NO BPF restoration (CI is stateless)
-        ***REMOVED*** - Cleanup
+        run: make test-e2e-ci-nobpf
+        # Makefile target handles:
+        # - Building image with BPF_MAP_SIZE=1000 (enables overflow testing)
+        # - Creating Kind cluster (requires Docker on host)
+        # - Loading image to Kind
+        # - Running all E2E tests
+        # - NO BPF restoration (CI is stateless)
+        # - Cleanup
 
       - name: Export Kind cluster logs
         if: always()

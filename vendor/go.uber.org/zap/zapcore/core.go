@@ -103,7 +103,7 @@ func (c *ioCore) Write(ent Entry, fields []Field) error {
 	}
 	if ent.Level > ErrorLevel {
 		// Since we may be crashing the program, sync the output.
-		// Ignore Sync errors, pending a clean solution to issue ***REMOVED***370.
+		// Ignore Sync errors, pending a clean solution to issue #370.
 		_ = c.Sync()
 	}
 	return nil

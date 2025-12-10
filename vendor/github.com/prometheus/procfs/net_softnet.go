@@ -26,10 +26,10 @@ import (
 
 // For the proc file format details,
 // See:
-// * Linux 2.6.23 https://elixir.bootlin.com/linux/v2.6.23/source/net/core/dev.c***REMOVED***L2343
-// * Linux 2.6.39 https://elixir.bootlin.com/linux/v2.6.39/source/net/core/dev.c***REMOVED***L4086
-// * Linux 4.18 https://elixir.bootlin.com/linux/v4.18/source/net/core/net-procfs.c***REMOVED***L162
-// * Linux 5.14 https://elixir.bootlin.com/linux/v5.14/source/net/core/net-procfs.c***REMOVED***L169
+// * Linux 2.6.23 https://elixir.bootlin.com/linux/v2.6.23/source/net/core/dev.c#L2343
+// * Linux 2.6.39 https://elixir.bootlin.com/linux/v2.6.39/source/net/core/dev.c#L4086
+// * Linux 4.18 https://elixir.bootlin.com/linux/v4.18/source/net/core/net-procfs.c#L162
+// * Linux 5.14 https://elixir.bootlin.com/linux/v5.14/source/net/core/net-procfs.c#L169
 
 // SoftnetStat contains a single row of data from /proc/net/softnet_stat.
 type SoftnetStat struct {
@@ -86,7 +86,7 @@ func parseSoftnet(r io.Reader) ([]SoftnetStat, error) {
 			return nil, fmt.Errorf("%w: detected %d columns, but expected at least %d", ErrFileParse, width, minColumns)
 		}
 
-		// Linux 2.6.23 https://elixir.bootlin.com/linux/v2.6.23/source/net/core/dev.c***REMOVED***L2347
+		// Linux 2.6.23 https://elixir.bootlin.com/linux/v2.6.23/source/net/core/dev.c#L2347
 		if width >= minColumns {
 			us, err := parseHexUint32s(columns[0:9])
 			if err != nil {
@@ -99,7 +99,7 @@ func parseSoftnet(r io.Reader) ([]SoftnetStat, error) {
 			softnetStat.CPUCollision = us[8]
 		}
 
-		// Linux 2.6.39 https://elixir.bootlin.com/linux/v2.6.39/source/net/core/dev.c***REMOVED***L4086
+		// Linux 2.6.39 https://elixir.bootlin.com/linux/v2.6.39/source/net/core/dev.c#L4086
 		if width >= 10 {
 			us, err := parseHexUint32s(columns[9:10])
 			if err != nil {
@@ -109,7 +109,7 @@ func parseSoftnet(r io.Reader) ([]SoftnetStat, error) {
 			softnetStat.ReceivedRps = us[0]
 		}
 
-		// Linux 4.18 https://elixir.bootlin.com/linux/v4.18/source/net/core/net-procfs.c***REMOVED***L162
+		// Linux 4.18 https://elixir.bootlin.com/linux/v4.18/source/net/core/net-procfs.c#L162
 		if width >= 11 {
 			us, err := parseHexUint32s(columns[10:11])
 			if err != nil {
@@ -119,7 +119,7 @@ func parseSoftnet(r io.Reader) ([]SoftnetStat, error) {
 			softnetStat.FlowLimitCount = us[0]
 		}
 
-		// Linux 5.14 https://elixir.bootlin.com/linux/v5.14/source/net/core/net-procfs.c***REMOVED***L169
+		// Linux 5.14 https://elixir.bootlin.com/linux/v5.14/source/net/core/net-procfs.c#L169
 		if width >= 13 {
 			us, err := parseHexUint32s(columns[11:13])
 			if err != nil {

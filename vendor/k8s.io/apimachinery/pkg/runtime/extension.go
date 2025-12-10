@@ -99,7 +99,7 @@ func (re RawExtension) MarshalJSON() ([]byte, error) {
 	if re.Raw == nil {
 		// TODO: this is to support legacy behavior of JSONPrinter and YAMLPrinter, which
 		// expect to call json.Marshal on arbitrary versioned objects (even those not in
-		// the scheme). pkg/kubectl/resource***REMOVED***AsVersionedObjects and its interaction with
+		// the scheme). pkg/kubectl/resource#AsVersionedObjects and its interaction with
 		// kubectl get on objects not in the scheme needs to be updated to ensure that the
 		// objects that are not part of the scheme are correctly put into the right form.
 		if re.Object != nil {

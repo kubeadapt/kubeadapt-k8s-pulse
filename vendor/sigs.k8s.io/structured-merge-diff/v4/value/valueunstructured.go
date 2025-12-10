@@ -62,7 +62,7 @@ func (v valueUnstructured) AsMapUsing(_ Allocator) Map {
 	case map[interface{}]interface{}:
 		return mapUnstructuredInterface(t)
 	}
-	panic(fmt.Errorf("not a map: %***REMOVED***v", v))
+	panic(fmt.Errorf("not a map: %#v", v))
 }
 
 func (v valueUnstructured) IsList() bool {

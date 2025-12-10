@@ -57,7 +57,7 @@ const installHintVerboseHelp = `
 It looks like you are trying to use a client-go credential plugin that is not installed.
 
 To learn more about this feature, consult the documentation available at:
-      https://kubernetes.io/docs/reference/access-authn-authz/authentication/***REMOVED***client-go-credential-plugins`
+      https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins`
 
 var scheme = runtime.NewScheme()
 var codecs = serializer.NewCodecFactory(scheme)
@@ -482,9 +482,9 @@ func (a *Authenticator) refreshCredsLocked() error {
 		}
 
 		// Leaf is initialized to be nil:
-		//  https://golang.org/pkg/crypto/tls/***REMOVED***X509KeyPair
+		//  https://golang.org/pkg/crypto/tls/#X509KeyPair
 		// Leaf certificate is the first certificate:
-		//  https://golang.org/pkg/crypto/tls/***REMOVED***Certificate
+		//  https://golang.org/pkg/crypto/tls/#Certificate
 		// Populating leaf is useful for quickly accessing the underlying x509
 		// certificate values.
 		cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])

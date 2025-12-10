@@ -79,7 +79,7 @@ type Config struct {
 	// ResponseDefinitions will be added to "responses" under the top-level swagger object. This is an object
 	// that holds responses definitions that can be used across operations. This property does not define
 	// global responses for all operations. For more info please refer:
-	//     https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md***REMOVED***fixed-fields
+	//     https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#fixed-fields
 	ResponseDefinitions map[string]spec.Response
 
 	// CommonResponses will be added as a response to all operation specs. This is a good place to add common
@@ -233,7 +233,7 @@ var schemaTypeFormatMap = map[string]typeInfo{
 // Implement OpenAPIDefinitionGetter for IntOrString:
 //
 //	"port" : {
-//	          $Ref:    "***REMOVED***/definitions/IntOrString"
+//	          $Ref:    "#/definitions/IntOrString"
 //	          Description: "port of the server"
 //	}
 //

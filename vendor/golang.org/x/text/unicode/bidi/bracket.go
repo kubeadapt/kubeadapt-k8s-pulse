@@ -15,7 +15,7 @@ import (
 // https://www.unicode.org/Public/PROGRAMS/BidiReferenceJava/BidiPBAReference.java
 //
 // The implementation in this file covers definitions BD14-BD16 and rule N0
-// of UAX***REMOVED***9.
+// of UAX#9.
 //
 // Some preprocessing is done for each rune before data is passed to this
 // algorithm:
@@ -28,7 +28,7 @@ import (
 //    It is the responsibility of the caller to do this canonicalization.
 //
 // In implementing BD16, this implementation departs slightly from the "logical"
-// algorithm defined in UAX***REMOVED***9. In particular, the stack referenced there
+// algorithm defined in UAX#9. In particular, the stack referenced there
 // supports operations that go beyond a "basic" stack. An equivalent
 // implementation based on a linked list is used here.
 

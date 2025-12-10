@@ -45,7 +45,7 @@ message Overhead {
 // pod.  For more details, see
 // https://kubernetes.io/docs/concepts/containers/runtime-class/
 message RuntimeClass {
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
@@ -78,7 +78,7 @@ message RuntimeClass {
 // RuntimeClassList is a list of RuntimeClass objects.
 message RuntimeClassList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 

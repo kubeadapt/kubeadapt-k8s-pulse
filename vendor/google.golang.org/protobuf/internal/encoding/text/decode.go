@@ -640,7 +640,7 @@ func consume(b []byte, n int) []byte {
 		switch b[0] {
 		case ' ', '\n', '\r', '\t':
 			b = b[1:]
-		case '***REMOVED***':
+		case '#':
 			if i := bytes.IndexByte(b, '\n'); i >= 0 {
 				b = b[i+len("\n"):]
 			} else {

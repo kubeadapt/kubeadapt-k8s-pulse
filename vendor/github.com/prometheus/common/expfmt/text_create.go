@@ -105,7 +105,7 @@ func MetricFamilyToText(out io.Writer, in *dto.MetricFamily) (written int, err e
 
 	// Comments, first HELP, then TYPE.
 	if in.Help != nil {
-		n, err = w.WriteString("***REMOVED*** HELP ")
+		n, err = w.WriteString("# HELP ")
 		written += n
 		if err != nil {
 			return
@@ -131,7 +131,7 @@ func MetricFamilyToText(out io.Writer, in *dto.MetricFamily) (written int, err e
 			return
 		}
 	}
-	n, err = w.WriteString("***REMOVED*** TYPE ")
+	n, err = w.WriteString("# TYPE ")
 	written += n
 	if err != nil {
 		return

@@ -53,7 +53,7 @@ func (MigrationCondition) SwaggerDoc() map[string]string {
 
 var map_StorageVersionMigration = map[string]string{
 	"":         "StorageVersionMigration represents a migration of stored data to the latest storage version.",
-	"metadata": "Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
+	"metadata": "Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"spec":     "Specification of the migration.",
 	"status":   "Status of the migration.",
 }
@@ -64,7 +64,7 @@ func (StorageVersionMigration) SwaggerDoc() map[string]string {
 
 var map_StorageVersionMigrationList = map[string]string{
 	"":         "StorageVersionMigrationList is a collection of storage version migrations.",
-	"metadata": "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
+	"metadata": "Standard list metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"items":    "Items is the list of StorageVersionMigration",
 }
 

@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// Parameter a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***parameterObject
+// Parameter a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#parameterObject
 //
 // Note that this struct is actually a thin wrapper around ParameterProps to make it referable and extensible
 type Parameter struct {
@@ -100,7 +100,7 @@ func (p *Parameter) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.
 	return nil
 }
 
-// ParameterProps a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***parameterObject
+// ParameterProps a struct that describes a single operation parameter, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#parameterObject
 type ParameterProps struct {
 	// Name holds the name of the parameter
 	Name string `json:"name,omitempty"`

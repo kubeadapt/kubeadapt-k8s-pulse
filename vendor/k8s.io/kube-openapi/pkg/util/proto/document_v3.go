@@ -69,7 +69,7 @@ func (d *Definitions) ParseV3SchemaReference(s *openapi_v3.Reference, path *Path
 		Description: s.Description,
 	}
 
-	if !strings.HasPrefix(s.GetXRef(), "***REMOVED***/components/schemas") {
+	if !strings.HasPrefix(s.GetXRef(), "#/components/schemas") {
 		// Only resolve references to components/schemas. We may add support
 		// later for other in-spec paths, but otherwise treat unrecognized
 		// refs as arbitrary/unknown values.
@@ -78,7 +78,7 @@ func (d *Definitions) ParseV3SchemaReference(s *openapi_v3.Reference, path *Path
 		}, nil
 	}
 
-	reference := strings.TrimPrefix(s.GetXRef(), "***REMOVED***/components/schemas/")
+	reference := strings.TrimPrefix(s.GetXRef(), "#/components/schemas/")
 	if _, ok := d.models[reference]; !ok {
 		return nil, newSchemaError(path, "unknown model in reference: %q", reference)
 	}
@@ -98,7 +98,7 @@ func (d *Definitions) ParseV3SchemaOrReference(s *openapi_v3.SchemaOrReference, 
 
 	switch v := s.GetOneof().(type) {
 	case *openapi_v3.SchemaOrReference_Reference:
-		// Any references stored in ***REMOVED***!/components/... are bound to refer
+		// Any references stored in #!/components/... are bound to refer
 		// to external documents. This API does not support such a
 		// feature.
 		//

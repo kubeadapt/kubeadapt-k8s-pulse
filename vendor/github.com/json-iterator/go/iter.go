@@ -221,7 +221,7 @@ func (iter *Iterator) ReportError(operation string, msg string) {
 		contextEnd = iter.tail
 	}
 	context := string(iter.buf[contextStart:contextEnd])
-	iter.Error = fmt.Errorf("%s: %s, error found in ***REMOVED***%v byte of ...|%s|..., bigger context ...|%s|...",
+	iter.Error = fmt.Errorf("%s: %s, error found in #%v byte of ...|%s|..., bigger context ...|%s|...",
 		operation, msg, iter.head-peekStart, parsing, context)
 }
 
@@ -231,7 +231,7 @@ func (iter *Iterator) CurrentBuffer() string {
 	if peekStart < 0 {
 		peekStart = 0
 	}
-	return fmt.Sprintf("parsing ***REMOVED***%v byte, around ...|%s|..., whole buffer ...|%s|...", iter.head,
+	return fmt.Sprintf("parsing #%v byte, around ...|%s|..., whole buffer ...|%s|...", iter.head,
 		string(iter.buf[peekStart:iter.head]), string(iter.buf[0:iter.tail]))
 }
 
@@ -327,7 +327,7 @@ func (iter *Iterator) Read() interface{} {
 	}
 }
 
-// limit maximum depth of nesting, as allowed by https://tools.ietf.org/html/rfc7159***REMOVED***section-9
+// limit maximum depth of nesting, as allowed by https://tools.ietf.org/html/rfc7159#section-9
 const maxDepth = 10000
 
 func (iter *Iterator) incrementDepth() (success bool) {

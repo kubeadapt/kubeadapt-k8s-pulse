@@ -84,7 +84,7 @@ var Encode = EncMode{
 			ByteArray: cbor.ByteArrayToArray,
 
 			// Marshal []byte to CBOR byte string enclosed in tag 22 (expected later base64
-			// encoding, https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***section-3.4.5.2), to
+			// encoding, https://www.rfc-editor.org/rfc/rfc8949.html#section-3.4.5.2), to
 			// interoperate with the existing JSON behavior. This indicates to the decoder that,
 			// when decoding into a string (or unstructured), the resulting value should be the
 			// base64 encoding of the original bytes. No base64 encoding or decoding needs to be

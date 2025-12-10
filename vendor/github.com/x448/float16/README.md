@@ -1,4 +1,4 @@
-***REMOVED*** Float16 (Binary16) in Go/Golang
+# Float16 (Binary16) in Go/Golang
 [![Build Status](https://travis-ci.org/x448/float16.svg?branch=master)](https://travis-ci.org/x448/float16)
 [![codecov](https://codecov.io/gh/x448/float16/branch/master/graph/badge.svg?v=4)](https://codecov.io/gh/x448/float16)
 [![Go Report Card](https://goreportcard.com/badge/github.com/x448/float16)](https://goreportcard.com/report/github.com/x448/float16)
@@ -13,7 +13,7 @@ All possible 4+ billion floating-point conversions with this library are verifie
 
 Lowercase "float16" refers to IEEE 754 binary16. And capitalized "Float16" refers to exported Go data type provided by this library.
 
-***REMOVED******REMOVED*** Features
+## Features
 Current features include:
 
 * float16 to float32 conversions use lossless conversion.
@@ -23,7 +23,7 @@ Current features include:
 * other functions include: IsInf(), IsNaN(), IsNormal(), PrecisionFromfloat32(), String(), etc.
 * all functions in this library use zero allocs except String().
 
-***REMOVED******REMOVED*** Status
+## Status
 This library is used by [fxamacker/cbor](https://github.com/fxamacker/cbor) and is ready for production use on supported platforms. The version number < 1.0 indicates more functions and options are planned but not yet published.
 
 Current status:
@@ -41,19 +41,19 @@ Roadmap:
 * speed up unit test when verifying all possible 4+ billion conversions.
 * test on additional platforms.
  
-***REMOVED******REMOVED*** Float16 to Float32 Conversion
+## Float16 to Float32 Conversion
 Conversions from float16 to float32 are lossless conversions.  All 65536 possible float16 to float32 conversions (in pure Go) are confirmed to be correct.  
 
 Unit tests take a fraction of a second to check all 65536 expected values for float16 to float32 conversions.
 
-***REMOVED******REMOVED*** Float32 to Float16 Conversion
+## Float32 to Float16 Conversion
 Conversions from float32 to float16 use IEEE 754 default rounding ("Round-to-Nearest RoundTiesToEven").  All 4294967296 possible float32 to float16 conversions (in pure Go) are confirmed to be correct.  
 
 Unit tests in normal mode take about 1-2 minutes to check all 4+ billion float32 input values and results for Fromfloat32(), FromNaN32ps(), and PrecisionFromfloat32(). 
 
 Unit tests in short mode use a small subset (around 229 float32 inputs) and finish in under 0.01 second while still reaching 100% code coverage.
 
-***REMOVED******REMOVED*** Usage
+## Usage
 Install with `go get github.com/x448/float16`.
 ```
 // Convert float32 to float16
@@ -70,7 +70,7 @@ if float16.PrecisionFromfloat32(pi) == float16.PrecisionExact {
 }
 ```
 
-***REMOVED******REMOVED*** Float16 Type and API
+## Float16 Type and API
 Float16 (capitalized) is a Go type with uint16 as the underlying state.  There are 6 exported functions and 9 exported methods.
 ```
 package float16 // import "github.com/x448/float16"
@@ -107,7 +107,7 @@ PrecisionFromfloat32(f32 float32) Precision  // quickly indicates exact, ..., ov
 ```
 See [API](https://godoc.org/github.com/x448/float16) at godoc.org for more info.
 
-***REMOVED******REMOVED*** Benchmarks
+## Benchmarks
 Conversions (in pure Go) are around 2.65 ns/op for float16 -> float32 and float32 -> float16 on amd64. Speeds can vary depending on input value.
 
 ```
@@ -120,14 +120,14 @@ Frombits-2       0.29ns ± 5%    // speed using Frombits() to cast a uint16 to F
 PrecisionFromFloat32-2  0.29ns ± 1%  // speed using PrecisionFromfloat32() to check for overflows, etc.
 ```
 
-***REMOVED******REMOVED*** System Requirements
+## System Requirements
 * Tested on Go 1.11, 1.12, and 1.13 but it should also work with older versions.
 * Tested on amd64 but it should also work on all little-endian platforms supported by Go.
 
-***REMOVED******REMOVED*** Special Thanks
+## Special Thanks
 Special thanks to Kathryn Long (starkat99) for creating [half-rs](https://github.com/starkat99/half-rs), a very nice rust implementation of float16.
 
-***REMOVED******REMOVED*** License
+## License
 Copyright (c) 2019 Montgomery Edwards⁴⁴⁸ and Faye Amacker
 
 Licensed under [MIT License](LICENSE)

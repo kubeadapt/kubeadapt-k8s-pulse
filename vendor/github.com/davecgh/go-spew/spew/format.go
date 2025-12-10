@@ -25,7 +25,7 @@ import (
 )
 
 // supportedFlags is a list of all the character flags supported by fmt package.
-const supportedFlags = "0-+***REMOVED*** "
+const supportedFlags = "0-+# "
 
 // formatState implements the fmt.Formatter interface and contains information
 // about the state of a formatting operation.  The NewFormatter function can
@@ -104,7 +104,7 @@ func (f *formatState) unpackValue(v reflect.Value) reflect.Value {
 // formatPtr handles formatting of pointers by indirecting them as necessary.
 func (f *formatState) formatPtr(v reflect.Value) {
 	// Display nil if top level pointer is nil.
-	showTypes := f.fs.Flag('***REMOVED***')
+	showTypes := f.fs.Flag('#')
 	if v.IsNil() && (!showTypes || f.ignoreNextType) {
 		f.fs.Write(nilAngleBytes)
 		return
@@ -213,7 +213,7 @@ func (f *formatState) format(v reflect.Value) {
 	}
 
 	// Print type information unless already handled elsewhere.
-	if !f.ignoreNextType && f.fs.Flag('***REMOVED***') {
+	if !f.ignoreNextType && f.fs.Flag('#') {
 		f.fs.Write(openParenBytes)
 		f.fs.Write([]byte(v.Type().String()))
 		f.fs.Write(closeParenBytes)
@@ -338,7 +338,7 @@ func (f *formatState) format(v reflect.Value) {
 					f.fs.Write(spaceBytes)
 				}
 				vtf := vt.Field(i)
-				if f.fs.Flag('+') || f.fs.Flag('***REMOVED***') {
+				if f.fs.Flag('+') || f.fs.Flag('#') {
 					f.fs.Write([]byte(vtf.Name))
 					f.fs.Write(colonBytes)
 				}
@@ -379,7 +379,7 @@ func (f *formatState) Format(fs fmt.State, verb rune) {
 	}
 
 	if f.value == nil {
-		if fs.Flag('***REMOVED***') {
+		if fs.Flag('#') {
 			fs.Write(interfaceBytes)
 		}
 		fs.Write(nilAngleBytes)
@@ -404,7 +404,7 @@ printing functions.  The formatter is useful for inline printing of smaller data
 types similar to the standard %v format specifier.
 
 The custom formatter only responds to the %v (most compact), %+v (adds pointer
-addresses), %***REMOVED***v (adds types), or %***REMOVED***+v (adds types and pointer addresses) verb
+addresses), %#v (adds types), or %#+v (adds types and pointer addresses) verb
 combinations.  Any other verbs such as %x and %q will be sent to the the
 standard fmt package for formatting.  In addition, the custom formatter ignores
 the width and precision arguments (however they will still work on the format

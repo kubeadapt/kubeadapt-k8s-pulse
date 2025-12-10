@@ -33,7 +33,7 @@ func lower(b byte) byte {
 }
 
 // isASCIIPrint returns whether s is ASCII and printable according to
-// https://tools.ietf.org/html/rfc20***REMOVED***section-4.2.
+// https://tools.ietf.org/html/rfc20#section-4.2.
 func isASCIIPrint(s string) bool {
 	for i := 0; i < len(s); i++ {
 		if s[i] < ' ' || s[i] > '~' {

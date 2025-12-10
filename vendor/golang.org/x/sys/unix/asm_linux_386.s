@@ -4,7 +4,7 @@
 
 //go:build gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for 386, Linux
@@ -12,7 +12,7 @@
 
 // See ../runtime/sys_linux_386.s for the reason why we always use int 0x80
 // instead of the glibc-specific "CALL 0x10(GS)".
-***REMOVED***define INVOKE_SYSCALL	INT	$0x80
+#define INVOKE_SYSCALL	INT	$0x80
 
 // Just jump to package syscall's implementation for all these functions.
 // The runtime may know about them.

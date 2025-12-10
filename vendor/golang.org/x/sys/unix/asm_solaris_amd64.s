@@ -4,7 +4,7 @@
 
 //go:build gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for amd64, Solaris are implemented in runtime/syscall_solaris.go

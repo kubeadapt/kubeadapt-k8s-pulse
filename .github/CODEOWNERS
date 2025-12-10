@@ -1,0 +1,19 @@
+# CODEOWNERS - Automatic PR reviewers
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for all files
+* @ugurcancaykara
+
+# eBPF kernel code - requires careful review
+/bpf/ @ugurcancaykara
+/internal/bpf/ @ugurcancaykara
+
+# CI/CD workflows
+/.github/ @ugurcancaykara
+
+# Kubernetes manifests and configs
+/configs/ @ugurcancaykara
+
+# Build system
+/Makefile @ugurcancaykara
+/Dockerfile* @ugurcancaykara

@@ -13,7 +13,7 @@ import (
 // Interval fields govern the behavior of Do, which performs the action.
 // A zero Sometimes value will perform an action exactly once.
 //
-// ***REMOVED*** Example: logging with rate limiting
+// # Example: logging with rate limiting
 //
 //	var sometimes = rate.Sometimes{First: 3, Interval: 10*time.Second}
 //	func Spammy() {

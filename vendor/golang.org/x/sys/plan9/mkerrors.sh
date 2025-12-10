@@ -1,11 +1,11 @@
-***REMOVED***!/usr/bin/env bash
-***REMOVED*** Copyright 2009 The Go Authors. All rights reserved.
-***REMOVED*** Use of this source code is governed by a BSD-style
-***REMOVED*** license that can be found in the LICENSE file.
+#!/usr/bin/env bash
+# Copyright 2009 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
-***REMOVED*** Generate Go code listing errors and other ***REMOVED***defined constant
-***REMOVED*** values (ENAMETOOLONG etc.), by asking the preprocessor
-***REMOVED*** about the definitions.
+# Generate Go code listing errors and other #defined constant
+# values (ENAMETOOLONG etc.), by asking the preprocessor
+# about the definitions.
 
 unset LANG
 export LC_ALL=C
@@ -16,24 +16,24 @@ CC=${CC:-gcc}
 uname=$(uname)
 
 includes='
-***REMOVED***include <sys/types.h>
-***REMOVED***include <sys/file.h>
-***REMOVED***include <fcntl.h>
-***REMOVED***include <dirent.h>
-***REMOVED***include <sys/socket.h>
-***REMOVED***include <netinet/in.h>
-***REMOVED***include <netinet/ip.h>
-***REMOVED***include <netinet/ip6.h>
-***REMOVED***include <netinet/tcp.h>
-***REMOVED***include <errno.h>
-***REMOVED***include <sys/signal.h>
-***REMOVED***include <signal.h>
-***REMOVED***include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/file.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netinet/tcp.h>
+#include <errno.h>
+#include <sys/signal.h>
+#include <signal.h>
+#include <sys/resource.h>
 '
 
 ccflags="$@"
 
-***REMOVED*** Write go tool cgo -godefs input.
+# Write go tool cgo -godefs input.
 (
 	echo package plan9
 	echo
@@ -45,13 +45,13 @@ ccflags="$@"
 	echo
 	echo 'const ('
 
-	***REMOVED*** The gcc command line prints all the ***REMOVED***defines
-	***REMOVED*** it encounters while processing the input
+	# The gcc command line prints all the #defines
+	# it encounters while processing the input
 	echo "${!indirect} $includes" | $CC -x c - -E -dM $ccflags |
 	awk '
-		$1 != "***REMOVED***define" || $2 ~ /\(/ || $3 == "" {next}
+		$1 != "#define" || $2 ~ /\(/ || $3 == "" {next}
 
-		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ {next}  ***REMOVED*** 386 registers
+		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ {next}  # 386 registers
 		$2 ~ /^(SIGEV_|SIGSTKSZ|SIGRT(MIN|MAX))/ {next}
 		$2 ~ /^(SCM_SRCRT)$/ {next}
 		$2 ~ /^(MAP_FAILED)$/ {next}
@@ -115,27 +115,27 @@ ccflags="$@"
 	echo ')'
 ) >_const.go
 
-***REMOVED*** Pull out the error names for later.
+# Pull out the error names for later.
 errors=$(
-	echo '***REMOVED***include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^E[A-Z0-9_]+$/ { print $2 }' |
+	echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print $2 }' |
 	sort
 )
 
-***REMOVED*** Pull out the signal names for later.
+# Pull out the signal names for later.
 signals=$(
-	echo '***REMOVED***include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^SIG[A-Z0-9]+$/ { print $2 }' |
+	echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print $2 }' |
 	grep -v 'SIGSTKSIZE\|SIGSTKSZ\|SIGRT' |
 	sort
 )
 
-***REMOVED*** Again, writing regexps to a file.
-echo '***REMOVED***include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^E[A-Z0-9_]+$/ { print "^\t" $2 "[ \t]*=" }' |
+# Again, writing regexps to a file.
+echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	sort >_error.grep
-echo '***REMOVED***include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="***REMOVED***define" && $2 ~ /^SIG[A-Z0-9]+$/ { print "^\t" $2 "[ \t]*=" }' |
+echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	grep -v 'SIGSTKSIZE\|SIGSTKSZ\|SIGRT' |
 	sort >_signal.grep
 
@@ -156,17 +156,17 @@ echo 'const ('
 cat _error.out | grep -f _signal.grep | sed 's/=\(.*\)/= Signal(\1)/'
 echo ')'
 
-***REMOVED*** Run C program to print error and syscall strings.
+# Run C program to print error and syscall strings.
 (
 	echo -E "
-***REMOVED***include <stdio.h>
-***REMOVED***include <stdlib.h>
-***REMOVED***include <errno.h>
-***REMOVED***include <ctype.h>
-***REMOVED***include <string.h>
-***REMOVED***include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <ctype.h>
+#include <string.h>
+#include <signal.h>
 
-***REMOVED***define nelem(x) (sizeof(x)/sizeof((x)[0]))
+#define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
 enum { A = 'A', Z = 'Z', a = 'a', z = 'z' }; // avoid need for single quotes below
 
@@ -187,7 +187,7 @@ int signals[] = {
 		echo -E '	'$i,
 	done
 
-	***REMOVED*** Use -E because on some systems bash builtin interprets \n itself.
+	# Use -E because on some systems bash builtin interprets \n itself.
 	echo -E '
 };
 

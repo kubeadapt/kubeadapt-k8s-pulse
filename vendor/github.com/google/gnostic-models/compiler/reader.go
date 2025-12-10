@@ -244,16 +244,16 @@ func ReadInfoForRef(basefile string, ref string) (*yaml.Node, error) {
 		info, ok := infoCache[ref]
 		if ok {
 			if verboseReader {
-				log.Printf("Cache hit for ref %s***REMOVED***%s", basefile, ref)
+				log.Printf("Cache hit for ref %s#%s", basefile, ref)
 			}
 			return info, nil
 		}
 		if verboseReader {
-			log.Printf("Reading info for ref %s***REMOVED***%s", basefile, ref)
+			log.Printf("Reading info for ref %s#%s", basefile, ref)
 		}
 	}
 	basedir, _ := filepath.Split(basefile)
-	parts := strings.Split(ref, "***REMOVED***")
+	parts := strings.Split(ref, "#")
 	var filename string
 	if parts[0] != "" {
 		filename = parts[0]

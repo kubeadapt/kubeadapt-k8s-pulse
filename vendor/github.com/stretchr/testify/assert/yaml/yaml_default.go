@@ -7,7 +7,7 @@
 // indirection with an alternative implementation of this package that uses
 // another implementation of YAML deserialization. This allows to not either not
 // use YAML deserialization at all, or to use another implementation than
-// [gopkg.in/yaml.v3] (for example for license compatibility reasons, see [PR ***REMOVED***1120]).
+// [gopkg.in/yaml.v3] (for example for license compatibility reasons, see [PR #1120]).
 //
 // Alternative implementations are selected using build tags:
 //
@@ -26,7 +26,7 @@
 //	go list -tags testify_yaml_fail -f '{{.Imports}}' github.com/stretchr/testify/assert/yaml
 //	go list -tags testify_yaml_custom -f '{{.Imports}}' github.com/stretchr/testify/assert/yaml
 //
-// [PR ***REMOVED***1120]: https://github.com/stretchr/testify/pull/1120
+// [PR #1120]: https://github.com/stretchr/testify/pull/1120
 package yaml
 
 import goyaml "gopkg.in/yaml.v3"

@@ -83,7 +83,7 @@ func (e *StatusError) DebugError() (string, []interface{}) {
 	if out, err := json.MarshalIndent(e.ErrStatus, "", "  "); err == nil {
 		return "server response object: %s", []interface{}{string(out)}
 	}
-	return "server response object: %***REMOVED***v", []interface{}{e.ErrStatus}
+	return "server response object: %#v", []interface{}{e.ErrStatus}
 }
 
 // HasStatusCause returns true if the provided error has a details cause

@@ -259,7 +259,7 @@ type swaggerSchemaPropsOmitZero struct {
 // and uses a predefined subset of it.
 // On top of this subset, there are extensions provided by this specification to allow for more complete documentation.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***schemaObject
+// For more information: http://goo.gl/8us55a#schemaObject
 type Schema struct {
 	VendorExtensible
 	SchemaProps

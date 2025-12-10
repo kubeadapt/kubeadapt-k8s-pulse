@@ -202,7 +202,7 @@ func isData(frameType int) bool {
 }
 
 var validReceivedCloseCodes = map[int]bool{
-	// see http://www.iana.org/assignments/websocket/websocket.xhtml***REMOVED***close-code-number
+	// see http://www.iana.org/assignments/websocket/websocket.xhtml#close-code-number
 
 	CloseNormalClosure:           true,
 	CloseGoingAway:               true,
@@ -867,7 +867,7 @@ func (c *Conn) advanceFrame() (int, error) {
 	}
 
 	// 3. Read and parse frame length as per
-	// https://tools.ietf.org/html/rfc6455***REMOVED***section-5.2
+	// https://tools.ietf.org/html/rfc6455#section-5.2
 	//
 	// The length of the "Payload data", in bytes: if 0-125, that is the payload
 	// length.

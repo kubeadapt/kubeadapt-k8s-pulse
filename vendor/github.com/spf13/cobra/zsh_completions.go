@@ -89,10 +89,10 @@ func genZshComp(buf io.StringWriter, name string, includeDesc bool) {
 	if !includeDesc {
 		compCmd = ShellCompNoDescRequestCmd
 	}
-	WriteStringAndCheck(buf, fmt.Sprintf(`***REMOVED***compdef %[1]s
+	WriteStringAndCheck(buf, fmt.Sprintf(`#compdef %[1]s
 compdef _%[1]s %[1]s
 
-***REMOVED*** zsh completion for %-36[1]s -*- shell-script -*-
+# zsh completion for %-36[1]s -*- shell-script -*-
 
 __%[1]s_debug()
 {
@@ -117,10 +117,10 @@ _%[1]s()
     __%[1]s_debug "\n========= starting completion logic =========="
     __%[1]s_debug "CURRENT: ${CURRENT}, words[*]: ${words[*]}"
 
-    ***REMOVED*** The user could have moved the cursor backwards on the command-line.
-    ***REMOVED*** We need to trigger completion from the $CURRENT location, so we need
-    ***REMOVED*** to truncate the command-line ($words) up to the $CURRENT location.
-    ***REMOVED*** (We cannot use $CURSOR as its value does not work when a command is an alias.)
+    # The user could have moved the cursor backwards on the command-line.
+    # We need to trigger completion from the $CURRENT location, so we need
+    # to truncate the command-line ($words) up to the $CURRENT location.
+    # (We cannot use $CURSOR as its value does not work when a command is an alias.)
     words=("${=words[1,CURRENT]}")
     __%[1]s_debug "Truncated words[*]: ${words[*]},"
 
@@ -128,30 +128,30 @@ _%[1]s()
     lastChar=${lastParam[-1]}
     __%[1]s_debug "lastParam: ${lastParam}, lastChar: ${lastChar}"
 
-    ***REMOVED*** For zsh, when completing a flag with an = (e.g., %[1]s -n=<TAB>)
-    ***REMOVED*** completions must be prefixed with the flag
+    # For zsh, when completing a flag with an = (e.g., %[1]s -n=<TAB>)
+    # completions must be prefixed with the flag
     setopt local_options BASH_REMATCH
     if [[ "${lastParam}" =~ '-.*=' ]]; then
-        ***REMOVED*** We are dealing with a flag with an =
+        # We are dealing with a flag with an =
         flagPrefix="-P ${BASH_REMATCH}"
     fi
 
-    ***REMOVED*** Prepare the command to obtain completions
+    # Prepare the command to obtain completions
     requestComp="${words[1]} %[2]s ${words[2,-1]}"
     if [ "${lastChar}" = "" ]; then
-        ***REMOVED*** If the last parameter is complete (there is a space following it)
-        ***REMOVED*** We add an extra empty parameter so we can indicate this to the go completion code.
+        # If the last parameter is complete (there is a space following it)
+        # We add an extra empty parameter so we can indicate this to the go completion code.
         __%[1]s_debug "Adding extra empty parameter"
         requestComp="${requestComp} \"\""
     fi
 
     __%[1]s_debug "About to call: eval ${requestComp}"
 
-    ***REMOVED*** Use eval to handle any environment variables and such
+    # Use eval to handle any environment variables and such
     out=$(eval ${requestComp} 2>/dev/null)
     __%[1]s_debug "completion output: ${out}"
 
-    ***REMOVED*** Extract the directive integer following a : from the last line
+    # Extract the directive integer following a : from the last line
     local lastLine
     while IFS='\n' read -r line; do
         lastLine=${line}
@@ -160,12 +160,12 @@ _%[1]s()
 
     if [ "${lastLine[1]}" = : ]; then
         directive=${lastLine[2,-1]}
-        ***REMOVED*** Remove the directive including the : and the newline
+        # Remove the directive including the : and the newline
         local suffix
-        (( suffix=${***REMOVED***lastLine}+2))
+        (( suffix=${#lastLine}+2))
         out=${out[1,-$suffix]}
     else
-        ***REMOVED*** There is no directive specified.  Leave $out as is.
+        # There is no directive specified.  Leave $out as is.
         __%[1]s_debug "No directive found.  Setting do default"
         directive=0
     fi
@@ -180,11 +180,11 @@ _%[1]s()
     fi
 
     local activeHelpMarker="%[9]s"
-    local endIndex=${***REMOVED***activeHelpMarker}
-    local startIndex=$((${***REMOVED***activeHelpMarker}+1))
+    local endIndex=${#activeHelpMarker}
+    local startIndex=$((${#activeHelpMarker}+1))
     local hasActiveHelp=0
     while IFS='\n' read -r comp; do
-        ***REMOVED*** Check if this is an activeHelp statement (i.e., prefixed with $activeHelpMarker)
+        # Check if this is an activeHelp statement (i.e., prefixed with $activeHelpMarker)
         if [ "${comp[1,$endIndex]}" = "$activeHelpMarker" ];then
             __%[1]s_debug "ActiveHelp found: $comp"
             comp="${comp[$startIndex,-1]}"
@@ -198,10 +198,10 @@ _%[1]s()
         fi
 
         if [ -n "$comp" ]; then
-            ***REMOVED*** If requested, completions are returned with a description.
-            ***REMOVED*** The description is preceded by a TAB character.
-            ***REMOVED*** For zsh's _describe, we need to use a : instead of a TAB.
-            ***REMOVED*** We first need to escape any : as part of the completion itself.
+            # If requested, completions are returned with a description.
+            # The description is preceded by a TAB character.
+            # For zsh's _describe, we need to use a : instead of a TAB.
+            # We first need to escape any : as part of the completion itself.
             comp=${comp//:/\\:}
 
             local tab="$(printf '\t')"
@@ -213,11 +213,11 @@ _%[1]s()
         fi
     done < <(printf "%%s\n" "${out[@]}")
 
-    ***REMOVED*** Add a delimiter after the activeHelp statements, but only if:
-    ***REMOVED*** - there are completions following the activeHelp statements, or
-    ***REMOVED*** - file completion will be performed (so there will be choices after the activeHelp)
+    # Add a delimiter after the activeHelp statements, but only if:
+    # - there are completions following the activeHelp statements, or
+    # - file completion will be performed (so there will be choices after the activeHelp)
     if [ $hasActiveHelp -eq 1 ]; then
-        if [ ${***REMOVED***completions} -ne 0 ] || [ $((directive & shellCompDirectiveNoFileComp)) -eq 0 ]; then
+        if [ ${#completions} -ne 0 ] || [ $((directive & shellCompDirectiveNoFileComp)) -eq 0 ]; then
             __%[1]s_debug "Adding activeHelp delimiter"
             compadd -x "--"
             hasActiveHelp=0
@@ -235,12 +235,12 @@ _%[1]s()
     fi
 
     if [ $((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
-        ***REMOVED*** File extension filtering
+        # File extension filtering
         local filteringCmd
         filteringCmd='_files'
         for filter in ${completions[@]}; do
             if [ ${filter[1]} != '*' ]; then
-                ***REMOVED*** zsh requires a glob pattern to do file filtering
+                # zsh requires a glob pattern to do file filtering
                 filter="\*.$filter"
             fi
             filteringCmd+=" -g $filter"
@@ -250,7 +250,7 @@ _%[1]s()
         __%[1]s_debug "File filtering command: $filteringCmd"
         _arguments '*:filename:'"$filteringCmd"
     elif [ $((directive & shellCompDirectiveFilterDirs)) -ne 0 ]; then
-        ***REMOVED*** File completion for directories only
+        # File completion for directories only
         local subdir
         subdir="${completions[1]}"
         if [ -n "$subdir" ]; then
@@ -272,7 +272,7 @@ _%[1]s()
         if eval _describe $keepOrder "completions" completions $flagPrefix $noSpace; then
             __%[1]s_debug "_describe found some completions"
 
-            ***REMOVED*** Return the success of having called _describe
+            # Return the success of having called _describe
             return 0
         else
             __%[1]s_debug "_describe did not find completions."
@@ -280,24 +280,24 @@ _%[1]s()
             if [ $((directive & shellCompDirectiveNoFileComp)) -ne 0 ]; then
                 __%[1]s_debug "deactivating file completion"
 
-                ***REMOVED*** We must return an error code here to let zsh know that there were no
-                ***REMOVED*** completions found by _describe; this is what will trigger other
-                ***REMOVED*** matching algorithms to attempt to find completions.
-                ***REMOVED*** For example zsh can match letters in the middle of words.
+                # We must return an error code here to let zsh know that there were no
+                # completions found by _describe; this is what will trigger other
+                # matching algorithms to attempt to find completions.
+                # For example zsh can match letters in the middle of words.
                 return 1
             else
-                ***REMOVED*** Perform file completion
+                # Perform file completion
                 __%[1]s_debug "Activating file completion"
 
-                ***REMOVED*** We must return the result of this command, so it must be the
-                ***REMOVED*** last command, or else we must store its result to return it.
+                # We must return the result of this command, so it must be the
+                # last command, or else we must store its result to return it.
                 _arguments '*:filename:_files'" ${flagPrefix}"
             fi
         fi
     fi
 }
 
-***REMOVED*** don't run the completion function when being source-ed or eval-ed
+# don't run the completion function when being source-ed or eval-ed
 if [ "$funcstack[1]" = "_%[1]s" ]; then
     _%[1]s
 fi

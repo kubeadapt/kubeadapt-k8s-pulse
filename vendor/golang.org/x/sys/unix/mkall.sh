@@ -1,15 +1,15 @@
-***REMOVED***!/usr/bin/env bash
-***REMOVED*** Copyright 2009 The Go Authors. All rights reserved.
-***REMOVED*** Use of this source code is governed by a BSD-style
-***REMOVED*** license that can be found in the LICENSE file.
+#!/usr/bin/env bash
+# Copyright 2009 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
-***REMOVED*** This script runs or (given -n) prints suggested commands to generate files for
-***REMOVED*** the Architecture/OS specified by the GOARCH and GOOS environment variables.
-***REMOVED*** See README.md for more information about how the build system works.
+# This script runs or (given -n) prints suggested commands to generate files for
+# the Architecture/OS specified by the GOARCH and GOOS environment variables.
+# See README.md for more information about how the build system works.
 
 GOOSARCH="${GOOS}_${GOARCH}"
 
-***REMOVED*** defaults
+# defaults
 mksyscall="go run mksyscall.go"
 mkerrors="./mkerrors.sh"
 zerrors="zerrors_$GOOSARCH.go"
@@ -25,8 +25,8 @@ case "$1" in
 -syscalls)
 	for i in zsyscall*go
 	do
-		***REMOVED*** Run the command line that appears in the first line
-		***REMOVED*** of the generated file to regenerate it.
+		# Run the command line that appears in the first line
+		# of the generated file to regenerate it.
 		sed 1q $i | sed 's;^// ;;' | sh > _$i && gofmt < _$i > $i
 		rm _$i
 	done
@@ -38,7 +38,7 @@ case "$1" in
 	shift
 esac
 
-case "$***REMOVED***" in
+case "$#" in
 0)
 	;;
 *)
@@ -47,8 +47,8 @@ case "$***REMOVED***" in
 esac
 
 if [[ "$GOOS" = "linux" ]]; then
-	***REMOVED*** Use the Docker-based build system
-	***REMOVED*** Files generated through docker (use $cmd so you can Ctl-C the build or run)
+	# Use the Docker-based build system
+	# Files generated through docker (use $cmd so you can Ctl-C the build or run)
 	$cmd docker build --tag generate:$GOOS $GOOS
 	$cmd docker run --interactive --tty --volume $(cd -- "$(dirname -- "$0")/.." && pwd):/build generate:$GOOS
 	exit
@@ -101,8 +101,8 @@ freebsd_arm)
 	mkerrors="$mkerrors"
 	mksyscall="go run mksyscall.go -l32 -arm"
 	mksysnum="go run mksysnum.go 'https://cgit.freebsd.org/src/plain/sys/kern/syscalls.master?h=stable/12'"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 freebsd_arm64)
@@ -131,8 +131,8 @@ netbsd_arm)
 	mkerrors="$mkerrors"
 	mksyscall="go run mksyscall.go -l32 -netbsd -arm"
 	mksysnum="go run mksysnum.go 'http://cvsweb.netbsd.org/bsdweb.cgi/~checkout~/src/sys/kern/syscalls.master'"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 netbsd_arm64)
@@ -160,8 +160,8 @@ openbsd_arm)
 	mkerrors="$mkerrors"
 	mksyscall="go run mksyscall.go -l32 -openbsd -arm -libc"
 	mksysctl="go run mksysctl_openbsd.go"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 openbsd_arm64)
@@ -169,8 +169,8 @@ openbsd_arm64)
 	mkerrors="$mkerrors -m64"
 	mksyscall="go run mksyscall.go -openbsd -libc"
 	mksysctl="go run mksysctl_openbsd.go"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 openbsd_mips64)
@@ -178,8 +178,8 @@ openbsd_mips64)
 	mkerrors="$mkerrors -m64"
 	mksyscall="go run mksyscall.go -openbsd -libc"
 	mksysctl="go run mksysctl_openbsd.go"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 openbsd_ppc64)
@@ -187,8 +187,8 @@ openbsd_ppc64)
 	mkerrors="$mkerrors -m64"
 	mksyscall="go run mksyscall.go -openbsd -libc"
 	mksysctl="go run mksysctl_openbsd.go"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 openbsd_riscv64)
@@ -196,8 +196,8 @@ openbsd_riscv64)
 	mkerrors="$mkerrors -m64"
 	mksyscall="go run mksyscall.go -openbsd -libc"
 	mksysctl="go run mksysctl_openbsd.go"
-	***REMOVED*** Let the type of C char be signed for making the bare syscall
-	***REMOVED*** API consistent across platforms.
+	# Let the type of C char be signed for making the bare syscall
+	# API consistent across platforms.
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs -- -fsigned-char"
 	;;
 solaris_amd64)
@@ -230,12 +230,12 @@ esac
 		esac
 		if [ -n "$mksyscall" ]; then
 			if [ "$GOOSARCH" == "aix_ppc64" ]; then
-				***REMOVED*** aix/ppc64 script generates files instead of writing to stdin.
+				# aix/ppc64 script generates files instead of writing to stdin.
 				echo "$mksyscall -tags $GOOS,$GOARCH $syscall_goos $GOOSARCH_in && gofmt -w zsyscall_$GOOSARCH.go && gofmt -w zsyscall_"$GOOSARCH"_gccgo.go && gofmt -w zsyscall_"$GOOSARCH"_gc.go " ;
 			elif [ "$GOOS" == "illumos" ]; then
-			        ***REMOVED*** illumos code generation requires a --illumos switch
+			        # illumos code generation requires a --illumos switch
 			        echo "$mksyscall -illumos -tags illumos,$GOARCH syscall_illumos.go |gofmt > zsyscall_illumos_$GOARCH.go";
-			        ***REMOVED*** illumos implies solaris, so solaris code generation is also required
+			        # illumos implies solaris, so solaris code generation is also required
 				echo "$mksyscall -tags solaris,$GOARCH syscall_solaris.go syscall_solaris_$GOARCH.go |gofmt >zsyscall_solaris_$GOARCH.go";
 			else
 				echo "$mksyscall -tags $GOOS,$GOARCH $syscall_goos $GOOSARCH_in |gofmt >zsyscall_$GOOSARCH.go";

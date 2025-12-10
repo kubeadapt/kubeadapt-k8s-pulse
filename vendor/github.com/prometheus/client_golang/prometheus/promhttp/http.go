@@ -212,7 +212,7 @@ func HandlerForTransactional(reg prometheus.TransactionalGatherer, opts HandlerO
 			}
 		}
 		if closer, ok := enc.(expfmt.Closer); ok {
-			// This in particular takes care of the final "***REMOVED*** EOF\n" line for OpenMetrics.
+			// This in particular takes care of the final "# EOF\n" line for OpenMetrics.
 			if handleError(closer.Close()) {
 				return
 			}

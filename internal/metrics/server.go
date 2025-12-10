@@ -206,16 +206,16 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 <head>
     <title>KubeAdapt eBPF Agent</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; background: ***REMOVED***f5f5f5; }
-        h1 { color: ***REMOVED***333; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; background: #f5f5f5; }
+        h1 { color: #333; }
         .info { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0; }
         .metric { margin: 10px 0; }
-        .label { font-weight: 600; color: ***REMOVED***666; }
-        a { color: ***REMOVED***007bff; text-decoration: none; }
+        .label { font-weight: 600; color: #666; }
+        a { color: #007bff; text-decoration: none; }
         a:hover { text-decoration: underline; }
         .status { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-        .status.ready { background: ***REMOVED***d4edda; color: ***REMOVED***155724; }
-        .status.notready { background: ***REMOVED***f8d7da; color: ***REMOVED***721c24; }
+        .status.ready { background: #d4edda; color: #155724; }
+        .status.notready { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>

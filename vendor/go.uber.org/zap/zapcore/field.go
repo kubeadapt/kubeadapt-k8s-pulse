@@ -213,7 +213,7 @@ func addFields(enc ObjectEncoder, fields []Field) {
 
 func encodeStringer(key string, stringer interface{}, enc ObjectEncoder) (retErr error) {
 	// Try to capture panics (from nil references or otherwise) when calling
-	// the String() method, similar to https://golang.org/src/fmt/print.go***REMOVED***L540
+	// the String() method, similar to https://golang.org/src/fmt/print.go#L540
 	defer func() {
 		if err := recover(); err != nil {
 			// If it's a nil pointer, just say "<nil>". The likeliest causes are a

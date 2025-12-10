@@ -38,7 +38,7 @@ type SecuritySchemeProps struct {
 // Supported schemes are basic authentication, an API key (either as a header or as a query parameter)
 // and OAuth2's common flows (implicit, password, application and access code).
 //
-// For more information: http://goo.gl/8us55a***REMOVED***securitySchemeObject
+// For more information: http://goo.gl/8us55a#securitySchemeObject
 type SecurityScheme struct {
 	VendorExtensible
 	SecuritySchemeProps

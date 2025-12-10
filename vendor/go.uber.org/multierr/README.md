@@ -1,8 +1,8 @@
-***REMOVED*** multierr [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
+# multierr [![GoDoc][doc-img]][doc] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
 `multierr` allows combining one or more Go `error`s together.
 
-***REMOVED******REMOVED*** Features
+## Features
 
 - **Idiomatic**:
   multierr follows best practices in Go, and keeps your code idiomatic.
@@ -20,13 +20,13 @@
 - **Lightweight**:
   multierr comes with virtually no dependencies.
 
-***REMOVED******REMOVED*** Installation
+## Installation
 
 ```bash
 go get -u go.uber.org/multierr@latest
 ```
 
-***REMOVED******REMOVED*** Status
+## Status
 
 Stable: No breaking changes will be made before 2.0.
 

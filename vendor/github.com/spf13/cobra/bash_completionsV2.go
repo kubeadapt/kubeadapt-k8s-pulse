@@ -34,7 +34,7 @@ func genBashComp(buf io.StringWriter, name string, includeDesc bool) {
 		compCmd = ShellCompNoDescRequestCmd
 	}
 
-	WriteStringAndCheck(buf, fmt.Sprintf(`***REMOVED*** bash completion V2 for %-36[1]s -*- shell-script -*-
+	WriteStringAndCheck(buf, fmt.Sprintf(`# bash completion V2 for %-36[1]s -*- shell-script -*-
 
 __%[1]s_debug()
 {
@@ -43,52 +43,52 @@ __%[1]s_debug()
     fi
 }
 
-***REMOVED*** Macs have bash3 for which the bash-completion package doesn't include
-***REMOVED*** _init_completion. This is a minimal version of that function.
+# Macs have bash3 for which the bash-completion package doesn't include
+# _init_completion. This is a minimal version of that function.
 __%[1]s_init_completion()
 {
     COMPREPLY=()
     _get_comp_words_by_ref "$@" cur prev words cword
 }
 
-***REMOVED*** This function calls the %[1]s program to obtain the completion
-***REMOVED*** results and the directive.  It fills the 'out' and 'directive' vars.
+# This function calls the %[1]s program to obtain the completion
+# results and the directive.  It fills the 'out' and 'directive' vars.
 __%[1]s_get_completion_results() {
     local requestComp lastParam lastChar args
 
-    ***REMOVED*** Prepare the command to request completions for the program.
-    ***REMOVED*** Calling ${words[0]} instead of directly %[1]s allows handling aliases
+    # Prepare the command to request completions for the program.
+    # Calling ${words[0]} instead of directly %[1]s allows handling aliases
     args=("${words[@]:1}")
     requestComp="${words[0]} %[2]s ${args[*]}"
 
-    lastParam=${words[$((${***REMOVED***words[@]}-1))]}
-    lastChar=${lastParam:$((${***REMOVED***lastParam}-1)):1}
+    lastParam=${words[$((${#words[@]}-1))]}
+    lastChar=${lastParam:$((${#lastParam}-1)):1}
     __%[1]s_debug "lastParam ${lastParam}, lastChar ${lastChar}"
 
     if [[ -z ${cur} && ${lastChar} != = ]]; then
-        ***REMOVED*** If the last parameter is complete (there is a space following it)
-        ***REMOVED*** We add an extra empty parameter so we can indicate this to the go method.
+        # If the last parameter is complete (there is a space following it)
+        # We add an extra empty parameter so we can indicate this to the go method.
         __%[1]s_debug "Adding extra empty parameter"
         requestComp="${requestComp} ''"
     fi
 
-    ***REMOVED*** When completing a flag with an = (e.g., %[1]s -n=<TAB>)
-    ***REMOVED*** bash focuses on the part after the =, so we need to remove
-    ***REMOVED*** the flag part from $cur
+    # When completing a flag with an = (e.g., %[1]s -n=<TAB>)
+    # bash focuses on the part after the =, so we need to remove
+    # the flag part from $cur
     if [[ ${cur} == -*=* ]]; then
-        cur="${cur***REMOVED****=}"
+        cur="${cur#*=}"
     fi
 
     __%[1]s_debug "Calling ${requestComp}"
-    ***REMOVED*** Use eval to handle any environment variables and such
+    # Use eval to handle any environment variables and such
     out=$(eval "${requestComp}" 2>/dev/null)
 
-    ***REMOVED*** Extract the directive integer at the very end of the output following a colon (:)
-    directive=${out***REMOVED******REMOVED****:}
-    ***REMOVED*** Remove the directive
+    # Extract the directive integer at the very end of the output following a colon (:)
+    directive=${out##*:}
+    # Remove the directive
     out=${out%%:*}
     if [[ ${directive} == "${out}" ]]; then
-        ***REMOVED*** There is not directive specified
+        # There is not directive specified
         directive=0
     fi
     __%[1]s_debug "The completion directive is: ${directive}"
@@ -104,7 +104,7 @@ __%[1]s_process_completion_results() {
     local shellCompDirectiveKeepOrder=%[8]d
 
     if (((directive & shellCompDirectiveError) != 0)); then
-        ***REMOVED*** Error code.  No completion.
+        # Error code.  No completion.
         __%[1]s_debug "Received error from custom completion go code"
         return
     else
@@ -118,7 +118,7 @@ __%[1]s_process_completion_results() {
         fi
         if (((directive & shellCompDirectiveKeepOrder) != 0)); then
             if [[ $(type -t compopt) == builtin ]]; then
-                ***REMOVED*** no sort isn't supported for bash less than < 4.4
+                # no sort isn't supported for bash less than < 4.4
                 if [[ ${BASH_VERSINFO[0]} -lt 4 || ( ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -lt 4 ) ]]; then
                     __%[1]s_debug "No sort directive not supported in this version of bash"
                 else
@@ -139,17 +139,17 @@ __%[1]s_process_completion_results() {
         fi
     fi
 
-    ***REMOVED*** Separate activeHelp from normal completions
+    # Separate activeHelp from normal completions
     local completions=()
     local activeHelp=()
     __%[1]s_extract_activeHelp
 
     if (((directive & shellCompDirectiveFilterFileExt) != 0)); then
-        ***REMOVED*** File extension filtering
+        # File extension filtering
         local fullFilter filter filteringCmd
 
-        ***REMOVED*** Do not use quotes around the $completions variable or else newline
-        ***REMOVED*** characters will be kept.
+        # Do not use quotes around the $completions variable or else newline
+        # characters will be kept.
         for filter in ${completions[*]}; do
             fullFilter+="$filter|"
         done
@@ -158,7 +158,7 @@ __%[1]s_process_completion_results() {
         __%[1]s_debug "File filtering command: $filteringCmd"
         $filteringCmd
     elif (((directive & shellCompDirectiveFilterDirs) != 0)); then
-        ***REMOVED*** File completion for directories only
+        # File completion for directories only
 
         local subdir
         subdir=${completions[0]}
@@ -176,29 +176,29 @@ __%[1]s_process_completion_results() {
     __%[1]s_handle_special_char "$cur" :
     __%[1]s_handle_special_char "$cur" =
 
-    ***REMOVED*** Print the activeHelp statements before we finish
-    if ((${***REMOVED***activeHelp[*]} != 0)); then
+    # Print the activeHelp statements before we finish
+    if ((${#activeHelp[*]} != 0)); then
         printf "\n";
         printf "%%s\n" "${activeHelp[@]}"
         printf "\n"
 
-        ***REMOVED*** The prompt format is only available from bash 4.4.
-        ***REMOVED*** We test if it is available before using it.
+        # The prompt format is only available from bash 4.4.
+        # We test if it is available before using it.
         if (x=${PS1@P}) 2> /dev/null; then
             printf "%%s" "${PS1@P}${COMP_LINE[@]}"
         else
-            ***REMOVED*** Can't print the prompt.  Just print the
-            ***REMOVED*** text the user had typed, it is workable enough.
+            # Can't print the prompt.  Just print the
+            # text the user had typed, it is workable enough.
             printf "%%s" "${COMP_LINE[@]}"
         fi
     fi
 }
 
-***REMOVED*** Separate activeHelp lines from real completions.
-***REMOVED*** Fills the $activeHelp and $completions arrays.
+# Separate activeHelp lines from real completions.
+# Fills the $activeHelp and $completions arrays.
 __%[1]s_extract_activeHelp() {
     local activeHelpMarker="%[9]s"
-    local endIndex=${***REMOVED***activeHelpMarker}
+    local endIndex=${#activeHelpMarker}
 
     while IFS='' read -r comp; do
         if [[ ${comp:0:endIndex} == $activeHelpMarker ]]; then
@@ -208,7 +208,7 @@ __%[1]s_extract_activeHelp() {
                 activeHelp+=("$comp")
             fi
         else
-            ***REMOVED*** Not an activeHelp line but a normal completion
+            # Not an activeHelp line but a normal completion
             completions+=("$comp")
         fi
     done <<<"${out}"
@@ -219,16 +219,16 @@ __%[1]s_handle_completion_types() {
 
     case $COMP_TYPE in
     37|42)
-        ***REMOVED*** Type: menu-complete/menu-complete-backward and insert-completions
-        ***REMOVED*** If the user requested inserting one completion at a time, or all
-        ***REMOVED*** completions at once on the command-line we must remove the descriptions.
-        ***REMOVED*** https://github.com/spf13/cobra/issues/1508
+        # Type: menu-complete/menu-complete-backward and insert-completions
+        # If the user requested inserting one completion at a time, or all
+        # completions at once on the command-line we must remove the descriptions.
+        # https://github.com/spf13/cobra/issues/1508
         local tab=$'\t' comp
         while IFS='' read -r comp; do
             [[ -z $comp ]] && continue
-            ***REMOVED*** Strip any description
+            # Strip any description
             comp=${comp%%%%$tab*}
-            ***REMOVED*** Only consider the completions that match
+            # Only consider the completions that match
             if [[ $comp == "$cur"* ]]; then
                 COMPREPLY+=("$comp")
             fi
@@ -236,7 +236,7 @@ __%[1]s_handle_completion_types() {
         ;;
 
     *)
-        ***REMOVED*** Type: complete (normal completion)
+        # Type: complete (normal completion)
         __%[1]s_handle_standard_completion_case
         ;;
     esac
@@ -245,7 +245,7 @@ __%[1]s_handle_completion_types() {
 __%[1]s_handle_standard_completion_case() {
     local tab=$'\t' comp
 
-    ***REMOVED*** Short circuit to optimize if we don't have descriptions
+    # Short circuit to optimize if we don't have descriptions
     if [[ "${completions[*]}" != *$tab* ]]; then
         IFS=$'\n' read -ra COMPREPLY -d '' < <(compgen -W "${completions[*]}" -- "$cur")
         return 0
@@ -253,26 +253,26 @@ __%[1]s_handle_standard_completion_case() {
 
     local longest=0
     local compline
-    ***REMOVED*** Look for the longest completion so that we can format things nicely
+    # Look for the longest completion so that we can format things nicely
     while IFS='' read -r compline; do
         [[ -z $compline ]] && continue
-        ***REMOVED*** Strip any description before checking the length
+        # Strip any description before checking the length
         comp=${compline%%%%$tab*}
-        ***REMOVED*** Only consider the completions that match
+        # Only consider the completions that match
         [[ $comp == "$cur"* ]] || continue
         COMPREPLY+=("$compline")
-        if ((${***REMOVED***comp}>longest)); then
-            longest=${***REMOVED***comp}
+        if ((${#comp}>longest)); then
+            longest=${#comp}
         fi
     done < <(printf "%%s\n" "${completions[@]}")
 
-    ***REMOVED*** If there is a single completion left, remove the description text
-    if ((${***REMOVED***COMPREPLY[*]} == 1)); then
+    # If there is a single completion left, remove the description text
+    if ((${#COMPREPLY[*]} == 1)); then
         __%[1]s_debug "COMPREPLY[0]: ${COMPREPLY[0]}"
         comp="${COMPREPLY[0]%%%%$tab*}"
         __%[1]s_debug "Removed description from single completion, which is now: ${comp}"
         COMPREPLY[0]=$comp
-    else ***REMOVED*** Format the descriptions
+    else # Format the descriptions
         __%[1]s_format_comp_descriptions $longest
     fi
 }
@@ -282,10 +282,10 @@ __%[1]s_handle_special_char()
     local comp="$1"
     local char=$2
     if [[ "$comp" == *${char}* && "$COMP_WORDBREAKS" == *${char}* ]]; then
-        local word=${comp%%"${comp***REMOVED******REMOVED****${char}}"}
-        local idx=${***REMOVED***COMPREPLY[*]}
+        local word=${comp%%"${comp##*${char}}"}
+        local idx=${#COMPREPLY[*]}
         while ((--idx >= 0)); do
-            COMPREPLY[idx]=${COMPREPLY[idx]***REMOVED***"$word"}
+            COMPREPLY[idx]=${COMPREPLY[idx]#"$word"}
         done
     fi
 }
@@ -299,32 +299,32 @@ __%[1]s_format_comp_descriptions()
     local i ci
     for ci in ${!COMPREPLY[*]}; do
         comp=${COMPREPLY[ci]}
-        ***REMOVED*** Properly format the description string which follows a tab character if there is one
+        # Properly format the description string which follows a tab character if there is one
         if [[ "$comp" == *$tab* ]]; then
             __%[1]s_debug "Original comp: $comp"
-            desc=${comp***REMOVED****$tab}
+            desc=${comp#*$tab}
             comp=${comp%%%%$tab*}
 
-            ***REMOVED*** $COLUMNS stores the current shell width.
-            ***REMOVED*** Remove an extra 4 because we add 2 spaces and 2 parentheses.
+            # $COLUMNS stores the current shell width.
+            # Remove an extra 4 because we add 2 spaces and 2 parentheses.
             maxdesclength=$(( COLUMNS - longest - 4 ))
 
-            ***REMOVED*** Make sure we can fit a description of at least 8 characters
-            ***REMOVED*** if we are to align the descriptions.
+            # Make sure we can fit a description of at least 8 characters
+            # if we are to align the descriptions.
             if ((maxdesclength > 8)); then
-                ***REMOVED*** Add the proper number of spaces to align the descriptions
-                for ((i = ${***REMOVED***comp} ; i < longest ; i++)); do
+                # Add the proper number of spaces to align the descriptions
+                for ((i = ${#comp} ; i < longest ; i++)); do
                     comp+=" "
                 done
             else
-                ***REMOVED*** Don't pad the descriptions so we can fit more text after the completion
-                maxdesclength=$(( COLUMNS - ${***REMOVED***comp} - 4 ))
+                # Don't pad the descriptions so we can fit more text after the completion
+                maxdesclength=$(( COLUMNS - ${#comp} - 4 ))
             fi
 
-            ***REMOVED*** If there is enough space for any description text,
-            ***REMOVED*** truncate the descriptions that are too long for the shell width
+            # If there is enough space for any description text,
+            # truncate the descriptions that are too long for the shell width
             if ((maxdesclength > 0)); then
-                if ((${***REMOVED***desc} > maxdesclength)); then
+                if ((${#desc} > maxdesclength)); then
                     desc=${desc:0:$(( maxdesclength - 1 ))}
                     desc+="…"
                 fi
@@ -342,8 +342,8 @@ __start_%[1]s()
 
     COMPREPLY=()
 
-    ***REMOVED*** Call _init_completion from the bash-completion package
-    ***REMOVED*** to prepare the arguments properly
+    # Call _init_completion from the bash-completion package
+    # to prepare the arguments properly
     if declare -F _init_completion >/dev/null 2>&1; then
         _init_completion -n =: || return
     else
@@ -352,11 +352,11 @@ __start_%[1]s()
 
     __%[1]s_debug
     __%[1]s_debug "========= starting completion logic =========="
-    __%[1]s_debug "cur is ${cur}, words[*] is ${words[*]}, ***REMOVED***words[@] is ${***REMOVED***words[@]}, cword is $cword"
+    __%[1]s_debug "cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}, cword is $cword"
 
-    ***REMOVED*** The user could have moved the cursor backwards on the command-line.
-    ***REMOVED*** We need to trigger completion from the $cword location, so we need
-    ***REMOVED*** to truncate the command-line ($words) up to the $cword location.
+    # The user could have moved the cursor backwards on the command-line.
+    # We need to trigger completion from the $cword location, so we need
+    # to truncate the command-line ($words) up to the $cword location.
     words=("${words[@]:0:$cword+1}")
     __%[1]s_debug "Truncated words[*]: ${words[*]},"
 
@@ -371,7 +371,7 @@ else
     complete -o default -o nospace -F __start_%[1]s %[1]s
 fi
 
-***REMOVED*** ex: ts=4 sw=4 et filetype=sh
+# ex: ts=4 sw=4 et filetype=sh
 `, name, compCmd,
 		ShellCompDirectiveError, ShellCompDirectiveNoSpace, ShellCompDirectiveNoFileComp,
 		ShellCompDirectiveFilterFileExt, ShellCompDirectiveFilterDirs, ShellCompDirectiveKeepOrder,

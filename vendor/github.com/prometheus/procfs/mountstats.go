@@ -46,11 +46,11 @@ const (
 	fieldTransport11UDPLen = 10
 
 	// kernel version >= 4.14 MaxLen
-	// See: https://elixir.bootlin.com/linux/v6.4.8/source/net/sunrpc/xprtrdma/xprt_rdma.h***REMOVED***L393
+	// See: https://elixir.bootlin.com/linux/v6.4.8/source/net/sunrpc/xprtrdma/xprt_rdma.h#L393
 	fieldTransport11RDMAMaxLen = 28
 
 	// kernel version <= 4.2 MinLen
-	// See: https://elixir.bootlin.com/linux/v4.2.8/source/net/sunrpc/xprtrdma/xprt_rdma.h***REMOVED***L331
+	// See: https://elixir.bootlin.com/linux/v4.2.8/source/net/sunrpc/xprtrdma/xprt_rdma.h#L331
 	fieldTransport11RDMAMinLen = 20
 )
 
@@ -653,7 +653,7 @@ func parseNFSTransportStats(ss []string, statVersion string) (*NFSTransportStats
 	// From https://utcc.utoronto.ca/%7Ecks/space/blog/linux/NFSMountstatsXprt
 	//
 	// For the udp RPC transport there is no connection count, connect idle time,
-	// or idle time (fields ***REMOVED***3, ***REMOVED***4, and ***REMOVED***5); all other fields are the same. So
+	// or idle time (fields #3, #4, and #5); all other fields are the same. So
 	// we set them to 0 here.
 	if protocol == "udp" {
 		ns = append(ns[:2], append(make([]uint64, 3), ns[2:]...)...)

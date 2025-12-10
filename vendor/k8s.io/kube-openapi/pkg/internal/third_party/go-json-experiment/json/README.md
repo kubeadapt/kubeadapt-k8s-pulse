@@ -1,4 +1,4 @@
-***REMOVED*** JSON Serialization (v2)
+# JSON Serialization (v2)
 
 [![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)](https://pkg.go.dev/github.com/go-json-experiment/json)
 [![Build Status](https://github.com/go-json-experiment/json/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/go-json-experiment/json/actions)
@@ -7,7 +7,7 @@ This module hosts an experimental implementation of v2 `encoding/json`.
 The API is unstable and breaking changes will regularly be made.
 Do not depend on this in publicly available modules.
 
-***REMOVED******REMOVED*** Goals and objectives
+## Goals and objectives
 
 * **Mostly backwards compatible:** If possible, v2 should aim to be _mostly_
 compatible with v1 in terms of both API and default behavior to ease migration.
@@ -33,12 +33,12 @@ may be dropped in favor of better performance. For example,
 despite `Encoder` and `Decoder` operating on an `io.Writer` and `io.Reader`,
 they do not operate in a truly streaming manner,
 leading to a loss in performance. The v2 implementation should aim to be truly
-streaming by default (see [***REMOVED***33714](https://golang.org/issue/33714)).
+streaming by default (see [#33714](https://golang.org/issue/33714)).
 
 * **Easy to use (hard to misuse):** The v2 API should aim to make
 the common case easy and the less common case at least possible.
 The API should avoid behavior that goes contrary to user expectation,
-which may result in subtle bugs (see [***REMOVED***36225](https://golang.org/issue/36225)).
+which may result in subtle bugs (see [#36225](https://golang.org/issue/36225)).
 
 * **v1 and v2 maintainability:** Since the v1 implementation must stay forever,
 it would be beneficial if v1 could be implemented under the hood with v2,
@@ -49,12 +49,12 @@ behavioral changes in v2 relative to v1 need to be exposed as options.
 package `unsafe` even if it could provide a performance boost.
 We aim to preserve this property.
 
-***REMOVED******REMOVED*** Expectations
+## Expectations
 
 While this module aims to possibly be the v2 implementation of `encoding/json`,
 there is no guarantee that this outcome will occur. As with any major change
 to the Go standard library, this will eventually go through the
-[Go proposal process](https://github.com/golang/proposal***REMOVED***readme).
+[Go proposal process](https://github.com/golang/proposal#readme).
 At the present moment, this is still in the design and experimentation phase
 and is not ready for a formal proposal.
 
@@ -70,7 +70,7 @@ the existing v1 `encoding/json` package.
 its addition to the standard library.
 5. Some other unforeseen outcome (among the infinite number of possibilities).
 
-***REMOVED******REMOVED*** Development
+## Development
 
 This module is primarily developed by
 [@dsnet](https://github.com/dsnet),
@@ -84,7 +84,7 @@ with feedback provided by
 Discussion about semantics occur semi-regularly, where a
 [record of past meetings can be found here](https://docs.google.com/document/d/1rovrOTd-wTawGMPPlPuKhwXaYBg9VszTXR9AQQL5LfI/edit?usp=sharing).
 
-***REMOVED******REMOVED*** Design overview
+## Design overview
 
 This package aims to provide a clean separation between syntax and semantics.
 Syntax deals with the structural representation of JSON (as specified in
@@ -117,7 +117,7 @@ semantic meaning to syntactic data handled by the bottom half.
 In contrast to v1 `encoding/json`, options are represented as separate types
 rather than being setter methods on the `Encoder` or `Decoder` types.
 
-***REMOVED******REMOVED*** Behavior changes
+## Behavior changes
 
 The v2 `json` package changes the default behavior of `Marshal` and `Unmarshal`
 relative to the v1 `json` package to be more sensible.
@@ -128,32 +128,32 @@ This table shows an overview of the changes:
 
 | v1 | v2 | Details |
 | -- | -- | ------- |
-| JSON object members are unmarshaled into a Go struct using a **case-insensitive name match**. | JSON object members are unmarshaled into a Go struct using a **case-sensitive name match**. | [CaseSensitivity](/diff_test.go***REMOVED***:~:text=TestCaseSensitivity) |
-| When marshaling a Go struct, a struct field marked as `omitempty` is omitted if **the field value is an empty Go value**, which is defined as false, 0, a nil pointer, a nil interface value, and any empty array, slice, map, or string. | When marshaling a Go struct, a struct field marked as `omitempty` is omitted if **the field value would encode as an empty JSON value**, which is defined as a JSON null, or an empty JSON string, object, or array. | [OmitEmptyOption](/diff_test.go***REMOVED***:~:text=TestOmitEmptyOption) |
-| The `string` option **does affect** Go bools. | The `string` option **does not affect** Go bools. | [StringOption](/diff_test.go***REMOVED***:~:text=TestStringOption) |
-| The `string` option **does not recursively affect** sub-values of the Go field value. | The `string` option **does recursively affect** sub-values of the Go field value. | [StringOption](/diff_test.go***REMOVED***:~:text=TestStringOption) |
-| The `string` option **sometimes accepts** a JSON null escaped within a JSON string. | The `string` option **never accepts** a JSON null escaped within a JSON string. | [StringOption](/diff_test.go***REMOVED***:~:text=TestStringOption) |
-| A nil Go slice is marshaled as a **JSON null**. | A nil Go slice is marshaled as an **empty JSON array**. | [NilSlicesAndMaps](/diff_test.go***REMOVED***:~:text=TestNilSlicesAndMaps) |
-| A nil Go map is marshaled as a **JSON null**. | A nil Go map is marshaled as an **empty JSON object**. | [NilSlicesAndMaps](/diff_test.go***REMOVED***:~:text=TestNilSlicesAndMaps) |
-| A Go array may be unmarshaled from a **JSON array of any length**. | A Go array must be unmarshaled from a **JSON array of the same length**. | [Arrays](/diff_test.go***REMOVED***:~:text=Arrays) |
-| A Go byte array is represented as a **JSON array of JSON numbers**. | A Go byte array is represented as a **Base64-encoded JSON string**. | [ByteArrays](/diff_test.go***REMOVED***:~:text=TestByteArrays) |
-| `MarshalJSON` and `UnmarshalJSON` methods declared on a pointer receiver are **inconsistently called**. | `MarshalJSON` and `UnmarshalJSON` methods declared on a pointer receiver are **consistently called**. | [PointerReceiver](/diff_test.go***REMOVED***:~:text=TestPointerReceiver) |
-| A Go map is marshaled in a **deterministic order**. | A Go map is marshaled in a **non-deterministic order**. | [MapDeterminism](/diff_test.go***REMOVED***:~:text=TestMapDeterminism) |
-| JSON strings are encoded **with HTML-specific characters being escaped**. | JSON strings are encoded **without any characters being escaped** (unless necessary). | [EscapeHTML](/diff_test.go***REMOVED***:~:text=TestEscapeHTML) |
-| When marshaling, invalid UTF-8 within a Go string **are silently replaced**. | When marshaling, invalid UTF-8 within a Go string **results in an error**. | [InvalidUTF8](/diff_test.go***REMOVED***:~:text=TestInvalidUTF8) |
-| When unmarshaling, invalid UTF-8 within a JSON string **are silently replaced**. | When unmarshaling, invalid UTF-8 within a JSON string **results in an error**. | [InvalidUTF8](/diff_test.go***REMOVED***:~:text=TestInvalidUTF8) |
-| When marshaling, **an error does not occur** if the output JSON value contains objects with duplicate names. | When marshaling, **an error does occur** if the output JSON value contains objects with duplicate names. | [DuplicateNames](/diff_test.go***REMOVED***:~:text=TestDuplicateNames) |
-| When unmarshaling, **an error does not occur** if the input JSON value contains objects with duplicate names. | When unmarshaling, **an error does occur** if the input JSON value contains objects with duplicate names. | [DuplicateNames](/diff_test.go***REMOVED***:~:text=TestDuplicateNames) |
-| Unmarshaling a JSON null into a non-empty Go value **inconsistently clears the value or does nothing**. | Unmarshaling a JSON null into a non-empty Go value **always clears the value**. | [MergeNull](/diff_test.go***REMOVED***:~:text=TestMergeNull) |
-| Unmarshaling a JSON value into a non-empty Go value **follows inconsistent and bizarre behavior**. | Unmarshaling a JSON value into a non-empty Go value **always merges if the input is an object, and otherwise replaces**.  | [MergeComposite](/diff_test.go***REMOVED***:~:text=TestMergeComposite) |
-| A `time.Duration` is represented as a **JSON number containing the decimal number of nanoseconds**. | A `time.Duration` is represented as a **JSON string containing the formatted duration (e.g., "1h2m3.456s")**. | [TimeDurations](/diff_test.go***REMOVED***:~:text=TestTimeDurations) |
-| Unmarshaling a JSON number into a Go float beyond its representation **results in an error**. | Unmarshaling a JSON number into a Go float beyond its representation **uses the closest representable value (e.g., ±`math.MaxFloat`)**. | [MaxFloats](/diff_test.go***REMOVED***:~:text=TestMaxFloats) |
-| A Go struct with only unexported fields **can be serialized**. | A Go struct with only unexported fields **cannot be serialized**. | [EmptyStructs](/diff_test.go***REMOVED***:~:text=TestEmptyStructs) |
-| A Go struct that embeds an unexported struct type **can sometimes be serialized**. | A Go struct that embeds an unexported struct type **cannot be serialized**. | [EmbedUnexported](/diff_test.go***REMOVED***:~:text=TestEmbedUnexported) |
+| JSON object members are unmarshaled into a Go struct using a **case-insensitive name match**. | JSON object members are unmarshaled into a Go struct using a **case-sensitive name match**. | [CaseSensitivity](/diff_test.go#:~:text=TestCaseSensitivity) |
+| When marshaling a Go struct, a struct field marked as `omitempty` is omitted if **the field value is an empty Go value**, which is defined as false, 0, a nil pointer, a nil interface value, and any empty array, slice, map, or string. | When marshaling a Go struct, a struct field marked as `omitempty` is omitted if **the field value would encode as an empty JSON value**, which is defined as a JSON null, or an empty JSON string, object, or array. | [OmitEmptyOption](/diff_test.go#:~:text=TestOmitEmptyOption) |
+| The `string` option **does affect** Go bools. | The `string` option **does not affect** Go bools. | [StringOption](/diff_test.go#:~:text=TestStringOption) |
+| The `string` option **does not recursively affect** sub-values of the Go field value. | The `string` option **does recursively affect** sub-values of the Go field value. | [StringOption](/diff_test.go#:~:text=TestStringOption) |
+| The `string` option **sometimes accepts** a JSON null escaped within a JSON string. | The `string` option **never accepts** a JSON null escaped within a JSON string. | [StringOption](/diff_test.go#:~:text=TestStringOption) |
+| A nil Go slice is marshaled as a **JSON null**. | A nil Go slice is marshaled as an **empty JSON array**. | [NilSlicesAndMaps](/diff_test.go#:~:text=TestNilSlicesAndMaps) |
+| A nil Go map is marshaled as a **JSON null**. | A nil Go map is marshaled as an **empty JSON object**. | [NilSlicesAndMaps](/diff_test.go#:~:text=TestNilSlicesAndMaps) |
+| A Go array may be unmarshaled from a **JSON array of any length**. | A Go array must be unmarshaled from a **JSON array of the same length**. | [Arrays](/diff_test.go#:~:text=Arrays) |
+| A Go byte array is represented as a **JSON array of JSON numbers**. | A Go byte array is represented as a **Base64-encoded JSON string**. | [ByteArrays](/diff_test.go#:~:text=TestByteArrays) |
+| `MarshalJSON` and `UnmarshalJSON` methods declared on a pointer receiver are **inconsistently called**. | `MarshalJSON` and `UnmarshalJSON` methods declared on a pointer receiver are **consistently called**. | [PointerReceiver](/diff_test.go#:~:text=TestPointerReceiver) |
+| A Go map is marshaled in a **deterministic order**. | A Go map is marshaled in a **non-deterministic order**. | [MapDeterminism](/diff_test.go#:~:text=TestMapDeterminism) |
+| JSON strings are encoded **with HTML-specific characters being escaped**. | JSON strings are encoded **without any characters being escaped** (unless necessary). | [EscapeHTML](/diff_test.go#:~:text=TestEscapeHTML) |
+| When marshaling, invalid UTF-8 within a Go string **are silently replaced**. | When marshaling, invalid UTF-8 within a Go string **results in an error**. | [InvalidUTF8](/diff_test.go#:~:text=TestInvalidUTF8) |
+| When unmarshaling, invalid UTF-8 within a JSON string **are silently replaced**. | When unmarshaling, invalid UTF-8 within a JSON string **results in an error**. | [InvalidUTF8](/diff_test.go#:~:text=TestInvalidUTF8) |
+| When marshaling, **an error does not occur** if the output JSON value contains objects with duplicate names. | When marshaling, **an error does occur** if the output JSON value contains objects with duplicate names. | [DuplicateNames](/diff_test.go#:~:text=TestDuplicateNames) |
+| When unmarshaling, **an error does not occur** if the input JSON value contains objects with duplicate names. | When unmarshaling, **an error does occur** if the input JSON value contains objects with duplicate names. | [DuplicateNames](/diff_test.go#:~:text=TestDuplicateNames) |
+| Unmarshaling a JSON null into a non-empty Go value **inconsistently clears the value or does nothing**. | Unmarshaling a JSON null into a non-empty Go value **always clears the value**. | [MergeNull](/diff_test.go#:~:text=TestMergeNull) |
+| Unmarshaling a JSON value into a non-empty Go value **follows inconsistent and bizarre behavior**. | Unmarshaling a JSON value into a non-empty Go value **always merges if the input is an object, and otherwise replaces**.  | [MergeComposite](/diff_test.go#:~:text=TestMergeComposite) |
+| A `time.Duration` is represented as a **JSON number containing the decimal number of nanoseconds**. | A `time.Duration` is represented as a **JSON string containing the formatted duration (e.g., "1h2m3.456s")**. | [TimeDurations](/diff_test.go#:~:text=TestTimeDurations) |
+| Unmarshaling a JSON number into a Go float beyond its representation **results in an error**. | Unmarshaling a JSON number into a Go float beyond its representation **uses the closest representable value (e.g., ±`math.MaxFloat`)**. | [MaxFloats](/diff_test.go#:~:text=TestMaxFloats) |
+| A Go struct with only unexported fields **can be serialized**. | A Go struct with only unexported fields **cannot be serialized**. | [EmptyStructs](/diff_test.go#:~:text=TestEmptyStructs) |
+| A Go struct that embeds an unexported struct type **can sometimes be serialized**. | A Go struct that embeds an unexported struct type **cannot be serialized**. | [EmbedUnexported](/diff_test.go#:~:text=TestEmbedUnexported) |
 
 See [diff_test.go](/diff_test.go) for details about every change.
 
-***REMOVED******REMOVED*** Performance
+## Performance
 
 One of the goals of the v2 module is to be more performant than v1.
 
@@ -217,9 +217,9 @@ Benchmarks were performed on an AMD Ryzen 9 5900X.
 The code for the benchmarks is located at
 https://github.com/go-json-experiment/jsonbench.
 
-***REMOVED******REMOVED******REMOVED*** Marshal Performance
+### Marshal Performance
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Concrete types
+#### Concrete types
 
 ![Benchmark Marshal Concrete](benchmark-marshal-concrete.png)
 
@@ -235,7 +235,7 @@ https://github.com/go-json-experiment/jsonbench.
 * For `JSONv1` and `JSONv2`, marshaling from concrete types is
   mostly limited by the performance of Go reflection.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Interface types
+#### Interface types
 
 ![Benchmark Marshal Interface](benchmark-marshal-interface.png)
 
@@ -251,7 +251,7 @@ https://github.com/go-json-experiment/jsonbench.
   One advantange is because it does not sort the keys for a `map[string]any`,
   while alternatives (except `SonicJSON` and `JSONIterator`) do sort the keys.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** RawValue types
+#### RawValue types
 
 ![Benchmark Marshal Rawvalue](benchmark-marshal-rawvalue.png)
 
@@ -267,9 +267,9 @@ https://github.com/go-json-experiment/jsonbench.
 * Relative to `SonicJSON`, `JSONv2` is up to 1.5x faster.
 * Aside from `JSONIterator`, `JSONv2` is generally the fastest.
 
-***REMOVED******REMOVED******REMOVED*** Unmarshal Performance
+### Unmarshal Performance
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Concrete types
+#### Concrete types
 
 ![Benchmark Unmarshal Concrete](benchmark-unmarshal-concrete.png)
 
@@ -284,7 +284,7 @@ https://github.com/go-json-experiment/jsonbench.
 * For `JSONv1` and `JSONv2`, unmarshaling into concrete types is
   mostly limited by the performance of Go reflection.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Interface types
+#### Interface types
 
 ![Benchmark Unmarshal Interface](benchmark-unmarshal-interface.png)
 
@@ -299,7 +299,7 @@ https://github.com/go-json-experiment/jsonbench.
 * Aside from `SonicJSON`, `JSONv2` is generally just as fast
   or faster than all the alternatives.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** RawValue types
+#### RawValue types
 
 ![Benchmark Unmarshal Rawvalue](benchmark-unmarshal-rawvalue.png)
 
@@ -313,7 +313,7 @@ https://github.com/go-json-experiment/jsonbench.
 * Relative to `SonicJSON`, `JSONv2` is up to 2.0x faster
   (ignoring `StringUnicode` since `SonicJSON` does not validate UTF-8).
 * `JSONv1` takes a
-  [lexical scanning approach](https://talks.golang.org/2011/lex.slide***REMOVED***1),
+  [lexical scanning approach](https://talks.golang.org/2011/lex.slide#1),
   which performs a virtual function call for every byte of input.
   In contrast, `JSONv2` makes heavy use of iterative and linear parsing logic
   (with extra complexity to resume parsing when encountering segmented buffers).

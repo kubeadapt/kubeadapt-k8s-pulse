@@ -15,11 +15,11 @@ and easier to use with structs.
 For example, "toarray" tag makes struct fields encode to CBOR array elements.  And
 "keyasint" makes a field encode to an element of CBOR map with specified int key.
 
-Latest docs can be viewed at https://github.com/fxamacker/cbor***REMOVED***cbor-library-in-go
+Latest docs can be viewed at https://github.com/fxamacker/cbor#cbor-library-in-go
 
-***REMOVED*** Basics
+# Basics
 
-The Quick Start guide is at https://github.com/fxamacker/cbor***REMOVED***quick-start
+The Quick Start guide is at https://github.com/fxamacker/cbor#quick-start
 
 Function signatures identical to encoding/json include:
 
@@ -98,15 +98,15 @@ Creating and Using Encoding Modes
 	// NOTE: Both em.Marshal(v) and encoder.Encode(v) use encoding options
 	// specified during creation of em (encoding mode).
 
-***REMOVED*** CBOR Options
+# CBOR Options
 
-Predefined Encoding Options: https://github.com/fxamacker/cbor***REMOVED***predefined-encoding-options
+Predefined Encoding Options: https://github.com/fxamacker/cbor#predefined-encoding-options
 
-Encoding Options: https://github.com/fxamacker/cbor***REMOVED***encoding-options
+Encoding Options: https://github.com/fxamacker/cbor#encoding-options
 
-Decoding Options: https://github.com/fxamacker/cbor***REMOVED***decoding-options
+Decoding Options: https://github.com/fxamacker/cbor#decoding-options
 
-***REMOVED*** Struct Tags
+# Struct Tags
 
 Struct tags like `cbor:"name,omitempty"` and `json:"name,omitempty"` work as expected.
 If both struct tags are specified then `cbor` is used.
@@ -119,9 +119,9 @@ makes struct fields encode to elements of CBOR map with int keys.
 
 https://raw.githubusercontent.com/fxamacker/images/master/cbor/v2.0.0/cbor_easy_api.png
 
-Struct tags are listed at https://github.com/fxamacker/cbor***REMOVED***struct-tags-1
+Struct tags are listed at https://github.com/fxamacker/cbor#struct-tags-1
 
-***REMOVED*** Tests and Fuzzing
+# Tests and Fuzzing
 
 Over 375 tests are included in this package. Cover-guided fuzzing is handled by
 a private fuzzer that replaced fxamacker/cbor-fuzz years ago.

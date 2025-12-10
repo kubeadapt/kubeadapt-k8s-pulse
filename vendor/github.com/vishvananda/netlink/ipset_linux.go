@@ -387,7 +387,7 @@ func (h *Handle) newIpsetRequest(cmd int) *nl.NetlinkRequest {
 
 // NOTE: This can't just take typename into account, it also has to take desired
 // feature support into account, on a per-set-type basis, to return the correct revision, see e.g.
-// https://github.com/Olipro/ipset/blob/9f145b49100104d6570fe5c31a5236816ebb4f8f/kernel/net/netfilter/ipset/ip_set_hash_ipport.c***REMOVED***L30
+// https://github.com/Olipro/ipset/blob/9f145b49100104d6570fe5c31a5236816ebb4f8f/kernel/net/netfilter/ipset/ip_set_hash_ipport.c#L30
 //
 // This means that whenever a new "type" of ipset is added, returning the "correct" default revision
 // requires adding a new case here for that type, and consulting the ipset C code to figure out the correct

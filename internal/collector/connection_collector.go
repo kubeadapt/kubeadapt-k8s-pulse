@@ -63,7 +63,7 @@ import (
 //	  protocol="tcp",
 //	  daemonset_pod_uid="abc-123-def-456",
 //	  daemonset_node_name="node-1"
-//	} 4500  ***REMOVED*** Total bytes from pod A to pod B since this agent started
+//	} 4500  # Total bytes from pod A to pod B since this agent started
 type ConnectionCollector struct {
 	bpfManager  *bpf.Manager
 	logger      *zap.Logger

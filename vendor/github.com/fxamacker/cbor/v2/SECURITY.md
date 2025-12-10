@@ -1,4 +1,4 @@
-***REMOVED*** Security Policy
+# Security Policy
 
 Security fixes are provided for the latest released version of fxamacker/cbor.
 

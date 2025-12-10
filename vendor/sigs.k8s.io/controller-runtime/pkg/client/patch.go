@@ -169,7 +169,7 @@ func MergeFromWithOptions(obj Object, opts ...MergeFromOption) Patch {
 // See https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/ for more details on
 // the difference between merge-patch and strategic-merge-patch.
 // Please note, that CRDs don't support strategic-merge-patch, see
-// https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/***REMOVED***advanced-features-and-flexibility
+// https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#advanced-features-and-flexibility
 func StrategicMergeFrom(obj Object, opts ...MergeFromOption) Patch {
 	options := &MergeFromOptions{}
 	for _, opt := range opts {

@@ -1,4 +1,4 @@
-***REMOVED*** eBPF
+# eBPF
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/cilium/ebpf)](https://pkg.go.dev/github.com/cilium/ebpf)
 
@@ -11,14 +11,14 @@ be used in long running processes.
 See [ebpf.io](https://ebpf.io) for complementary projects from the wider eBPF
 ecosystem.
 
-***REMOVED******REMOVED*** Getting Started
+## Getting Started
 
 Please take a look at our [Getting Started] guide.
 
 [Contributions](https://ebpf-go.dev/contributing) are highly encouraged, as they highlight certain use cases of
 eBPF and the library, and help shape the future of the project.
 
-***REMOVED******REMOVED*** Getting Help
+## Getting Help
 
 The community actively monitors our [GitHub Discussions](https://github.com/cilium/ebpf/discussions) page.
 Please search for existing threads before starting a new one. Refrain from
@@ -26,12 +26,12 @@ opening issues on the bug tracker if you're just starting out or if you're not
 sure if something is a bug in the library code.
 
 Alternatively, [join](https://ebpf.io/slack) the
-[***REMOVED***ebpf-go](https://cilium.slack.com/messages/ebpf-go) channel on Slack if you
+[#ebpf-go](https://cilium.slack.com/messages/ebpf-go) channel on Slack if you
 have other questions regarding the project. Note that this channel is ephemeral
 and has its history erased past a certain point, which is less helpful for
 others running into the same problem later.
 
-***REMOVED******REMOVED*** Packages
+## Packages
 
 This library includes the following packages:
 
@@ -55,20 +55,20 @@ This library includes the following packages:
 * [btf](https://pkg.go.dev/github.com/cilium/ebpf/btf) allows reading the BPF Type Format.
 * [pin](https://pkg.go.dev/github.com/cilium/ebpf/pin) provides APIs for working with pinned objects on bpffs.
 
-***REMOVED******REMOVED*** Requirements
+## Requirements
 
 * A version of Go that is [supported by
-  upstream](https://golang.org/doc/devel/release.html***REMOVED***policy)
+  upstream](https://golang.org/doc/devel/release.html#policy)
 * Linux: CI is run against kernel.org LTS releases. >= 4.4 should work but EOL'ed
   versions are not supported.
 * Windows: CI is run against Windows Server 2022. Only the latest eBPF for Windows
   release is supported.
 
-***REMOVED******REMOVED*** License
+## License
 
 MIT
 
-***REMOVED******REMOVED******REMOVED*** eBPF Gopher
+### eBPF Gopher
 
 The eBPF honeygopher is based on the Go gopher designed by Renee French.
 

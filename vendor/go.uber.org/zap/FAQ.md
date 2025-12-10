@@ -1,8 +1,8 @@
-***REMOVED*** Frequently Asked Questions
+# Frequently Asked Questions
 
-***REMOVED******REMOVED*** Design
+## Design
 
-***REMOVED******REMOVED******REMOVED*** Why spend so much effort on logger performance?
+### Why spend so much effort on logger performance?
 
 Of course, most applications won't notice the impact of a slow logger: they
 already take tens or hundreds of milliseconds for each operation, so an extra
@@ -14,7 +14,7 @@ structured logging possible in performance-sensitive contexts. Across a fleet
 of Go microservices, making each application even slightly more efficient adds
 up quickly.
 
-***REMOVED******REMOVED******REMOVED*** Why aren't `Logger` and `SugaredLogger` interfaces?
+### Why aren't `Logger` and `SugaredLogger` interfaces?
 
 Unlike the familiar `io.Writer` and `http.Handler`, `Logger` and
 `SugaredLogger` interfaces would include *many* methods. As [Rob Pike points
@@ -27,14 +27,14 @@ abstraction, and it lets us add methods without introducing breaking changes.
 Your applications should define and depend upon an interface that includes
 just the methods you use.
 
-***REMOVED******REMOVED******REMOVED*** Why are some of my logs missing?
+### Why are some of my logs missing?
 
 Logs are dropped intentionally by zap when sampling is enabled. The production
 configuration (as returned by `NewProductionConfig()` enables sampling which will
 cause repeated logs within a second to be sampled. See more details on why sampling
-is enabled in [Why sample application logs](https://github.com/uber-go/zap/blob/master/FAQ.md***REMOVED***why-sample-application-logs).
+is enabled in [Why sample application logs](https://github.com/uber-go/zap/blob/master/FAQ.md#why-sample-application-logs).
 
-***REMOVED******REMOVED******REMOVED*** Why sample application logs?
+### Why sample application logs?
 
 Applications often experience runs of errors, either because of a bug or
 because of a misbehaving user. Logging errors is usually a good idea, but it
@@ -48,7 +48,7 @@ conditions, your application writes out every entry. When similar entries are
 logged hundreds or thousands of times each second, though, zap begins dropping
 duplicates to preserve throughput.
 
-***REMOVED******REMOVED******REMOVED*** Why do the structured logging APIs take a message in addition to fields?
+### Why do the structured logging APIs take a message in addition to fields?
 
 Subjectively, we find it helpful to accompany structured context with a brief
 description. This isn't critical during development, but it makes debugging
@@ -59,7 +59,7 @@ duplicate entries. In our experience, this is a practical middle ground
 between random sampling (which often drops the exact entry that you need while
 debugging) and hashing the complete entry (which is prohibitively expensive).
 
-***REMOVED******REMOVED******REMOVED*** Why include package-global loggers?
+### Why include package-global loggers?
 
 Since so many other logging packages include a global logger, many
 applications aren't designed to accept loggers as explicit parameters.
@@ -68,7 +68,7 @@ global loggers to simplify migration.
 
 Avoid them where possible.
 
-***REMOVED******REMOVED******REMOVED*** Why include dedicated Panic and Fatal log levels?
+### Why include dedicated Panic and Fatal log levels?
 
 In general, application code should handle errors gracefully instead of using
 `panic` or `os.Exit`. However, every rule has exceptions, and it's common to
@@ -80,9 +80,9 @@ Zap makes this easy by offering `Panic` and `Fatal` logging methods that
 automatically flush before exiting. Of course, this doesn't guarantee that
 logs will never be lost, but it eliminates a common error.
 
-See the discussion in uber-go/zap***REMOVED***207 for more details.
+See the discussion in uber-go/zap#207 for more details.
 
-***REMOVED******REMOVED******REMOVED*** What's `DPanic`?
+### What's `DPanic`?
 
 `DPanic` stands for "panic in development." In development, it logs at
 `PanicLevel`; otherwise, it logs at `ErrorLevel`. `DPanic` makes it easier to
@@ -97,9 +97,9 @@ if err != nil {
 }
 ```
 
-***REMOVED******REMOVED*** Installation
+## Installation
 
-***REMOVED******REMOVED******REMOVED*** What does the error `expects import "go.uber.org/zap"` mean?
+### What does the error `expects import "go.uber.org/zap"` mean?
 
 Either zap was installed incorrectly or you're referencing the wrong package
 name in your code.
@@ -115,9 +115,9 @@ get -u go.uber.org/zap`, and always import it in your code with `import
 "go.uber.org/zap"`. Your code shouldn't contain *any* references to
 `github.com/uber-go/zap`.
 
-***REMOVED******REMOVED*** Usage
+## Usage
 
-***REMOVED******REMOVED******REMOVED*** Does zap support log rotation?
+### Does zap support log rotation?
 
 Zap doesn't natively support rotating log files, since we prefer to leave this
 to an external program like `logrotate`.
@@ -142,7 +142,7 @@ core := zapcore.NewCore(
 logger := zap.New(core)
 ```
 
-***REMOVED******REMOVED*** Extensions
+## Extensions
 
 We'd love to support every logging need within zap itself, but we're only
 familiar with a handful of log ingestion systems, flag-parsing packages, and
@@ -160,5 +160,5 @@ We're aware of the following extensions, but haven't used them ourselves:
 | `github.com/moul/zapfilter` | Advanced filtering rules |
 
 [go-proverbs]: https://go-proverbs.github.io/
-[import-path]: https://golang.org/cmd/go/***REMOVED***hdr-Remote_import_paths
+[import-path]: https://golang.org/cmd/go/#hdr-Remote_import_paths
 [lumberjack]: https://godoc.org/gopkg.in/natefinch/lumberjack.v2

@@ -113,8 +113,8 @@ func (st StackTrace) Format(s fmt.State, verb rune) {
 				io.WriteString(s, "\n")
 				f.Format(s, verb)
 			}
-		case s.Flag('***REMOVED***'):
-			fmt.Fprintf(s, "%***REMOVED***v", []Frame(st))
+		case s.Flag('#'):
+			fmt.Fprintf(s, "%#v", []Frame(st))
 		default:
 			st.formatSlice(s, verb)
 		}

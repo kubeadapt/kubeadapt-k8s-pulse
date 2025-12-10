@@ -200,7 +200,7 @@ func (c *Config) String() string {
 	if cc.ExecProvider != nil && cc.ExecProvider.Config != nil {
 		cc.ExecProvider.Config = sanitizedObject{Object: cc.ExecProvider.Config}
 	}
-	return fmt.Sprintf("%***REMOVED***v", cc)
+	return fmt.Sprintf("%#v", cc)
 }
 
 // ImpersonationConfig has all the available impersonation options
@@ -282,7 +282,7 @@ func (c TLSClientConfig) String() string {
 	if len(cc.KeyData) != 0 {
 		cc.KeyData = []byte("--- REDACTED ---")
 	}
-	return fmt.Sprintf("%***REMOVED***v", cc)
+	return fmt.Sprintf("%#v", cc)
 }
 
 type ContentConfig struct {

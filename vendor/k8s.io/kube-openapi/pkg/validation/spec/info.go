@@ -161,7 +161,7 @@ type InfoProps struct {
 // Info object provides metadata about the API.
 // The metadata can be used by the clients if needed, and can be presented in the Swagger-UI for convenience.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***infoObject
+// For more information: http://goo.gl/8us55a#infoObject
 type Info struct {
 	VendorExtensible
 	InfoProps

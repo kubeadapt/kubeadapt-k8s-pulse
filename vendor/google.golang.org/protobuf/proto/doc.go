@@ -13,7 +13,7 @@
 // For a guide to generated Go protocol buffer code, see:
 // https://protobuf.dev/reference/go/go-generated.
 //
-// ***REMOVED*** Binary serialization
+// # Binary serialization
 //
 // This package contains functions to convert to and from the wire format,
 // an efficient binary serialization of protocol buffers.
@@ -26,7 +26,7 @@
 //   - [Unmarshal] converts a message from the wire format.
 //     The [UnmarshalOptions] type provides more control over wire unmarshaling.
 //
-// ***REMOVED*** Basic message operations
+// # Basic message operations
 //
 //   - [Clone] makes a deep copy of a message.
 //
@@ -40,7 +40,7 @@
 //
 //   - [CheckInitialized] reports whether all required fields in a message are set.
 //
-// ***REMOVED*** Optional scalar constructors
+// # Optional scalar constructors
 //
 // The API for some generated messages represents optional scalar fields
 // as pointers to a value. For example, an optional string field has the
@@ -55,14 +55,14 @@
 //
 // Optional scalar fields are only supported in proto2.
 //
-// ***REMOVED*** Extension accessors
+// # Extension accessors
 //
 //   - [HasExtension], [GetExtension], [SetExtension], and [ClearExtension]
 //     access extension field values in a protocol buffer message.
 //
 // Extension fields are only supported in proto2.
 //
-// ***REMOVED*** Related packages
+// # Related packages
 //
 //   - Package [google.golang.org/protobuf/encoding/protojson] converts messages to
 //     and from JSON.

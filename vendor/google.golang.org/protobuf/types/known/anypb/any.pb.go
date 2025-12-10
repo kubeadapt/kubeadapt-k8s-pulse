@@ -37,7 +37,7 @@
 // It is functionally a tuple of the full name of the remote message type and
 // the serialized bytes of the remote message value.
 //
-// ***REMOVED*** Constructing an Any
+// # Constructing an Any
 //
 // An Any message containing another message value is constructed using New:
 //
@@ -47,7 +47,7 @@
 //	}
 //	... // make use of any
 //
-// ***REMOVED*** Unmarshaling an Any
+// # Unmarshaling an Any
 //
 // With a populated Any message, the underlying message can be serialized into
 // a remote concrete message value in a few ways.
@@ -93,7 +93,7 @@
 // listed in the case clauses are linked into the Go binary and therefore also
 // registered in the global registry.
 //
-// ***REMOVED*** Type checking an Any
+// # Type checking an Any
 //
 // In order to type check whether an Any message represents some other message,
 // then use the MessageIs method:

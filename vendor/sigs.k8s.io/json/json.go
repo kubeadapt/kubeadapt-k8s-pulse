@@ -24,7 +24,7 @@ import (
 	internaljson "sigs.k8s.io/json/internal/golang/encoding/json"
 )
 
-// Decoder describes the decoding API exposed by `encoding/json***REMOVED***Decoder`
+// Decoder describes the decoding API exposed by `encoding/json#Decoder`
 type Decoder interface {
 	Decode(v interface{}) error
 	Buffered() io.Reader
@@ -33,13 +33,13 @@ type Decoder interface {
 	InputOffset() int64
 }
 
-// NewDecoderCaseSensitivePreserveInts returns a decoder that matches the behavior of encoding/json***REMOVED***NewDecoder, with the following changes:
+// NewDecoderCaseSensitivePreserveInts returns a decoder that matches the behavior of encoding/json#NewDecoder, with the following changes:
 //   - When unmarshaling into a struct, JSON keys must case-sensitively match `json` tag names (for tagged struct fields)
 //     or struct field names (for untagged struct fields), or they are treated as unknown fields and discarded.
 //   - When unmarshaling a number into an interface value, it is unmarshaled as an int64 if
 //     the JSON data does not contain a "." character and parses as an integer successfully and
 //     does not overflow int64. Otherwise, the number is unmarshaled as a float64.
-//   - If a syntax error is returned, it will not be of type encoding/json***REMOVED***SyntaxError,
+//   - If a syntax error is returned, it will not be of type encoding/json#SyntaxError,
 //     but will be recognizeable by this package's IsSyntaxError() function.
 func NewDecoderCaseSensitivePreserveInts(r io.Reader) Decoder {
 	d := internaljson.NewDecoder(r)
@@ -50,13 +50,13 @@ func NewDecoderCaseSensitivePreserveInts(r io.Reader) Decoder {
 
 // UnmarshalCaseSensitivePreserveInts parses the JSON-encoded data and stores the result in the value pointed to by v.
 //
-// UnmarshalCaseSensitivePreserveInts matches the behavior of encoding/json***REMOVED***Unmarshal, with the following changes:
+// UnmarshalCaseSensitivePreserveInts matches the behavior of encoding/json#Unmarshal, with the following changes:
 //   - When unmarshaling into a struct, JSON keys must case-sensitively match `json` tag names (for tagged struct fields)
 //     or struct field names (for untagged struct fields), or they are treated as unknown fields and discarded.
 //   - When unmarshaling a number into an interface value, it is unmarshaled as an int64 if
 //     the JSON data does not contain a "." character and parses as an integer successfully and
 //     does not overflow int64. Otherwise, the number is unmarshaled as a float64.
-//   - If a syntax error is returned, it will not be of type encoding/json***REMOVED***SyntaxError,
+//   - If a syntax error is returned, it will not be of type encoding/json#SyntaxError,
 //     but will be recognizeable by this package's IsSyntaxError() function.
 func UnmarshalCaseSensitivePreserveInts(data []byte, v interface{}) error {
 	return internaljson.Unmarshal(

@@ -3,38 +3,38 @@
 // +build gc
 // +build !purego
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // Registers:
-***REMOVED***define h      AX
-***REMOVED***define d      AX
-***REMOVED***define p      SI // pointer to advance through b
-***REMOVED***define n      DX
-***REMOVED***define end    BX // loop end
-***REMOVED***define v1     R8
-***REMOVED***define v2     R9
-***REMOVED***define v3     R10
-***REMOVED***define v4     R11
-***REMOVED***define x      R12
-***REMOVED***define prime1 R13
-***REMOVED***define prime2 R14
-***REMOVED***define prime4 DI
+#define h      AX
+#define d      AX
+#define p      SI // pointer to advance through b
+#define n      DX
+#define end    BX // loop end
+#define v1     R8
+#define v2     R9
+#define v3     R10
+#define v4     R11
+#define x      R12
+#define prime1 R13
+#define prime2 R14
+#define prime4 DI
 
-***REMOVED***define round(acc, x) \
+#define round(acc, x) \
 	IMULQ prime2, x   \
 	ADDQ  x, acc      \
 	ROLQ  $31, acc    \
 	IMULQ prime1, acc
 
 // round0 performs the operation x = round(0, x).
-***REMOVED***define round0(x) \
+#define round0(x) \
 	IMULQ prime2, x \
 	ROLQ  $31, x    \
 	IMULQ prime1, x
 
 // mergeRound applies a merge round on the two registers acc and x.
 // It assumes that prime1, prime2, and prime4 have been loaded.
-***REMOVED***define mergeRound(acc, x) \
+#define mergeRound(acc, x) \
 	round0(x)         \
 	XORQ  x, acc      \
 	IMULQ prime1, acc \
@@ -43,7 +43,7 @@
 // blockLoop processes as many 32-byte blocks as possible,
 // updating v1, v2, v3, and v4. It assumes that there is at least one block
 // to process.
-***REMOVED***define blockLoop() \
+#define blockLoop() \
 loop:  \
 	MOVQ +0(p), x  \
 	round(v1, x)   \

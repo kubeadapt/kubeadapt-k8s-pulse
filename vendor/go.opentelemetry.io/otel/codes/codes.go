@@ -54,7 +54,7 @@ func (c Code) String() string {
 // UnmarshalJSON unmarshals b into the Code.
 //
 // This is based on the functionality in the gRPC codes package:
-// https://github.com/grpc/grpc-go/blob/bb64fee312b46ebee26be43364a7a966033521b1/codes/codes.go***REMOVED***L218-L244
+// https://github.com/grpc/grpc-go/blob/bb64fee312b46ebee26be43364a7a966033521b1/codes/codes.go#L218-L244
 func (c *Code) UnmarshalJSON(b []byte) error {
 	// From json.Unmarshaler: By convention, to approximate the behavior of
 	// Unmarshal itself, Unmarshalers implement UnmarshalJSON([]byte("null")) as

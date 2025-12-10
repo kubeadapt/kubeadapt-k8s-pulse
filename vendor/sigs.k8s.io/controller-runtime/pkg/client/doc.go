@@ -17,7 +17,7 @@ limitations under the License.
 // Package client contains functionality for interacting with Kubernetes API
 // servers.
 //
-// ***REMOVED*** Clients
+// # Clients
 //
 // Clients are split into two interfaces -- Readers and Writers.   Readers
 // get and list, while writers create, update, and delete.
@@ -28,7 +28,7 @@ limitations under the License.
 // It is a common pattern in Kubernetes to read from a cache and write to the API
 // server.  This pattern is covered by the creating the Client with a Cache.
 //
-// ***REMOVED*** Options
+// # Options
 //
 // Many client operations in Kubernetes support options.  These options are
 // represented as variadic arguments at the end of a given method call.
@@ -36,7 +36,7 @@ limitations under the License.
 //
 //	err := someReader.List(context.Background(), &podList, client.MatchingLabels{"somelabel": "someval"})
 //
-// ***REMOVED*** Indexing
+// # Indexing
 //
 // Indexes may be added to caches using a FieldIndexer.  This allows you to easily
 // and efficiently look up objects with certain properties.  You can then make

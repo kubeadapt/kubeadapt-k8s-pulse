@@ -32,7 +32,7 @@ func genFishComp(buf io.StringWriter, name string, includeDesc bool) {
 	if !includeDesc {
 		compCmd = ShellCompNoDescRequestCmd
 	}
-	WriteStringAndCheck(buf, fmt.Sprintf("***REMOVED*** fish completion for %-36s -*- shell-script -*-\n", name))
+	WriteStringAndCheck(buf, fmt.Sprintf("# fish completion for %-36s -*- shell-script -*-\n", name))
 	WriteStringAndCheck(buf, fmt.Sprintf(`
 function __%[1]s_debug
     set -l file "$BASH_COMP_DEBUG_FILE"
@@ -44,29 +44,29 @@ end
 function __%[1]s_perform_completion
     __%[1]s_debug "Starting __%[1]s_perform_completion"
 
-    ***REMOVED*** Extract all args except the last one
+    # Extract all args except the last one
     set -l args (commandline -opc)
-    ***REMOVED*** Extract the last arg and escape it in case it is a space
+    # Extract the last arg and escape it in case it is a space
     set -l lastArg (string escape -- (commandline -ct))
 
     __%[1]s_debug "args: $args"
     __%[1]s_debug "last arg: $lastArg"
 
-    ***REMOVED*** Disable ActiveHelp which is not supported for fish shell
+    # Disable ActiveHelp which is not supported for fish shell
     set -l requestComp "%[10]s=0 $args[1] %[3]s $args[2..-1] $lastArg"
 
     __%[1]s_debug "Calling $requestComp"
     set -l results (eval $requestComp 2> /dev/null)
 
-    ***REMOVED*** Some programs may output extra empty lines after the directive.
-    ***REMOVED*** Let's ignore them or else it will break completion.
-    ***REMOVED*** Ref: https://github.com/spf13/cobra/issues/1279
+    # Some programs may output extra empty lines after the directive.
+    # Let's ignore them or else it will break completion.
+    # Ref: https://github.com/spf13/cobra/issues/1279
     for line in $results[-1..1]
         if test (string trim -- $line) = ""
-            ***REMOVED*** Found an empty line, remove it
+            # Found an empty line, remove it
             set results $results[1..-2]
         else
-            ***REMOVED*** Found non-empty line, we have our proper output
+            # Found non-empty line, we have our proper output
             break
         end
     end
@@ -74,8 +74,8 @@ function __%[1]s_perform_completion
     set -l comps $results[1..-2]
     set -l directiveLine $results[-1]
 
-    ***REMOVED*** For Fish, when completing a flag with an = (e.g., <program> -n=<TAB>)
-    ***REMOVED*** completions must be prefixed with the flag
+    # For Fish, when completing a flag with an = (e.g., <program> -n=<TAB>)
+    # completions must be prefixed with the flag
     set -l flagPrefix (string match -r -- '-.*=' "$lastArg")
 
     __%[1]s_debug "Comps: $comps"
@@ -89,7 +89,7 @@ function __%[1]s_perform_completion
     printf "%%s\n" "$directiveLine"
 end
 
-***REMOVED*** this function limits calls to __%[1]s_perform_completion, by caching the result behind $__%[1]s_perform_completion_once_result
+# this function limits calls to __%[1]s_perform_completion, by caching the result behind $__%[1]s_perform_completion_once_result
 function __%[1]s_perform_completion_once
     __%[1]s_debug "Starting __%[1]s_perform_completion_once"
 
@@ -108,7 +108,7 @@ function __%[1]s_perform_completion_once
     return 0
 end
 
-***REMOVED*** this function is used to clear the $__%[1]s_perform_completion_once_result variable after completions are run
+# this function is used to clear the $__%[1]s_perform_completion_once_result variable after completions are run
 function __%[1]s_clear_perform_completion_once_result
     __%[1]s_debug ""
     __%[1]s_debug "========= clearing previously set __%[1]s_perform_completion_once_result variable =========="
@@ -143,14 +143,14 @@ function __%[1]s_requires_order_preservation
 end
 
 
-***REMOVED*** This function does two things:
-***REMOVED*** - Obtain the completions and store them in the global __%[1]s_comp_results
-***REMOVED*** - Return false if file completion should be performed
+# This function does two things:
+# - Obtain the completions and store them in the global __%[1]s_comp_results
+# - Return false if file completion should be performed
 function __%[1]s_prepare_completions
     __%[1]s_debug ""
     __%[1]s_debug "========= starting completion logic =========="
 
-    ***REMOVED*** Start fresh
+    # Start fresh
     set --erase __%[1]s_comp_results
 
     __%[1]s_perform_completion_once
@@ -158,7 +158,7 @@ function __%[1]s_prepare_completions
 
     if test -z "$__%[1]s_perform_completion_once_result"
         __%[1]s_debug "No completion, probably due to a failure"
-        ***REMOVED*** Might as well do file completion, in case it helps
+        # Might as well do file completion, in case it helps
         return 1
     end
 
@@ -181,7 +181,7 @@ function __%[1]s_prepare_completions
     set -l compErr (math (math --scale 0 $directive / $shellCompDirectiveError) %% 2)
     if test $compErr -eq 1
         __%[1]s_debug "Received error directive: aborting."
-        ***REMOVED*** Might as well do file completion, in case it helps
+        # Might as well do file completion, in case it helps
         return 1
     end
 
@@ -189,7 +189,7 @@ function __%[1]s_prepare_completions
     set -l dirfilter (math (math --scale 0 $directive / $shellCompDirectiveFilterDirs) %% 2)
     if test $filefilter -eq 1; or test $dirfilter -eq 1
         __%[1]s_debug "File extension filtering or directory filtering not supported"
-        ***REMOVED*** Do full file completion instead
+        # Do full file completion instead
         return 1
     end
 
@@ -198,11 +198,11 @@ function __%[1]s_prepare_completions
 
     __%[1]s_debug "nospace: $nospace, nofiles: $nofiles"
 
-    ***REMOVED*** If we want to prevent a space, or if file completion is NOT disabled,
-    ***REMOVED*** we need to count the number of valid completions.
-    ***REMOVED*** To do so, we will filter on prefix as the completions we have received
-    ***REMOVED*** may not already be filtered so as to allow fish to match on different
-    ***REMOVED*** criteria than the prefix.
+    # If we want to prevent a space, or if file completion is NOT disabled,
+    # we need to count the number of valid completions.
+    # To do so, we will filter on prefix as the completions we have received
+    # may not already be filtered so as to allow fish to match on different
+    # criteria than the prefix.
     if test $nospace -ne 0; or test $nofiles -eq 0
         set -l prefix (commandline -t | string escape --style=regex)
         __%[1]s_debug "prefix: $prefix"
@@ -211,23 +211,23 @@ function __%[1]s_prepare_completions
         set --global __%[1]s_comp_results $completions
         __%[1]s_debug "Filtered completions are: $__%[1]s_comp_results"
 
-        ***REMOVED*** Important not to quote the variable for count to work
+        # Important not to quote the variable for count to work
         set -l numComps (count $__%[1]s_comp_results)
         __%[1]s_debug "numComps: $numComps"
 
         if test $numComps -eq 1; and test $nospace -ne 0
-            ***REMOVED*** We must first split on \t to get rid of the descriptions to be
-            ***REMOVED*** able to check what the actual completion will be.
-            ***REMOVED*** We don't need descriptions anyway since there is only a single
-            ***REMOVED*** real completion which the shell will expand immediately.
+            # We must first split on \t to get rid of the descriptions to be
+            # able to check what the actual completion will be.
+            # We don't need descriptions anyway since there is only a single
+            # real completion which the shell will expand immediately.
             set -l split (string split --max 1 \t $__%[1]s_comp_results[1])
 
-            ***REMOVED*** Fish won't add a space if the completion ends with any
-            ***REMOVED*** of the following characters: @=/:.,
+            # Fish won't add a space if the completion ends with any
+            # of the following characters: @=/:.,
             set -l lastChar (string sub -s -1 -- $split)
             if not string match -r -q "[@=/:.,]" -- "$lastChar"
-                ***REMOVED*** In other cases, to support the "nospace" directive we trick the shell
-                ***REMOVED*** by outputting an extra, longer completion.
+                # In other cases, to support the "nospace" directive we trick the shell
+                # by outputting an extra, longer completion.
                 __%[1]s_debug "Adding second completion to perform nospace directive"
                 set --global __%[1]s_comp_results $split[1] $split[1].
                 __%[1]s_debug "Completions are now: $__%[1]s_comp_results"
@@ -235,8 +235,8 @@ function __%[1]s_prepare_completions
         end
 
         if test $numComps -eq 0; and test $nofiles -eq 0
-            ***REMOVED*** To be consistent with bash and zsh, we only trigger file
-            ***REMOVED*** completion when there are no other completions
+            # To be consistent with bash and zsh, we only trigger file
+            # completion when there are no other completions
             __%[1]s_debug "Requesting file completion"
             return 1
         end
@@ -245,27 +245,27 @@ function __%[1]s_prepare_completions
     return 0
 end
 
-***REMOVED*** Since Fish completions are only loaded once the user triggers them, we trigger them ourselves
-***REMOVED*** so we can properly delete any completions provided by another script.
-***REMOVED*** Only do this if the program can be found, or else fish may print some errors; besides,
-***REMOVED*** the existing completions will only be loaded if the program can be found.
+# Since Fish completions are only loaded once the user triggers them, we trigger them ourselves
+# so we can properly delete any completions provided by another script.
+# Only do this if the program can be found, or else fish may print some errors; besides,
+# the existing completions will only be loaded if the program can be found.
 if type -q "%[2]s"
-    ***REMOVED*** The space after the program name is essential to trigger completion for the program
-    ***REMOVED*** and not completion of the program name itself.
-    ***REMOVED*** Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
+    # The space after the program name is essential to trigger completion for the program
+    # and not completion of the program name itself.
+    # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
     complete --do-complete "%[2]s " > /dev/null 2>&1
 end
 
-***REMOVED*** Remove any pre-existing completions for the program since we will be handling all of them.
+# Remove any pre-existing completions for the program since we will be handling all of them.
 complete -c %[2]s -e
 
-***REMOVED*** this will get called after the two calls below and clear the $__%[1]s_perform_completion_once_result global
+# this will get called after the two calls below and clear the $__%[1]s_perform_completion_once_result global
 complete -c %[2]s -n '__%[1]s_clear_perform_completion_once_result'
-***REMOVED*** The call to __%[1]s_prepare_completions will setup __%[1]s_comp_results
-***REMOVED*** which provides the program's completion choices.
-***REMOVED*** If this doesn't require order preservation, we don't use the -k flag
+# The call to __%[1]s_prepare_completions will setup __%[1]s_comp_results
+# which provides the program's completion choices.
+# If this doesn't require order preservation, we don't use the -k flag
 complete -c %[2]s -n 'not __%[1]s_requires_order_preservation && __%[1]s_prepare_completions' -f -a '$__%[1]s_comp_results'
-***REMOVED*** otherwise we use the -k flag
+# otherwise we use the -k flag
 complete -k -c %[2]s -n '__%[1]s_requires_order_preservation && __%[1]s_prepare_completions' -f -a '$__%[1]s_comp_results'
 `, nameForVar, name, compCmd,
 		ShellCompDirectiveError, ShellCompDirectiveNoSpace, ShellCompDirectiveNoFileComp,

@@ -1,8 +1,8 @@
-***REMOVED***!/bin/bash
+#!/bin/bash
 
-***REMOVED*** Copyright 2019 The Go Authors. All rights reserved.
-***REMOVED*** Use of this source code is governed by a BSD-style
-***REMOVED*** license that can be found in the LICENSE file.
+# Copyright 2019 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 set -e
 shopt -s nullglob
@@ -23,14 +23,14 @@ declare -A errors
 
 	while read -r line; do
 		unset vtype
-		if [[ $line =~ ^***REMOVED***define\ +([A-Z0-9_]+k?)\ +([A-Z0-9_]+\()?([A-Z][A-Z0-9_]+k?)\)? ]]; then
+		if [[ $line =~ ^#define\ +([A-Z0-9_]+k?)\ +([A-Z0-9_]+\()?([A-Z][A-Z0-9_]+k?)\)? ]]; then
 			key="${BASH_REMATCH[1]}"
 			value="${BASH_REMATCH[3]}"
-		elif [[ $line =~ ^***REMOVED***define\ +([A-Z0-9_]+k?)\ +([A-Z0-9_]+\()?((0x)?[0-9A-Fa-f]+)L?\)? ]]; then
+		elif [[ $line =~ ^#define\ +([A-Z0-9_]+k?)\ +([A-Z0-9_]+\()?((0x)?[0-9A-Fa-f]+)L?\)? ]]; then
 			key="${BASH_REMATCH[1]}"
 			value="${BASH_REMATCH[3]}"
 			vtype="${BASH_REMATCH[2]}"
-		elif [[ $line =~ ^***REMOVED***define\ +([A-Z0-9_]+k?)\ +\(\(([A-Z]+)\)((0x)?[0-9A-Fa-f]+)L?\) ]]; then
+		elif [[ $line =~ ^#define\ +([A-Z0-9_]+k?)\ +\(\(([A-Z]+)\)((0x)?[0-9A-Fa-f]+)L?\) ]]; then
 			key="${BASH_REMATCH[1]}"
 			value="${BASH_REMATCH[3]}"
 			vtype="${BASH_REMATCH[2]}"
@@ -62,7 +62,7 @@ declare -A errors
 	done < "$winerror"
 
 	while read -r line; do
-		[[ $line =~ ^***REMOVED***define\ (STATUS_[^\s]+)\ +\(\(NTSTATUS\)((0x)?[0-9a-fA-F]+)L?\) ]] || continue
+		[[ $line =~ ^#define\ (STATUS_[^\s]+)\ +\(\(NTSTATUS\)((0x)?[0-9a-fA-F]+)L?\) ]] || continue
 		echo "${BASH_REMATCH[1]} NTStatus = ${BASH_REMATCH[2]}"
 	done < "$ntstatus"
 

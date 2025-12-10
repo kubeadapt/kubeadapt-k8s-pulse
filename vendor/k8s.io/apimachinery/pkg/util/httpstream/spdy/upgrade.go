@@ -87,7 +87,7 @@ func (u responseUpgrader) UpgradeResponse(w http.ResponseWriter, req *http.Reque
 	connectionHeader := strings.ToLower(req.Header.Get(httpstream.HeaderConnection))
 	upgradeHeader := strings.ToLower(req.Header.Get(httpstream.HeaderUpgrade))
 	if !strings.Contains(connectionHeader, strings.ToLower(httpstream.HeaderUpgrade)) || !strings.Contains(upgradeHeader, strings.ToLower(HeaderSpdy31)) {
-		errorMsg := fmt.Sprintf("unable to upgrade: missing upgrade headers in request: %***REMOVED***v", req.Header)
+		errorMsg := fmt.Sprintf("unable to upgrade: missing upgrade headers in request: %#v", req.Header)
 		http.Error(w, errorMsg, http.StatusBadRequest)
 		return nil
 	}

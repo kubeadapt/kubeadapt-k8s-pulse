@@ -27,7 +27,7 @@ var L4ProtoMap = map[uint8]string{
 //		TCP_CONNTRACK_TIME_WAIT,
 //		TCP_CONNTRACK_CLOSE,
 //		TCP_CONNTRACK_LISTEN,		/* obsolete */
-//	***REMOVED***define TCP_CONNTRACK_SYN_SENT2		TCP_CONNTRACK_LISTEN
+//	#define TCP_CONNTRACK_SYN_SENT2		TCP_CONNTRACK_LISTEN
 //		TCP_CONNTRACK_MAX,
 //		TCP_CONNTRACK_IGNORE
 //	 };
@@ -68,16 +68,16 @@ const (
 	IPCTNL_MSG_CT_DELETE = 2
 )
 
-// ***REMOVED***define NFNETLINK_V0	0
+// #define NFNETLINK_V0	0
 const (
 	NFNETLINK_V0 = 0
 )
 
 const (
-	NLA_F_NESTED        uint16 = (1 << 15) // ***REMOVED***define NLA_F_NESTED (1 << 15)
-	NLA_F_NET_BYTEORDER uint16 = (1 << 14) // ***REMOVED***define NLA_F_NESTED (1 << 14)
+	NLA_F_NESTED        uint16 = (1 << 15) // #define NLA_F_NESTED (1 << 15)
+	NLA_F_NET_BYTEORDER uint16 = (1 << 14) // #define NLA_F_NESTED (1 << 14)
 	NLA_TYPE_MASK              = ^(NLA_F_NESTED | NLA_F_NET_BYTEORDER)
-	NLA_ALIGNTO         uint16 = 4 // ***REMOVED***define NLA_ALIGNTO 4
+	NLA_ALIGNTO         uint16 = 4 // #define NLA_ALIGNTO 4
 )
 
 // enum ctattr_type {
@@ -88,7 +88,7 @@ const (
 // 	CTA_PROTOINFO,
 // 	CTA_HELP,
 // 	CTA_NAT_SRC,
-// ***REMOVED***define CTA_NAT	CTA_NAT_SRC	/* backwards compatibility */
+// #define CTA_NAT	CTA_NAT_SRC	/* backwards compatibility */
 // 	CTA_TIMEOUT,
 // 	CTA_MARK,
 // 	CTA_COUNTERS_ORIG,
@@ -134,7 +134,7 @@ const (
 // 	CTA_TUPLE_ZONE,
 // 	__CTA_TUPLE_MAX
 // };
-// ***REMOVED***define CTA_TUPLE_MAX (__CTA_TUPLE_MAX - 1)
+// #define CTA_TUPLE_MAX (__CTA_TUPLE_MAX - 1)
 const (
 	CTA_TUPLE_IP    = 1
 	CTA_TUPLE_PROTO = 2
@@ -148,7 +148,7 @@ const (
 // 	CTA_IP_V6_DST,
 // 	__CTA_IP_MAX
 // };
-// ***REMOVED***define CTA_IP_MAX (__CTA_IP_MAX - 1)
+// #define CTA_IP_MAX (__CTA_IP_MAX - 1)
 const (
 	CTA_IP_V4_SRC = 1
 	CTA_IP_V4_DST = 2
@@ -169,7 +169,7 @@ const (
 // 	CTA_PROTO_ICMPV6_CODE,
 // 	__CTA_PROTO_MAX
 // };
-// ***REMOVED***define CTA_PROTO_MAX (__CTA_PROTO_MAX - 1)
+// #define CTA_PROTO_MAX (__CTA_PROTO_MAX - 1)
 const (
 	CTA_PROTO_NUM      = 1
 	CTA_PROTO_SRC_PORT = 2
@@ -183,7 +183,7 @@ const (
 // 	CTA_PROTOINFO_SCTP,
 // 	__CTA_PROTOINFO_MAX
 // };
-// ***REMOVED***define CTA_PROTOINFO_MAX (__CTA_PROTOINFO_MAX - 1)
+// #define CTA_PROTOINFO_MAX (__CTA_PROTOINFO_MAX - 1)
 const (
 	CTA_PROTOINFO_UNSPEC = 0
 	CTA_PROTOINFO_TCP = 1
@@ -200,7 +200,7 @@ const (
 // 	CTA_PROTOINFO_TCP_FLAGS_REPLY,
 // 	__CTA_PROTOINFO_TCP_MAX
 // };
-// ***REMOVED***define CTA_PROTOINFO_TCP_MAX (__CTA_PROTOINFO_TCP_MAX - 1)
+// #define CTA_PROTOINFO_TCP_MAX (__CTA_PROTOINFO_TCP_MAX - 1)
 const (
 	CTA_PROTOINFO_TCP_STATE           = 1
 	CTA_PROTOINFO_TCP_WSCALE_ORIGINAL = 2
@@ -218,7 +218,7 @@ const (
 // 	CTA_COUNTERS_PAD,
 // 	__CTA_COUNTERS_M
 // };
-// ***REMOVED***define CTA_COUNTERS_MAX (__CTA_COUNTERS_MAX - 1)
+// #define CTA_COUNTERS_MAX (__CTA_COUNTERS_MAX - 1)
 const (
 	CTA_COUNTERS_PACKETS = 1
 	CTA_COUNTERS_BYTES   = 2

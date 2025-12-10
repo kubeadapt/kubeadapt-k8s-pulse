@@ -390,7 +390,7 @@ func (v multiGroupVersioner) Identifier() string {
 	}
 	identifier, err := json.Marshal(result)
 	if err != nil {
-		klog.Fatalf("Failed marshaling Identifier for %***REMOVED***v: %v", v, err)
+		klog.Fatalf("Failed marshaling Identifier for %#v: %v", v, err)
 	}
 	return string(identifier)
 }

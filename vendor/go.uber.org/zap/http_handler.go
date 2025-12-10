@@ -33,13 +33,13 @@ import (
 // ServeHTTP is a simple JSON endpoint that can report on or change the current
 // logging level.
 //
-// ***REMOVED*** GET
+// # GET
 //
 // The GET request returns a JSON description of the current logging level like:
 //
 //	{"level":"info"}
 //
-// ***REMOVED*** PUT
+// # PUT
 //
 // The PUT request changes the logging level. It is perfectly safe to change the
 // logging level while a program is running. Two content types are supported:

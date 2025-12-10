@@ -273,7 +273,7 @@ func IsRequestGzip(method string, header map[string][]string, disableCompression
 		method != "HEAD" {
 		// Request gzip only, not deflate. Deflate is ambiguous and
 		// not as universally supported anyway.
-		// See: https://zlib.net/zlib_faq.html***REMOVED***faq39
+		// See: https://zlib.net/zlib_faq.html#faq39
 		//
 		// Note that we don't request this for HEAD requests,
 		// due to a bug in nginx:
@@ -290,8 +290,8 @@ func IsRequestGzip(method string, header map[string][]string, disableCompression
 
 // checkConnHeaders checks whether req has any invalid connection-level headers.
 //
-// https://www.rfc-editor.org/rfc/rfc9114.html***REMOVED***section-4.2-3
-// https://www.rfc-editor.org/rfc/rfc9113.html***REMOVED***section-8.2.2-1
+// https://www.rfc-editor.org/rfc/rfc9114.html#section-4.2-3
+// https://www.rfc-editor.org/rfc/rfc9113.html#section-8.2.2-1
 //
 // Certain headers are special-cased as okay but not transmitted later.
 // For example, we allow "Transfer-Encoding: chunked", but drop the header when encoding.
@@ -435,7 +435,7 @@ func NewServerRequest(rp ServerRequestParam) ServerRequestResult {
 
 	// "':authority' MUST NOT include the deprecated userinfo subcomponent
 	// for "http" or "https" schemed URIs."
-	// https://www.rfc-editor.org/rfc/rfc9113.html***REMOVED***section-8.3.1-2.3.8
+	// https://www.rfc-editor.org/rfc/rfc9113.html#section-8.3.1-2.3.8
 	if strings.IndexByte(rp.Authority, '@') != -1 && (rp.Scheme == "http" || rp.Scheme == "https") {
 		return ServerRequestResult{
 			InvalidReason: "userinfo_in_authority",

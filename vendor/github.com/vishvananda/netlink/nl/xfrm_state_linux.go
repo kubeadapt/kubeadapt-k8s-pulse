@@ -98,18 +98,18 @@ func (msg *XfrmStats) Serialize() []byte {
 //   __u8        mode;   /* XFRM_MODE_xxx */
 //   __u8        replay_window;
 //   __u8        flags;
-// ***REMOVED***define XFRM_STATE_NOECN  1
-// ***REMOVED***define XFRM_STATE_DECAP_DSCP 2
-// ***REMOVED***define XFRM_STATE_NOPMTUDISC 4
-// ***REMOVED***define XFRM_STATE_WILDRECV 8
-// ***REMOVED***define XFRM_STATE_ICMP   16
-// ***REMOVED***define XFRM_STATE_AF_UNSPEC  32
-// ***REMOVED***define XFRM_STATE_ALIGN4 64
-// ***REMOVED***define XFRM_STATE_ESN    128
+// #define XFRM_STATE_NOECN  1
+// #define XFRM_STATE_DECAP_DSCP 2
+// #define XFRM_STATE_NOPMTUDISC 4
+// #define XFRM_STATE_WILDRECV 8
+// #define XFRM_STATE_ICMP   16
+// #define XFRM_STATE_AF_UNSPEC  32
+// #define XFRM_STATE_ALIGN4 64
+// #define XFRM_STATE_ESN    128
 // };
 //
-// ***REMOVED***define XFRM_SA_XFLAG_DONT_ENCAP_DSCP 1
-// ***REMOVED***define XFRM_SA_XFLAG_OSEQ_MAY_WRAP   2
+// #define XFRM_SA_XFLAG_DONT_ENCAP_DSCP 1
+// #define XFRM_SA_XFLAG_OSEQ_MAY_WRAP   2
 //
 
 type XfrmUsersaInfo struct {

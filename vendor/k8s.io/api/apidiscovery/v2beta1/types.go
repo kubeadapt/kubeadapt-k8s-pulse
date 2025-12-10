@@ -33,7 +33,7 @@ import (
 type APIGroupDiscoveryList struct {
 	v1.TypeMeta `json:",inline"`
 	// ResourceVersion will not be set, because this does not have a replayable ordering among multiple apiservers.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	v1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// items is the list of groups for discovery. The groups are listed in priority order.
@@ -55,7 +55,7 @@ type APIGroupDiscovery struct {
 	// The only field completed will be name. For instance, resourceVersion will be empty.
 	// name is the name of the API group whose discovery information is presented here.
 	// name is allowed to be "" to represent the legacy, ungroupified resources.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	v1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// versions are the versions supported in this group. They are sorted in descending order of preference,

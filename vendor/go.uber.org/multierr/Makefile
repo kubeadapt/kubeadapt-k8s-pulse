@@ -1,4 +1,4 @@
-***REMOVED*** Directory to put `go install`ed binaries in.
+# Directory to put `go install`ed binaries in.
 export GOBIN ?= $(shell pwd)/bin
 
 GO_FILES := $(shell \

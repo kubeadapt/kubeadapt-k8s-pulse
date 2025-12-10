@@ -1,8 +1,8 @@
-***REMOVED*** Architecture Documentation
+# Architecture Documentation
 
 This document provides detailed technical architecture information for the KubeAdapt eBPF Network Metrics Agent.
 
-***REMOVED******REMOVED*** High-Level Architecture
+## High-Level Architecture
 
 ```mermaid
 graph TB
@@ -41,14 +41,14 @@ graph TB
     COLLECTOR -->|"Export Gauges"| METRICS
     METRICS -->|"Scrape (30s)"| PROM
 
-    style TC_HOOKS fill:***REMOVED***c0392b,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style MAPS fill:***REMOVED***16a085,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style COLLECTOR fill:***REMOVED***2980b9,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style METRICS fill:***REMOVED***27ae60,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style PROM fill:***REMOVED***f39c12,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
+    style TC_HOOKS fill:#c0392b,stroke:#333,stroke-width:2px,color:#fff
+    style MAPS fill:#16a085,stroke:#333,stroke-width:2px,color:#fff
+    style COLLECTOR fill:#2980b9,stroke:#333,stroke-width:2px,color:#fff
+    style METRICS fill:#27ae60,stroke:#333,stroke-width:2px,color:#fff
+    style PROM fill:#f39c12,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-***REMOVED******REMOVED*** Low-Level eBPF Architecture
+## Low-Level eBPF Architecture
 
 ```mermaid
 graph TB
@@ -91,17 +91,17 @@ graph TB
     READ --> AGG
     AGG --> EXPORT
 
-    style TC_OUT fill:***REMOVED***c0392b,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style CONN_MAP fill:***REMOVED***16a085,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style OVERFLOW fill:***REMOVED***8e44ad,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style READ fill:***REMOVED***2980b9,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style AGG fill:***REMOVED***2980b9,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
-    style EXPORT fill:***REMOVED***27ae60,stroke:***REMOVED***333,stroke-width:2px,color:***REMOVED***fff
+    style TC_OUT fill:#c0392b,stroke:#333,stroke-width:2px,color:#fff
+    style CONN_MAP fill:#16a085,stroke:#333,stroke-width:2px,color:#fff
+    style OVERFLOW fill:#8e44ad,stroke:#333,stroke-width:2px,color:#fff
+    style READ fill:#2980b9,stroke:#333,stroke-width:2px,color:#fff
+    style AGG fill:#2980b9,stroke:#333,stroke-width:2px,color:#fff
+    style EXPORT fill:#27ae60,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-***REMOVED******REMOVED*** Data Flow & Metric Export
+## Data Flow & Metric Export
 
-***REMOVED******REMOVED******REMOVED*** Metrics Data Flow
+### Metrics Data Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -140,7 +140,7 @@ BPF Kernel Maps         Userspace Collector      Prometheus Server
                         └───────────────┘
 ```
 
-***REMOVED******REMOVED******REMOVED*** Connection Tracking Flow
+### Connection Tracking Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -209,24 +209,24 @@ BPF Kernel Maps         Userspace Collector      Prometheus Server
 └─────────────────────────────────────────────────────────────┘
 ```
 
-***REMOVED******REMOVED*** Counter Metrics with Read-Then-Delete Pattern
+## Counter Metrics with Read-Then-Delete Pattern
 
 The agent uses **Prometheus Counters** to export cumulative byte/packet metrics. This design combines kernel-side accumulation with userspace delta reporting.
 
-***REMOVED******REMOVED******REMOVED*** Kernel-Side Accounting (Cumulative Counters)
+### Kernel-Side Accounting (Cumulative Counters)
 
 - eBPF programs maintain **cumulative counters** in kernel space using atomic operations (`__sync_fetch_and_add`)
 - Each connection tracks total bytes/packets sent since connection creation
 - Kernel state accumulates until entry is read and deleted (read-then-delete pattern)
 
-***REMOVED******REMOVED******REMOVED*** Userspace Exports Deltas (Counters)
+### Userspace Exports Deltas (Counters)
 
 - The collector reads BPF maps every 25 seconds and extracts **delta values** for each connection
 - After reading, entries are **deleted from the map** (read-then-delete pattern)
 - Deltas are added to Prometheus Counters using `.Add(delta)`
 - Prometheus Counter maintains cumulative state automatically
 
-***REMOVED******REMOVED******REMOVED*** Why Counters (Not Gauges)?
+### Why Counters (Not Gauges)?
 
 ```go
 // Counter approach (current implementation):
@@ -241,24 +241,24 @@ counterMetric.Add(delta)        // Prometheus maintains cumulative state
 - **No userspace state**: BPF map is cleared each cycle (no persistent state)
 - **PromQL compatibility**: `rate()` and `increase()` functions designed for Counters
 
-***REMOVED******REMOVED******REMOVED*** Prometheus Rate Calculation
+### Prometheus Rate Calculation
 
 ```
 Time Series Example (25s Collection Windows):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-t=0s:   Collection ***REMOVED***1 reads map
+t=0s:   Collection #1 reads map
         Connection active, accumulated 5000 bytes → Gauge = 5000
         Entry DELETED from map after read
 
-t=25s:  Collection ***REMOVED***2 reads map
+t=25s:  Collection #2 reads map
         Connection still active, accumulated 4000 bytes (new window) → Gauge = 4000
         Entry DELETED from map after read
 
-t=50s:  Collection ***REMOVED***3 reads map
+t=50s:  Collection #3 reads map
         Connection closed before this collection
         Entry not in map → Gauge drops (no value exported)
 
-t=75s:  Collection ***REMOVED***4 reads map
+t=75s:  Collection #4 reads map
         No connection → No metric exported
 
 Prometheus Query: rate(kubeadapt_connection_traffic_bytes_total[1m])
@@ -273,7 +273,7 @@ t=50s+:   Connection ended, rate drops to 0
 ✅ Prometheus handles window transitions automatically
 ```
 
-***REMOVED******REMOVED******REMOVED*** Real-World Example
+### Real-World Example
 
 ```
 Kernel BPF Map (cumulative within window):
@@ -302,7 +302,7 @@ PromQL rate() Calculation:
 rate(counter_total[1m]) at t=50s = (8000 - 5000) / 25s = 120 bytes/sec
 ```
 
-***REMOVED******REMOVED*** References
+## References
 
 - [Linux Kernel TC Documentation](https://www.kernel.org/doc/html/latest/networking/filter.html)
 - [Linux Kernel BPF Documentation](https://www.kernel.org/doc/html/latest/bpf/)

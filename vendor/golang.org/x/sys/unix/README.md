@@ -1,4 +1,4 @@
-***REMOVED*** Building `sys/unix`
+# Building `sys/unix`
 
 The sys/unix package provides access to the raw system call interface of the
 underlying operating system. See: https://godoc.org/golang.org/x/sys/unix
@@ -7,14 +7,14 @@ Porting Go to a new architecture/OS combination or adding syscalls, types, or
 constants to an existing architecture/OS pair requires some manual effort;
 however, there are tools that automate much of the process.
 
-***REMOVED******REMOVED*** Build Systems
+## Build Systems
 
 There are currently two ways we generate the necessary files. We are currently
 migrating the build system to use containers so the builds are reproducible.
 This is being done on an OS-by-OS basis. Please update this documentation as
 components of the build system change.
 
-***REMOVED******REMOVED******REMOVED*** Old Build System (currently for `GOOS != "linux"`)
+### Old Build System (currently for `GOOS != "linux"`)
 
 The old build system generates the Go files based on the C header files
 present on your system. This means that files
@@ -34,7 +34,7 @@ your specific system. Running `mkall.sh -n` shows the commands that will be run.
 
 Requirements: bash, go
 
-***REMOVED******REMOVED******REMOVED*** New Build System (currently for `GOOS == "linux"`)
+### New Build System (currently for `GOOS == "linux"`)
 
 The new build system uses a Docker container to generate the go files directly
 from source checkouts of the kernel and various system libraries. This means
@@ -54,7 +54,7 @@ system. Running `mkall.sh -n` shows the commands that will be run.
 
 Requirements: bash, go, docker
 
-***REMOVED******REMOVED*** Component files
+## Component files
 
 This section describes the various files used in the code generation process.
 It also contains instructions on how to modify these files to add a new
@@ -62,7 +62,7 @@ architecture/OS or to add additional syscalls, types, or constants. Note that
 if you are using the new build system, the scripts/programs cannot be called normally.
 They must be called from within the docker container.
 
-***REMOVED******REMOVED******REMOVED*** asm files
+### asm files
 
 The hand-written assembly file at `asm_${GOOS}_${GOARCH}.s` implements system
 call dispatch. There are three entry points:
@@ -79,7 +79,7 @@ let it know that a system call is running.
 When porting Go to a new architecture/OS, this file must be implemented for
 each GOOS/GOARCH pair.
 
-***REMOVED******REMOVED******REMOVED*** mksysnum
+### mksysnum
 
 Mksysnum is a Go program located at `${GOOS}/mksysnum.go` (or `mksysnum_${GOOS}.go`
 for the old system). This program takes in a list of header files containing the
@@ -92,7 +92,7 @@ new installation of the target OS (or updating the source checkouts for the
 new build system). However, depending on the OS, you may need to update the
 parsing in mksysnum.
 
-***REMOVED******REMOVED******REMOVED*** mksyscall.go
+### mksyscall.go
 
 The `syscall.go`, `syscall_${GOOS}.go`, `syscall_${GOOS}_${GOARCH}.go` are
 hand-written Go files which implement system calls (for unix, the specific OS,
@@ -110,7 +110,7 @@ you want the interface to the syscall to be different, often one will make an
 unexported `//sys` prototype, and then write a custom wrapper in
 `syscall_${GOOS}.go`.
 
-***REMOVED******REMOVED******REMOVED*** types files
+### types files
 
 For each OS, there is a hand-written Go file at `${GOOS}/types.go` (or
 `types_${GOOS}.go` on the old system). This file includes standard C headers and
@@ -121,27 +121,27 @@ private identifiers. This cleaned-up code is written to
 `ztypes_${GOOS}_${GOARCH}.go`.
 
 The hardest part about preparing this file is figuring out which headers to
-include and which symbols need to be `***REMOVED***define`d to get the actual data
+include and which symbols need to be `#define`d to get the actual data
 structures that pass through to the kernel system calls. Some C libraries
 preset alternate versions for binary compatibility and translate them on the
-way in and out of system calls, but there is almost always a `***REMOVED***define` that can
+way in and out of system calls, but there is almost always a `#define` that can
 get the real ones.
 See `types_darwin.go` and `linux/types.go` for examples.
 
 To add a new type, add in the necessary include statement at the top of the
 file (if it is not already there) and add in a type alias line. Note that if
 your type is significantly different on different architectures, you may need
-some `***REMOVED***if/***REMOVED***elif` macros in your include statements.
+some `#if/#elif` macros in your include statements.
 
-***REMOVED******REMOVED******REMOVED*** mkerrors.sh
+### mkerrors.sh
 
 This script is used to generate the system's various constants. This doesn't
 just include the error numbers and error strings, but also the signal numbers
 and a wide variety of miscellaneous constants. The constants come from the list
 of include files in the `includes_${uname}` variable. A regex then picks out
-the desired `***REMOVED***define` statements, and generates the corresponding Go constants.
-The error numbers and strings are generated from `***REMOVED***include <errno.h>`, and the
-signal numbers and strings are generated from `***REMOVED***include <signal.h>`. All of
+the desired `#define` statements, and generates the corresponding Go constants.
+The error numbers and strings are generated from `#include <errno.h>`, and the
+signal numbers and strings are generated from `#include <signal.h>`. All of
 these constants are written to `zerrors_${GOOS}_${GOARCH}.go` via a C program,
 `_errors.c`, which prints out all the constants.
 
@@ -149,7 +149,7 @@ To add a constant, add the header that includes it to the appropriate variable.
 Then, edit the regex (if necessary) to match the desired constant. Avoid making
 the regex too broad to avoid matching unintended constants.
 
-***REMOVED******REMOVED******REMOVED*** internal/mkmerge
+### internal/mkmerge
 
 This program is used to extract duplicate const, func, and type declarations
 from the generated architecture-specific files listed below, and merge these
@@ -161,24 +161,24 @@ The merge is performed in the following steps:
 3. Remove the common code from all architecture-specific files.
 
 
-***REMOVED******REMOVED*** Generated files
+## Generated files
 
-***REMOVED******REMOVED******REMOVED*** `zerrors_${GOOS}_${GOARCH}.go`
+### `zerrors_${GOOS}_${GOARCH}.go`
 
 A file containing all of the system's generated error numbers, error strings,
 signal numbers, and constants. Generated by `mkerrors.sh` (see above).
 
-***REMOVED******REMOVED******REMOVED*** `zsyscall_${GOOS}_${GOARCH}.go`
+### `zsyscall_${GOOS}_${GOARCH}.go`
 
 A file containing all the generated syscalls for a specific GOOS and GOARCH.
 Generated by `mksyscall.go` (see above).
 
-***REMOVED******REMOVED******REMOVED*** `zsysnum_${GOOS}_${GOARCH}.go`
+### `zsysnum_${GOOS}_${GOARCH}.go`
 
 A list of numeric constants for all the syscall number of the specific GOOS
 and GOARCH. Generated by mksysnum (see above).
 
-***REMOVED******REMOVED******REMOVED*** `ztypes_${GOOS}_${GOARCH}.go`
+### `ztypes_${GOOS}_${GOARCH}.go`
 
 A file containing Go types for passing into (or returning from) syscalls.
 Generated by godefs and the types file (see above).

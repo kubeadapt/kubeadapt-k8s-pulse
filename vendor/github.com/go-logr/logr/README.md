@@ -1,4 +1,4 @@
-***REMOVED*** A minimal logging API for Go
+# A minimal logging API for Go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/go-logr/logr.svg)](https://pkg.go.dev/github.com/go-logr/logr)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-logr/logr)](https://goreportcard.com/report/github.com/go-logr/logr)
@@ -28,7 +28,7 @@ like this are pointless.  Those people are welcome to convince the authors of
 the tens-of-thousands of libraries that *DO* write logs that they are all
 wrong.  In the meantime, logr takes a more practical approach.
 
-***REMOVED******REMOVED*** Typical usage
+## Typical usage
 
 Somewhere, early in an application's life, it will make a decision about which
 logging library (implementation) it actually wants to use.  Something like:
@@ -70,7 +70,7 @@ received:
         // ... app code ...
 ```
 
-***REMOVED******REMOVED*** Background
+## Background
 
 If the Go standard library had defined an interface for logging, this project
 probably would not be needed.  Alas, here we are.
@@ -96,16 +96,16 @@ logr design but also left out some parts and changed others:
 
 The high-level slog API is explicitly meant to be one of many different APIs
 that can be layered on top of a shared `slog.Handler`. logr is one such
-alternative API, with [interoperability](***REMOVED***slog-interoperability) provided by
+alternative API, with [interoperability](#slog-interoperability) provided by
 some conversion functions.
 
-***REMOVED******REMOVED******REMOVED*** Inspiration
+### Inspiration
 
 Before you consider this package, please read [this blog post by the
 inimitable Dave Cheney][warning-makes-no-sense].  We really appreciate what
 he has to say, and it largely aligns with our own experiences.
 
-***REMOVED******REMOVED******REMOVED*** Differences from Dave's ideas
+### Differences from Dave's ideas
 
 The main differences are:
 
@@ -126,7 +126,7 @@ may feel very similar, but the primary difference is the lack of semantics.
 Because verbosity is a numerical value, it's safe to assume that an app running
 with higher verbosity means more (and less important) logs will be generated.
 
-***REMOVED******REMOVED*** Implementations (non-exhaustive)
+## Implementations (non-exhaustive)
 
 There are implementations for the following logging libraries:
 
@@ -144,7 +144,7 @@ There are implementations for the following logging libraries:
 - **github.com/go-kit/log**: [gokitlogr](https://github.com/tonglil/gokitlogr) (also compatible with github.com/go-kit/kit/log since v0.12.0)
 - **bytes.Buffer** (writing to a buffer): [bufrlogr](https://github.com/tonglil/buflogr) (useful for ensuring values were logged, like during testing)
 
-***REMOVED******REMOVED*** slog interoperability
+## slog interoperability
 
 Interoperability goes both ways, using the `logr.Logger` API with a `slog.Handler`
 and using the `slog.Logger` API with a `logr.LogSink`. `FromSlogHandler` and
@@ -152,7 +152,7 @@ and using the `slog.Logger` API with a `logr.LogSink`. `FromSlogHandler` and
 As usual, `slog.New` can be used to wrap such a `slog.Handler` in the high-level
 slog API.
 
-***REMOVED******REMOVED******REMOVED*** Using a `logr.LogSink` as backend for slog
+### Using a `logr.LogSink` as backend for slog
 
 Ideally, a logr sink implementation should support both logr and slog by
 implementing both the normal logr interface(s) and `SlogSink`.  Because
@@ -189,7 +189,7 @@ Not supporting slog has several drawbacks:
 These drawbacks are severe enough that applications using a mixture of slog and
 logr should switch to a different backend.
 
-***REMOVED******REMOVED******REMOVED*** Using a `slog.Handler` as backend for logr
+### Using a `slog.Handler` as backend for logr
 
 Using a plain `slog.Handler` without support for logr works better than the
 other direction:
@@ -207,7 +207,7 @@ ideally support both `logr.Marshaler` and `slog.Valuer`. If compatibility
 with logr implementations without slog support is not important, then
 `slog.Valuer` is sufficient.
 
-***REMOVED******REMOVED******REMOVED*** Context support for slog
+### Context support for slog
 
 Storing a logger in a `context.Context` is not supported by
 slog. `NewContextWithSlogLogger` and `FromContextAsSlogLogger` can be
@@ -241,11 +241,11 @@ for the context functions in logr, so developers who prefer to not use the logr
 APIs directly can use those instead and the resulting code will still be
 interoperable with logr.
 
-***REMOVED******REMOVED*** FAQ
+## FAQ
 
-***REMOVED******REMOVED******REMOVED*** Conceptual
+### Conceptual
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why structured logging?
+#### Why structured logging?
 
 - **Structured logs are more easily queryable**: Since you've got
   key-value pairs, it's much easier to query your structured logs for
@@ -270,7 +270,7 @@ interoperable with logr.
   objects.)  Structured logs allow you to preserve that structure when
   outputting.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why V-levels?
+#### Why V-levels?
 
 **V-levels give operators an easy way to control the chattiness of log
 operations**.  V-levels provide a way for a given package to distinguish
@@ -278,12 +278,12 @@ the relative importance or verbosity of a given log message.  Then, if
 a particular logger or package is logging too many messages, the user
 of the package can simply change the v-levels for that library.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why not named levels, like Info/Warning/Error?
+#### Why not named levels, like Info/Warning/Error?
 
 Read [Dave Cheney's post][warning-makes-no-sense].  Then read [Differences
-from Dave's ideas](***REMOVED***differences-from-daves-ideas).
+from Dave's ideas](#differences-from-daves-ideas).
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why not allow format strings, too?
+#### Why not allow format strings, too?
 
 **Format strings negate many of the benefits of structured logs**:
 
@@ -301,20 +301,20 @@ from Dave's ideas](***REMOVED***differences-from-daves-ideas).
 keys, at which point you've gotten key-value logging with meaningless
 keys.)
 
-***REMOVED******REMOVED******REMOVED*** Practical
+### Practical
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why key-value pairs, and not a map?
+#### Why key-value pairs, and not a map?
 
 Key-value pairs are *much* easier to optimize, especially around
 allocations.  Zap (a structured logger that inspired logr's interface) has
-[performance measurements](https://github.com/uber-go/zap***REMOVED***performance)
+[performance measurements](https://github.com/uber-go/zap#performance)
 that show this quite nicely.
 
 While the interface ends up being a little less obvious, you get
 potentially better performance, plus avoid making users type
 `map[string]string{}` every time they want to log.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** What if my V-levels differ between libraries?
+#### What if my V-levels differ between libraries?
 
 That's fine.  Control your V-levels on a per-logger basis, and use the
 `WithName` method to pass different loggers to different libraries.
@@ -323,7 +323,7 @@ Generally, you should take care to ensure that you have relatively
 consistent V-levels within a given logger, however, as this makes deciding
 on what verbosity of logs to request easier.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** But I really want to use a format string!
+#### But I really want to use a format string!
 
 That's not actually a question.  Assuming your question is "how do
 I convert my mental model of logging with format strings to logging with
@@ -353,7 +353,7 @@ reflect over type %T")` becomes `logger.Info("unable to reflect over
 type", "type", fmt.Sprintf("%T"))`.  In general though, the cases where
 this is necessary should be few and far between.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** How do I choose my V-levels?
+#### How do I choose my V-levels?
 
 This is basically the only hard constraint: increase V-levels to denote
 more verbose or more debug-y logs.
@@ -366,9 +366,9 @@ Then gradually choose levels in between as you need them, working your way
 down from 10 (for debug and trace style logs) and up from 1 (for chattier
 info-type logs). For reference, slog pre-defines -4 for debug logs
 (corresponds to 4 in logr), which matches what is
-[recommended for Kubernetes](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/logging.md***REMOVED***what-method-to-use).
+[recommended for Kubernetes](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/logging.md#what-method-to-use).
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** How do I choose my keys?
+#### How do I choose my keys?
 
 Keys are fairly flexible, and can hold more or less any string
 value. For best compatibility with implementations and consistency
@@ -383,20 +383,20 @@ should consider.
   [lowerCamelCase](https://en.wiktionary.org/wiki/lowerCamelCase) for
   more complex ones. Kubernetes is one example of a project that has
   [adopted that
-  convention](https://github.com/kubernetes/community/blob/HEAD/contributors/devel/sig-instrumentation/migration-to-structured-logging.md***REMOVED***name-arguments).
+  convention](https://github.com/kubernetes/community/blob/HEAD/contributors/devel/sig-instrumentation/migration-to-structured-logging.md#name-arguments).
 
 While key names are mostly unrestricted (and spaces are acceptable),
 it's generally a good idea to stick to printable ascii characters, or at
 least match the general character set of your log lines.
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why should keys be constant values?
+#### Why should keys be constant values?
 
 The point of structured logging is to make later log processing easier.  Your
 keys are, effectively, the schema of each log message.  If you use different
 keys across instances of the same log line, you will make your structured logs
 much harder to use.  `Sprintf()` is for values, not for keys!
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Why is this not a pure interface?
+#### Why is this not a pure interface?
 
 The Logger type is implemented as a struct in order to allow the Go compiler to
 optimize things like high-V `Info` logs that are not triggered.  Not all of

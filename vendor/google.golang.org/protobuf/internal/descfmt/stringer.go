@@ -23,7 +23,7 @@ type list interface {
 }
 
 func FormatList(s fmt.State, r rune, vs list) {
-	io.WriteString(s, formatListOpt(vs, true, r == 'v' && (s.Flag('+') || s.Flag('***REMOVED***'))))
+	io.WriteString(s, formatListOpt(vs, true, r == 'v' && (s.Flag('+') || s.Flag('#'))))
 }
 func formatListOpt(vs list, isRoot, allowMulti bool) string {
 	start, end := "[", "]"
@@ -110,7 +110,7 @@ type methodAndName struct {
 }
 
 func FormatDesc(s fmt.State, r rune, t protoreflect.Descriptor) {
-	io.WriteString(s, formatDescOpt(t, true, r == 'v' && (s.Flag('+') || s.Flag('***REMOVED***')), nil))
+	io.WriteString(s, formatDescOpt(t, true, r == 'v' && (s.Flag('+') || s.Flag('#')), nil))
 }
 
 func InternalFormatDescOptForTesting(t protoreflect.Descriptor, isRoot, allowMulti bool, record func(string)) string {

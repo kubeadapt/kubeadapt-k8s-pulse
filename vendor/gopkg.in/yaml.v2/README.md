@@ -1,4 +1,4 @@
-***REMOVED*** YAML support for the Go language
+# YAML support for the Go language
 
 Introduction
 ------------

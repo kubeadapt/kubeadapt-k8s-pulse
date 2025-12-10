@@ -270,7 +270,7 @@ type mapIndex struct {
 
 func (mi MapIndex) Type() reflect.Type             { return mi.typ }
 func (mi MapIndex) Values() (vx, vy reflect.Value) { return mi.vx, mi.vy }
-func (mi MapIndex) String() string                 { return fmt.Sprintf("[%***REMOVED***v]", mi.key) }
+func (mi MapIndex) String() string                 { return fmt.Sprintf("[%#v]", mi.key) }
 
 // Key is the value of the map key.
 func (mi MapIndex) Key() reflect.Value { return mi.key }

@@ -1,4 +1,4 @@
-***REMOVED*** OpenAPI v3 Protocol Buffer Models
+# OpenAPI v3 Protocol Buffer Models
 
 This directory contains a Protocol Buffer-language model and related code for
 supporting OpenAPI v3.

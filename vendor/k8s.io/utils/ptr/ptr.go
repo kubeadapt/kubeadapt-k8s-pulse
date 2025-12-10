@@ -30,7 +30,7 @@ import (
 func AllPtrFieldsNil(obj interface{}) bool {
 	v := reflect.ValueOf(obj)
 	if !v.IsValid() {
-		panic(fmt.Sprintf("reflect.ValueOf() produced a non-valid Value for %***REMOVED***v", obj))
+		panic(fmt.Sprintf("reflect.ValueOf() produced a non-valid Value for %#v", obj))
 	}
 	if v.Kind() == reflect.Ptr {
 		if v.IsNil() {

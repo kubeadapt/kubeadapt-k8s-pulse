@@ -36,7 +36,7 @@ import (
 // ways to turn it into a small number of simple array lookups. It probably only
 // matters for schema 5 and beyond, but should be investigated. See this comment
 // as a starting point:
-// https://github.com/open-telemetry/opentelemetry-specification/issues/1776***REMOVED***issuecomment-870164310
+// https://github.com/open-telemetry/opentelemetry-specification/issues/1776#issuecomment-870164310
 var nativeHistogramBounds = [][]float64{
 	// Schema "0":
 	{0.5},
@@ -249,7 +249,7 @@ type Histogram interface {
 	// prevent current versions of Prometheus from properly detecting
 	// counter resets in the sum of observations. (The experimental Native
 	// Histograms handle negative observations properly.) See
-	// https://prometheus.io/docs/practices/histograms/***REMOVED***count-and-sum-of-observations
+	// https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
 	// for details.
 	Observe(float64)
 }
@@ -381,7 +381,7 @@ type HistogramOpts struct {
 	// better covered by target labels set by the scraping Prometheus
 	// server, or by one specific metric (e.g. a build_info or a
 	// machine_role metric). See also
-	// https://prometheus.io/docs/instrumenting/writing_exporters/***REMOVED***target-labels-not-static-scraped-labels
+	// https://prometheus.io/docs/instrumenting/writing_exporters/#target-labels-not-static-scraped-labels
 	ConstLabels Labels
 
 	// Buckets defines the buckets into which observations are counted. Each
@@ -588,7 +588,7 @@ func newHistogram(desc *Desc, opts HistogramOpts, labelValues ...string) Histogr
 
 type histogramCounts struct {
 	// Order in this struct matters for the alignment required by atomic
-	// operations, see http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG
+	// operations, see http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 
 	// sumBits contains the bits of the float64 representing the sum of all
 	// observations.
@@ -697,7 +697,7 @@ type histogram struct {
 	// be merged into the new hot before releasing writeMtx.
 	//
 	// Fields with atomic access first! See alignment constraint:
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	countAndHotIdx uint64
 
 	selfCollector
@@ -709,7 +709,7 @@ type histogram struct {
 	// Two counts, one is "hot" for lock-free observations, the other is
 	// "cold" for writing out a dto.Metric. It has to be an array of
 	// pointers to guarantee 64bit alignment of the histogramCounts, see
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG.
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG.
 	counts [2]*histogramCounts
 
 	upperBounds                     []float64
@@ -1554,7 +1554,7 @@ func atomicAddFloat(bits *uint64, v float64) {
 }
 
 // atomicDecUint32 atomically decrements the uint32 p points to.  See
-// https://pkg.go.dev/sync/atomic***REMOVED***AddUint32 to understand how this is done.
+// https://pkg.go.dev/sync/atomic#AddUint32 to understand how this is done.
 func atomicDecUint32(p *uint32) {
 	atomic.AddUint32(p, ^uint32(0))
 }

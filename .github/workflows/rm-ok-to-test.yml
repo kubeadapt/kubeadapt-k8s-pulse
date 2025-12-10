@@ -1,8 +1,8 @@
 name: Remove ok-to-test Label
 
-***REMOVED*** Automatically remove "ok-to-test" label when PR is updated
-***REMOVED*** This ensures maintainers must re-review code before rebuilding PR image
-***REMOVED*** Security: Prevents malicious code from sneaking in after approval
+# Automatically remove "ok-to-test" label when PR is updated
+# This ensures maintainers must re-review code before rebuilding PR image
+# Security: Prevents malicious code from sneaking in after approval
 
 on:
   pull_request_target:
@@ -41,13 +41,13 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `***REMOVED******REMOVED*** 🔄 Label Removed: \`ok-to-test\`
+              body: `## 🔄 Label Removed: \`ok-to-test\`
 
             **Reason:** ${eventText}
 
             The \`ok-to-test\` label has been automatically removed because the PR code changed.
 
-            ***REMOVED******REMOVED******REMOVED*** ⚠️ For Maintainers
+            ### ⚠️ For Maintainers
             If you want to rebuild the PR image with the latest changes:
             1. Review the new commits carefully
             2. If safe, re-add the \`ok-to-test\` label

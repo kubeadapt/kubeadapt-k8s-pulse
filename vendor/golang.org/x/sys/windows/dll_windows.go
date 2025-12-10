@@ -110,7 +110,7 @@ func (d *DLL) MustFindProc(name string) *Proc {
 // if found. It returns an error if search fails.
 func (d *DLL) FindProcByOrdinal(ordinal uintptr) (proc *Proc, err error) {
 	a, e := GetProcAddressByOrdinal(d.Handle, ordinal)
-	name := "***REMOVED***" + itoa(int(ordinal))
+	name := "#" + itoa(int(ordinal))
 	if e != nil {
 		return nil, &DLLError{
 			Err:     e,

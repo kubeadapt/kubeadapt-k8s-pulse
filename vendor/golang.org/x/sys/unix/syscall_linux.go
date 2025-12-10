@@ -762,7 +762,7 @@ func (sa *SockaddrXDP) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	return unsafe.Pointer(&sa.raw), SizeofSockaddrXDP, nil
 }
 
-// This constant mirrors the ***REMOVED***define of PX_PROTO_OE in
+// This constant mirrors the #define of PX_PROTO_OE in
 // linux/if_pppox.h. We're defining this by hand here instead of
 // autogenerating through mkerrors.sh because including
 // linux/if_pppox.h causes some declaration conflicts with other
@@ -2600,7 +2600,7 @@ func Getresgid() (rgid, egid, sgid int) {
 // Pselect is a wrapper around the Linux pselect6 system call.
 // This version does not modify the timeout argument.
 func Pselect(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timespec, sigmask *Sigset_t) (n int, err error) {
-	// Per https://man7.org/linux/man-pages/man2/select.2.html***REMOVED***NOTES,
+	// Per https://man7.org/linux/man-pages/man2/select.2.html#NOTES,
 	// The Linux pselect6() system call modifies its timeout argument.
 	// [Not modifying the argument] is the behavior required by POSIX.1-2001.
 	var mutableTimeout *Timespec

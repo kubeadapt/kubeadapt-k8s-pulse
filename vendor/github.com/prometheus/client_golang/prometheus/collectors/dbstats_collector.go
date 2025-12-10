@@ -36,7 +36,7 @@ type dbStatsCollector struct {
 }
 
 // NewDBStatsCollector returns a collector that exports metrics about the given *sql.DB.
-// See https://golang.org/pkg/database/sql/***REMOVED***DBStats for more information on stats.
+// See https://golang.org/pkg/database/sql/#DBStats for more information on stats.
 func NewDBStatsCollector(db *sql.DB, dbName string) prometheus.Collector {
 	fqName := func(name string) string {
 		return "go_sql_" + name

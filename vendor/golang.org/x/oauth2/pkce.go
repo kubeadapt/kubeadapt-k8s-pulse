@@ -28,7 +28,7 @@ func GenerateVerifier() string {
 	// used to create a 32-octet sequence.  The octet sequence is then
 	// base64url-encoded to produce a 43-octet URL-safe string to use as the
 	// code verifier."
-	// https://datatracker.ietf.org/doc/html/rfc7636***REMOVED***section-4.1
+	// https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
 	data := make([]byte, 32)
 	if _, err := rand.Read(data); err != nil {
 		panic(err)

@@ -8,7 +8,7 @@
 
 A high-performance 100% compatible drop-in replacement of "encoding/json"
 
-***REMOVED*** Benchmark
+# Benchmark
 
 ![benchmark](http://jsoniter.com/benchmarks/go-benchmark.png)
 
@@ -28,7 +28,7 @@ Raw Result (easyjson requires static code generation)
 Always benchmark with your own workload.
 The result depends heavily on the data input.
 
-***REMOVED*** Usage
+# Usage
 
 100% compatibility with standard lib
 
@@ -66,13 +66,13 @@ json.Unmarshal(input, &data)
 
 [More documentation](http://jsoniter.com/migrate-from-go-std.html)
 
-***REMOVED*** How to get
+# How to get
 
 ```
 go get github.com/json-iterator/go
 ```
 
-***REMOVED*** Contribution Welcomed !
+# Contribution Welcomed !
 
 Contributors
 

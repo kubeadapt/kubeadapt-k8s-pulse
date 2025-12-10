@@ -1,6 +1,6 @@
-***REMOVED*** editor and IDE paraphernalia
+# editor and IDE paraphernalia
 .idea
 .vscode
 
-***REMOVED*** macOS paraphernalia
+# macOS paraphernalia
 .DS_Store

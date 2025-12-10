@@ -1,6 +1,6 @@
-***REMOVED*** The development version of clang is distributed as the 'clang' binary,
-***REMOVED*** while stable/released versions have a version number attached.
-***REMOVED*** Pin the default clang to a stable version.
+# The development version of clang is distributed as the 'clang' binary,
+# while stable/released versions have a version number attached.
+# Pin the default clang to a stable version.
 CLANG ?= clang-20
 STRIP ?= llvm-strip-20
 OBJCOPY ?= llvm-objcopy-20
@@ -8,13 +8,13 @@ CFLAGS := -O2 -g -Wall -Werror -mcpu=v2 $(CFLAGS)
 
 CI_KERNEL_URL ?= https://github.com/cilium/ci-kernels/raw/master/
 
-***REMOVED*** Obtain an absolute path to the directory of the Makefile.
-***REMOVED*** Assume the Makefile is in the root of the repository.
+# Obtain an absolute path to the directory of the Makefile.
+# Assume the Makefile is in the root of the repository.
 REPODIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 UIDGID := $(shell stat -c '%u:%g' ${REPODIR})
 
-***REMOVED*** Prefer podman if installed, otherwise use docker.
-***REMOVED*** Note: Setting the var at runtime will always override.
+# Prefer podman if installed, otherwise use docker.
+# Note: Setting the var at runtime will always override.
 CONTAINER_ENGINE ?= $(if $(shell command -v podman), podman, docker)
 CONTAINER_RUN_ARGS ?= $(if $(filter ${CONTAINER_ENGINE}, podman), \
 		--log-driver=none \
@@ -60,7 +60,7 @@ TARGETS := \
 
 .DEFAULT_TARGET = container-all
 
-***REMOVED*** Build all ELF binaries using a containerized LLVM toolchain.
+# Build all ELF binaries using a containerized LLVM toolchain.
 container-all:
 	+${CONTAINER_ENGINE} run --rm -ti ${CONTAINER_RUN_ARGS} \
 		-v "${REPODIR}":/ebpf -w /ebpf --env MAKEFLAGS \
@@ -70,8 +70,8 @@ container-all:
 		"${IMAGE}:${VERSION}" \
 		make all
 
-***REMOVED*** (debug) Drop the user into a shell inside the container as root.
-***REMOVED*** Set BPF2GO_ envs to make 'make generate' just work.
+# (debug) Drop the user into a shell inside the container as root.
+# Set BPF2GO_ envs to make 'make generate' just work.
 container-shell:
 	${CONTAINER_ENGINE} run --rm -ti ${CONTAINER_RUN_ARGS} \
 		-v "${REPODIR}":/ebpf -w /ebpf \

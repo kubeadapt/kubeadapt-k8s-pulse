@@ -104,7 +104,7 @@ type counter struct {
 	// valBits contains the bits of the represented float64 value, while
 	// valInt stores values that are exact integers. Both have to go first
 	// in the struct to guarantee alignment for atomic operations.
-	// http://golang.org/pkg/sync/atomic/***REMOVED***pkg-note-BUG
+	// http://golang.org/pkg/sync/atomic/#pkg-note-BUG
 	valBits uint64
 	valInt  uint64
 

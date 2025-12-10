@@ -44,12 +44,12 @@ func (msg *XfrmUserpolicyId) Serialize() []byte {
 //   __u32       index;
 //   __u8        dir;
 //   __u8        action;
-// ***REMOVED***define XFRM_POLICY_ALLOW 0
-// ***REMOVED***define XFRM_POLICY_BLOCK 1
+// #define XFRM_POLICY_ALLOW 0
+// #define XFRM_POLICY_BLOCK 1
 //   __u8        flags;
-// ***REMOVED***define XFRM_POLICY_LOCALOK 1 /* Allow user to override global policy */
+// #define XFRM_POLICY_LOCALOK 1 /* Allow user to override global policy */
 //   /* Automatically expand selector to include matching ICMP payloads. */
-// ***REMOVED***define XFRM_POLICY_ICMP  2
+// #define XFRM_POLICY_ICMP  2
 //   __u8        share;
 // };
 

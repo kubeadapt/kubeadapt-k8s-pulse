@@ -207,7 +207,7 @@ func resolveVar(variable *strings.Builder, expandFunc func(string) string) strin
 
 func isBoundary(token rune) bool {
 	switch {
-	case unicode.IsSpace(token), token == ':', token == '***REMOVED***', token == '%':
+	case unicode.IsSpace(token), token == ':', token == '#', token == '%':
 		return true
 	}
 	return false

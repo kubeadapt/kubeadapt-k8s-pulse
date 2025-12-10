@@ -21,7 +21,7 @@ limitations under the License.
 //
 // All the operations in this module are thread-safe.
 //
-// ***REMOVED*** Dependencies and types of caches
+// # Dependencies and types of caches
 //
 // This package uses a source/transform/sink model of caches to build
 // the dependency tree, and can be used as follows:
@@ -38,7 +38,7 @@ limitations under the License.
 //   - [LastSuccess]: A cache adapter that caches the last successful and returns
 //     it if the next call fails. It extends [Atomic].
 //
-// ***REMOVED*** Etags
+// # Etags
 //
 // Etags in this library is a cache version identifier. It doesn't
 // necessarily strictly match to the semantics of http `etags`, but are

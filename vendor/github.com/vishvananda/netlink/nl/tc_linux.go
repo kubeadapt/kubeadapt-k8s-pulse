@@ -672,7 +672,7 @@ func (x *TcGen) Serialize() []byte {
 	return (*(*[SizeofTcGen]byte)(unsafe.Pointer(x)))[:]
 }
 
-// ***REMOVED***define tc_gen \
+// #define tc_gen \
 //   __u32                 index; \
 //   __u32                 capab; \
 //   int                   action; \

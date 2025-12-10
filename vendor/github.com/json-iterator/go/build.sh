@@ -1,4 +1,4 @@
-***REMOVED***!/bin/bash
+#!/bin/bash
 set -e
 set -x
 

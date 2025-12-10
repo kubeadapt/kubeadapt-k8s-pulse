@@ -193,7 +193,7 @@ func proxyRedirectsforRootPath(path string, w http.ResponseWriter, req *http.Req
 	redirect := false
 	method := req.Method
 
-	// From pkg/genericapiserver/endpoints/handlers/proxy.go***REMOVED***ServeHTTP:
+	// From pkg/genericapiserver/endpoints/handlers/proxy.go#ServeHTTP:
 	// Redirect requests with an empty path to a location that ends with a '/'
 	// This is essentially a hack for https://issue.k8s.io/4958.
 	// Note: Keep this code after tryUpgrade to not break that flow.

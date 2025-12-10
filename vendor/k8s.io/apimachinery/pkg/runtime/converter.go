@@ -252,7 +252,7 @@ func (c *unstructuredConverter) FromUnstructuredWithValidation(u map[string]inte
 			klog.Fatalf("FromUnstructured unexpected error for %v: error: %v", u, err)
 		}
 		if err == nil && !c.comparison.DeepEqual(obj, newObj) {
-			klog.Fatalf("FromUnstructured mismatch\nobj1: %***REMOVED***v\nobj2: %***REMOVED***v", obj, newObj)
+			klog.Fatalf("FromUnstructured mismatch\nobj1: %#v\nobj2: %#v", obj, newObj)
 		}
 	}
 	if err != nil {
@@ -592,7 +592,7 @@ func (c *unstructuredConverter) ToUnstructured(obj interface{}) (map[string]inte
 			klog.Fatalf("ToUnstructured unexpected error for %v: error: %v; newErr: %v", obj, err, newErr)
 		}
 		if err == nil && !c.comparison.DeepEqual(u, newUnstr) {
-			klog.Fatalf("ToUnstructured mismatch\nobj1: %***REMOVED***v\nobj2: %***REMOVED***v", u, newUnstr)
+			klog.Fatalf("ToUnstructured mismatch\nobj1: %#v\nobj2: %#v", u, newUnstr)
 		}
 	}
 	if err != nil {

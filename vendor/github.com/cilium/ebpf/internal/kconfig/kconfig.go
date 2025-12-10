@@ -58,10 +58,10 @@ func Parse(source io.ReaderAt, filter map[string]struct{}) (map[string]string, e
 }
 
 // Golang translation of libbpf bpf_object__process_kconfig_line():
-// https://github.com/libbpf/libbpf/blob/fbd60dbff51c870f5e80a17c4f2fd639eb80af90/src/libbpf.c***REMOVED***L1874
+// https://github.com/libbpf/libbpf/blob/fbd60dbff51c870f5e80a17c4f2fd639eb80af90/src/libbpf.c#L1874
 // It does the same checks but does not put the data inside the BPF map.
 func processKconfigLine(line []byte, m map[string]string, filter map[string]struct{}) error {
-	// Ignore empty lines and "***REMOVED*** CONFIG_* is not set".
+	// Ignore empty lines and "# CONFIG_* is not set".
 	if !bytes.HasPrefix(line, []byte("CONFIG_")) {
 		return nil
 	}
@@ -86,7 +86,7 @@ func processKconfigLine(line []byte, m map[string]string, filter map[string]stru
 
 	// This can seem odd, but libbpf only sets the value the first time the key is
 	// met:
-	// https://github.com/torvalds/linux/blob/0d85b27b0cc6/tools/lib/bpf/libbpf.c***REMOVED***L1906-L1908
+	// https://github.com/torvalds/linux/blob/0d85b27b0cc6/tools/lib/bpf/libbpf.c#L1906-L1908
 	_, ok := m[string(key)]
 	if !ok {
 		m[string(key)] = string(value)
@@ -113,7 +113,7 @@ func PutValue(data []byte, typ btf.Type, value string) error {
 }
 
 // Golang translation of libbpf_tristate enum:
-// https://github.com/libbpf/libbpf/blob/fbd60dbff51c870f5e80a17c4f2fd639eb80af90/src/bpf_helpers.h***REMOVED***L169
+// https://github.com/libbpf/libbpf/blob/fbd60dbff51c870f5e80a17c4f2fd639eb80af90/src/bpf_helpers.h#L169
 type triState int
 
 const (
@@ -182,7 +182,7 @@ func putValueString(data []byte, typ btf.Type, value string) error {
 	}
 
 	// Any Int, which is not bool, of one byte could be used to store char:
-	// https://github.com/torvalds/linux/blob/1a5304fecee5/tools/lib/bpf/libbpf.c***REMOVED***L3637-L3638
+	// https://github.com/torvalds/linux/blob/1a5304fecee5/tools/lib/bpf/libbpf.c#L3637-L3638
 	if contentType.Size != 1 && contentType.Encoding != btf.Bool {
 		return fmt.Errorf("cannot add string value, expected array of btf.Int of size 1, got array of btf.Int of size: %v", contentType.Size)
 	}

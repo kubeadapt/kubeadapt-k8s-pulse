@@ -85,7 +85,7 @@ type commonValidationsOmitZero struct {
 // Items a limited subset of JSON-Schema's items object.
 // It is used by parameter definitions that are not located in "body".
 //
-// For more information: http://goo.gl/8us55a***REMOVED***items-object
+// For more information: http://goo.gl/8us55a#items-object
 type Items struct {
 	Refable
 	CommonValidations

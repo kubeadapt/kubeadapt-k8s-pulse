@@ -15,7 +15,7 @@ var ErrClosedFd = unix.EBADF
 //
 // Luckily this is consistent across Linux and Windows.
 //
-// See https://github.com/microsoft/ebpf-for-windows/blob/54632eb360c560ebef2f173be1a4a4625d540744/include/ebpf_api.h***REMOVED***L25
+// See https://github.com/microsoft/ebpf-for-windows/blob/54632eb360c560ebef2f173be1a4a4625d540744/include/ebpf_api.h#L25
 const invalidFd = -1
 
 func newFD(value int) *FD {

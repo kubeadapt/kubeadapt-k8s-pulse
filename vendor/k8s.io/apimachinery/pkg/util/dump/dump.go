@@ -45,10 +45,10 @@ func Pretty(a interface{}) string {
 
 // ForHash keeps the original Spew.Sprintf format to ensure the same checksum
 func ForHash(a interface{}) string {
-	return prettyPrintConfigForHash.Sprintf("%***REMOVED***v", a)
+	return prettyPrintConfigForHash.Sprintf("%#v", a)
 }
 
 // OneLine outputs the object in one line
 func OneLine(a interface{}) string {
-	return prettyPrintConfig.Sprintf("%***REMOVED***v", a)
+	return prettyPrintConfig.Sprintf("%#v", a)
 }

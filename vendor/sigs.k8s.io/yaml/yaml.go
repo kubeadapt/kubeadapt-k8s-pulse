@@ -244,7 +244,7 @@ func convertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (in
 					keyString = "false"
 				}
 			default:
-				return nil, fmt.Errorf("unsupported map key of type: %s, key: %+***REMOVED***v, value: %+***REMOVED***v",
+				return nil, fmt.Errorf("unsupported map key of type: %s, key: %+#v, value: %+#v",
 					reflect.TypeOf(k), k, v)
 			}
 
@@ -398,7 +398,7 @@ func jsonToYAMLValue(j interface{}) interface{} {
 		}
 		return ret
 	case float64:
-		// replicate the logic in https://github.com/go-yaml/yaml/blob/51d6538a90f86fe93ac480b35f37b2be17fef232/resolve.go***REMOVED***L151
+		// replicate the logic in https://github.com/go-yaml/yaml/blob/51d6538a90f86fe93ac480b35f37b2be17fef232/resolve.go#L151
 		if i64 := int64(j); j == float64(i64) {
 			if i := int(i64); i64 == int64(i) {
 				return i

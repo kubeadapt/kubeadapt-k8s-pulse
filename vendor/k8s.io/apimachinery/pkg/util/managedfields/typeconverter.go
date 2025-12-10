@@ -41,7 +41,7 @@ func NewDeducedTypeConverter() TypeConverter {
 // used by Refs within the schemas.
 // The schemas should conform to the Kubernetes Structural Schema OpenAPI
 // restrictions found in docs:
-// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/***REMOVED***specifying-a-structural-schema
+// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
 func NewTypeConverter(openapiSpec map[string]*spec.Schema, preserveUnknownFields bool) (TypeConverter, error) {
 	return internal.NewTypeConverter(openapiSpec, preserveUnknownFields)
 }

@@ -543,7 +543,7 @@ func (s *state) compareMap(t reflect.Type, vx, vy reflect.Value) {
 			// Rather than adding complex logic to deal with NaNs, make it
 			// the user's responsibility to compare such obscure maps.
 			const help = "consider providing a Comparer to compare the map"
-			panic(fmt.Sprintf("%***REMOVED***v has map key with NaNs\n%s", s.curPath, help))
+			panic(fmt.Sprintf("%#v has map key with NaNs\n%s", s.curPath, help))
 		}
 		s.compareAny(step)
 	}

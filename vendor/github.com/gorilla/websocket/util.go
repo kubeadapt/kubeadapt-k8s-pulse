@@ -34,7 +34,7 @@ func generateChallengeKey() (string, error) {
 // Token octets per RFC 2616.
 var isTokenOctet = [256]bool{
 	'!':  true,
-	'***REMOVED***':  true,
+	'#':  true,
 	'$':  true,
 	'%':  true,
 	'&':  true,
@@ -197,7 +197,7 @@ func equalASCIIFold(s, t string) bool {
 	return s == t
 }
 
-// tokenListContainsValue returns true if the 1***REMOVED***token header with the given
+// tokenListContainsValue returns true if the 1#token header with the given
 // name contains a token equal to value with ASCII case folding.
 func tokenListContainsValue(header http.Header, name string, value string) bool {
 headers:
@@ -229,7 +229,7 @@ func parseExtensions(header http.Header) []map[string]string {
 	// From RFC 6455:
 	//
 	//  Sec-WebSocket-Extensions = extension-list
-	//  extension-list = 1***REMOVED***extension
+	//  extension-list = 1#extension
 	//  extension = extension-token *( ";" extension-param )
 	//  extension-token = registered-token
 	//  registered-token = token

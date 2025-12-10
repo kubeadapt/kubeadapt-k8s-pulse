@@ -4,7 +4,7 @@
 
 //go:build (darwin || freebsd || netbsd || openbsd) && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 // System call support for ARM64 BSD
 

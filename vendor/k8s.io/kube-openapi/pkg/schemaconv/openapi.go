@@ -97,7 +97,7 @@ func (c *convert) parseSchema(m *spec.Schema) schema.Atom {
 	switch typ {
 	case "":
 		// According to Swagger docs:
-		// https://swagger.io/docs/specification/data-models/data-types/***REMOVED***any
+		// https://swagger.io/docs/specification/data-models/data-types/#any
 		//
 		// If no type is specified, it is equivalent to accepting any type.
 		return schema.Atom{

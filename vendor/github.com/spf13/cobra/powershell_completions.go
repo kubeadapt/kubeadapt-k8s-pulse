@@ -35,7 +35,7 @@ func genPowerShellComp(buf io.StringWriter, name string, includeDesc bool) {
 	if !includeDesc {
 		compCmd = ShellCompNoDescRequestCmd
 	}
-	WriteStringAndCheck(buf, fmt.Sprintf(`***REMOVED*** powershell completion for %-36[1]s -*- shell-script -*-
+	WriteStringAndCheck(buf, fmt.Sprintf(`# powershell completion for %-36[1]s -*- shell-script -*-
 
 function __%[1]s_debug {
     if ($env:BASH_COMP_DEBUG_FILE) {
@@ -44,7 +44,7 @@ function __%[1]s_debug {
 }
 
 filter __%[1]s_escapeStringWithSpecialChars {
-`+"    $_ -replace '\\s|***REMOVED***|@|\\$|;|,|''|\\{|\\}|\\(|\\)|\"|`|\\||<|>|&','`$&'"+`
+`+"    $_ -replace '\\s|#|@|\\$|;|,|''|\\{|\\}|\\(|\\)|\"|`|\\||<|>|&','`$&'"+`
 }
 
 [scriptblock]${__%[2]sCompleterBlock} = {
@@ -54,7 +54,7 @@ filter __%[1]s_escapeStringWithSpecialChars {
             $CursorPosition
         )
 
-    ***REMOVED*** Get the current command line and convert into a string
+    # Get the current command line and convert into a string
     $Command = $CommandAst.CommandElements
     $Command = "$Command"
 
@@ -62,11 +62,11 @@ filter __%[1]s_escapeStringWithSpecialChars {
     __%[1]s_debug "========= starting completion logic =========="
     __%[1]s_debug "WordToComplete: $WordToComplete Command: $Command CursorPosition: $CursorPosition"
 
-    ***REMOVED*** The user could have moved the cursor backwards on the command-line.
-    ***REMOVED*** We need to trigger completion from the $CursorPosition location, so we need
-    ***REMOVED*** to truncate the command-line ($Command) up to the $CursorPosition location.
-    ***REMOVED*** Make sure the $Command is longer then the $CursorPosition before we truncate.
-    ***REMOVED*** This happens because the $Command does not include the last space.
+    # The user could have moved the cursor backwards on the command-line.
+    # We need to trigger completion from the $CursorPosition location, so we need
+    # to truncate the command-line ($Command) up to the $CursorPosition location.
+    # Make sure the $Command is longer then the $CursorPosition before we truncate.
+    # This happens because the $Command does not include the last space.
     if ($Command.Length -gt $CursorPosition) {
         $Command=$Command.Substring(0,$CursorPosition)
     }
@@ -79,37 +79,37 @@ filter __%[1]s_escapeStringWithSpecialChars {
     $ShellCompDirectiveFilterDirs=%[8]d
     $ShellCompDirectiveKeepOrder=%[9]d
 
-    ***REMOVED*** Prepare the command to request completions for the program.
-    ***REMOVED*** Split the command at the first space to separate the program and arguments.
+    # Prepare the command to request completions for the program.
+    # Split the command at the first space to separate the program and arguments.
     $Program,$Arguments = $Command.Split(" ",2)
 
     $RequestComp="$Program %[3]s $Arguments"
     __%[1]s_debug "RequestComp: $RequestComp"
 
-    ***REMOVED*** we cannot use $WordToComplete because it
-    ***REMOVED*** has the wrong values if the cursor was moved
-    ***REMOVED*** so use the last argument
+    # we cannot use $WordToComplete because it
+    # has the wrong values if the cursor was moved
+    # so use the last argument
     if ($WordToComplete -ne "" ) {
         $WordToComplete = $Arguments.Split(" ")[-1]
     }
     __%[1]s_debug "New WordToComplete: $WordToComplete"
 
 
-    ***REMOVED*** Check for flag with equal sign
+    # Check for flag with equal sign
     $IsEqualFlag = ($WordToComplete -Like "--*=*" )
     if ( $IsEqualFlag ) {
         __%[1]s_debug "Completing equal sign flag"
-        ***REMOVED*** Remove the flag part
+        # Remove the flag part
         $Flag,$WordToComplete = $WordToComplete.Split("=",2)
     }
 
     if ( $WordToComplete -eq "" -And ( -Not $IsEqualFlag )) {
-        ***REMOVED*** If the last parameter is complete (there is a space following it)
-        ***REMOVED*** We add an extra empty parameter so we can indicate this to the go method.
+        # If the last parameter is complete (there is a space following it)
+        # We add an extra empty parameter so we can indicate this to the go method.
         __%[1]s_debug "Adding extra empty parameter"
-        ***REMOVED*** PowerShell 7.2+ changed the way how the arguments are passed to executables,
-        ***REMOVED*** so for pre-7.2 or when Legacy argument passing is enabled we need to use
-`+"        ***REMOVED*** `\"`\" to pass an empty argument, a \"\" or '' does not work!!!"+`
+        # PowerShell 7.2+ changed the way how the arguments are passed to executables,
+        # so for pre-7.2 or when Legacy argument passing is enabled we need to use
+`+"        # `\"`\" to pass an empty argument, a \"\" or '' does not work!!!"+`
         if ($PSVersionTable.PsVersion -lt [version]'7.2.0' -or
             ($PSVersionTable.PsVersion -lt [version]'7.3.0' -and -not [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -or
             (($PSVersionTable.PsVersion -ge [version]'7.3.0' -or [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -and
@@ -121,44 +121,44 @@ filter __%[1]s_escapeStringWithSpecialChars {
     }
 
     __%[1]s_debug "Calling $RequestComp"
-    ***REMOVED*** First disable ActiveHelp which is not supported for Powershell
+    # First disable ActiveHelp which is not supported for Powershell
     ${env:%[10]s}=0
 
-    ***REMOVED***call the command store the output in $out and redirect stderr and stdout to null
-    ***REMOVED*** $Out is an array contains each line per element
+    #call the command store the output in $out and redirect stderr and stdout to null
+    # $Out is an array contains each line per element
     Invoke-Expression -OutVariable out "$RequestComp" 2>&1 | Out-Null
 
-    ***REMOVED*** get directive from last line
+    # get directive from last line
     [int]$Directive = $Out[-1].TrimStart(':')
     if ($Directive -eq "") {
-        ***REMOVED*** There is no directive specified
+        # There is no directive specified
         $Directive = 0
     }
     __%[1]s_debug "The completion directive is: $Directive"
 
-    ***REMOVED*** remove directive (last element) from out
+    # remove directive (last element) from out
     $Out = $Out | Where-Object { $_ -ne $Out[-1] }
     __%[1]s_debug "The completions are: $Out"
 
     if (($Directive -band $ShellCompDirectiveError) -ne 0 ) {
-        ***REMOVED*** Error code.  No completion.
+        # Error code.  No completion.
         __%[1]s_debug "Received error from custom completion go code"
         return
     }
 
     $Longest = 0
     [Array]$Values = $Out | ForEach-Object {
-        ***REMOVED***Split the output in name and description
+        #Split the output in name and description
 `+"        $Name, $Description = $_.Split(\"`t\",2)"+`
         __%[1]s_debug "Name: $Name Description: $Description"
 
-        ***REMOVED*** Look for the longest completion so that we can format things nicely
+        # Look for the longest completion so that we can format things nicely
         if ($Longest -lt $Name.Length) {
             $Longest = $Name.Length
         }
 
-        ***REMOVED*** Set the description to a one space string if there is none set.
-        ***REMOVED*** This is needed because the CompletionResult does not accept an empty string as argument
+        # Set the description to a one space string if there is none set.
+        # This is needed because the CompletionResult does not accept an empty string as argument
         if (-Not $Description) {
             $Description = " "
         }
@@ -168,7 +168,7 @@ filter __%[1]s_escapeStringWithSpecialChars {
 
     $Space = " "
     if (($Directive -band $ShellCompDirectiveNoSpace) -ne 0 ) {
-        ***REMOVED*** remove the space here
+        # remove the space here
         __%[1]s_debug "ShellCompDirectiveNoSpace is called"
         $Space = ""
     }
@@ -177,22 +177,22 @@ filter __%[1]s_escapeStringWithSpecialChars {
        (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 ))  {
         __%[1]s_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
 
-        ***REMOVED*** return here to prevent the completion of the extensions
+        # return here to prevent the completion of the extensions
         return
     }
 
     $Values = $Values | Where-Object {
-        ***REMOVED*** filter the result
+        # filter the result
         $_.Name -like "$WordToComplete*"
 
-        ***REMOVED*** Join the flag back if we have an equal sign flag
+        # Join the flag back if we have an equal sign flag
         if ( $IsEqualFlag ) {
             __%[1]s_debug "Join the equal sign flag back to the completion value"
             $_.Name = $Flag + "=" + $_.Name
         }
     }
 
-    ***REMOVED*** we sort the values in ascending order by name if keep order isn't passed
+    # we sort the values in ascending order by name if keep order isn't passed
     if (($Directive -band $ShellCompDirectiveKeepOrder) -eq 0 ) {
         $Values = $Values | Sort-Object -Property Name
     }
@@ -201,54 +201,54 @@ filter __%[1]s_escapeStringWithSpecialChars {
         __%[1]s_debug "ShellCompDirectiveNoFileComp is called"
 
         if ($Values.Length -eq 0) {
-            ***REMOVED*** Just print an empty string here so the
-            ***REMOVED*** shell does not start to complete paths.
-            ***REMOVED*** We cannot use CompletionResult here because
-            ***REMOVED*** it does not accept an empty string as argument.
+            # Just print an empty string here so the
+            # shell does not start to complete paths.
+            # We cannot use CompletionResult here because
+            # it does not accept an empty string as argument.
             ""
             return
         }
     }
 
-    ***REMOVED*** Get the current mode
+    # Get the current mode
     $Mode = (Get-PSReadLineKeyHandler | Where-Object {$_.Key -eq "Tab" }).Function
     __%[1]s_debug "Mode: $Mode"
 
     $Values | ForEach-Object {
 
-        ***REMOVED*** store temporary because switch will overwrite $_
+        # store temporary because switch will overwrite $_
         $comp = $_
 
-        ***REMOVED*** PowerShell supports three different completion modes
-        ***REMOVED*** - TabCompleteNext (default windows style - on each key press the next option is displayed)
-        ***REMOVED*** - Complete (works like bash)
-        ***REMOVED*** - MenuComplete (works like zsh)
-        ***REMOVED*** You set the mode with Set-PSReadLineKeyHandler -Key Tab -Function <mode>
+        # PowerShell supports three different completion modes
+        # - TabCompleteNext (default windows style - on each key press the next option is displayed)
+        # - Complete (works like bash)
+        # - MenuComplete (works like zsh)
+        # You set the mode with Set-PSReadLineKeyHandler -Key Tab -Function <mode>
 
-        ***REMOVED*** CompletionResult Arguments:
-        ***REMOVED*** 1) CompletionText text to be used as the auto completion result
-        ***REMOVED*** 2) ListItemText   text to be displayed in the suggestion list
-        ***REMOVED*** 3) ResultType     type of completion result
-        ***REMOVED*** 4) ToolTip        text for the tooltip with details about the object
+        # CompletionResult Arguments:
+        # 1) CompletionText text to be used as the auto completion result
+        # 2) ListItemText   text to be displayed in the suggestion list
+        # 3) ResultType     type of completion result
+        # 4) ToolTip        text for the tooltip with details about the object
 
         switch ($Mode) {
 
-            ***REMOVED*** bash like
+            # bash like
             "Complete" {
 
                 if ($Values.Length -eq 1) {
                     __%[1]s_debug "Only one completion left"
 
-                    ***REMOVED*** insert space after value
+                    # insert space after value
                     [System.Management.Automation.CompletionResult]::new($($comp.Name | __%[1]s_escapeStringWithSpecialChars) + $Space, "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
 
                 } else {
-                    ***REMOVED*** Add the proper number of spaces to align the descriptions
+                    # Add the proper number of spaces to align the descriptions
                     while($comp.Name.Length -lt $Longest) {
                         $comp.Name = $comp.Name + " "
                     }
 
-                    ***REMOVED*** Check for empty description and only add parentheses if needed
+                    # Check for empty description and only add parentheses if needed
                     if ($($comp.Description) -eq " " ) {
                         $Description = ""
                     } else {
@@ -259,19 +259,19 @@ filter __%[1]s_escapeStringWithSpecialChars {
                 }
              }
 
-            ***REMOVED*** zsh like
+            # zsh like
             "MenuComplete" {
-                ***REMOVED*** insert space after value
-                ***REMOVED*** MenuComplete will automatically show the ToolTip of
-                ***REMOVED*** the highlighted value at the bottom of the suggestions.
+                # insert space after value
+                # MenuComplete will automatically show the ToolTip of
+                # the highlighted value at the bottom of the suggestions.
                 [System.Management.Automation.CompletionResult]::new($($comp.Name | __%[1]s_escapeStringWithSpecialChars) + $Space, "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
             }
 
-            ***REMOVED*** TabCompleteNext and in case we get something unknown
+            # TabCompleteNext and in case we get something unknown
             Default {
-                ***REMOVED*** Like MenuComplete but we don't want to add a space here because
-                ***REMOVED*** the user need to press space anyway to get the completion.
-                ***REMOVED*** Description will not be shown because that's not possible with TabCompleteNext
+                # Like MenuComplete but we don't want to add a space here because
+                # the user need to press space anyway to get the completion.
+                # Description will not be shown because that's not possible with TabCompleteNext
                 [System.Management.Automation.CompletionResult]::new($($comp.Name | __%[1]s_escapeStringWithSpecialChars), "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
             }
         }

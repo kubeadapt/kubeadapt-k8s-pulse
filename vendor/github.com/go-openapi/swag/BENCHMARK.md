@@ -1,12 +1,12 @@
-***REMOVED*** Benchmarks
+# Benchmarks
 
-***REMOVED******REMOVED*** Name mangling utilities
+## Name mangling utilities
 
 ```bash
 go test -bench XXX -run XXX -benchtime 30s
 ```
 
-***REMOVED******REMOVED******REMOVED*** Benchmarks at b3e7a5386f996177e4808f11acb2aa93a0f660df
+### Benchmarks at b3e7a5386f996177e4808f11acb2aa93a0f660df
 
 ```
 goos: linux
@@ -21,7 +21,7 @@ BenchmarkToXXXName/ToHumanNameLower-4 	  895334	     40354 ns/op	   10472 B/op	 
 BenchmarkToXXXName/ToHumanNameTitle-4 	  882441	     40678 ns/op	   10566 B/op	     749 allocs/op
 ```
 
-***REMOVED******REMOVED******REMOVED*** Benchmarks after PR ***REMOVED***79
+### Benchmarks after PR #79
 
 ~ x10 performance improvement and ~ /100 memory allocations.
 

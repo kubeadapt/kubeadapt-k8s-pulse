@@ -21,7 +21,7 @@ limitations under the License.
 // to back that API.  Packages in the Go ecosystem can depend on this package,
 // while callers can implement logging with whatever backend is appropriate.
 //
-// ***REMOVED*** Usage
+// # Usage
 //
 // Logging is done using a Logger instance.  Logger is a concrete type with
 // methods, which defers the actual logging to a LogSink interface.  The main
@@ -51,7 +51,7 @@ limitations under the License.
 // always logged, regardless of the current verbosity.  If there is no error
 // instance available, passing nil is valid.
 //
-// ***REMOVED*** Verbosity
+// # Verbosity
 //
 // Often we want to log information only when the application in "verbose
 // mode".  To write log lines that are more verbose, Logger has a V() method.
@@ -71,7 +71,7 @@ limitations under the License.
 //
 //	logger.V(2).Info("an unusual thing happened")
 //
-// ***REMOVED*** Logger Names
+// # Logger Names
 //
 // Logger instances can have name strings so that all messages logged through
 // that instance have additional context.  For example, you might want to add
@@ -88,7 +88,7 @@ limitations under the License.
 // joining operation (e.g. whitespace, commas, periods, slashes, brackets,
 // quotes, etc).
 //
-// ***REMOVED*** Saved Values
+// # Saved Values
 //
 // Logger instances can store any number of key/value pairs, which will be
 // logged alongside all messages logged through that instance.  For example,
@@ -108,7 +108,7 @@ limitations under the License.
 //	// later on...
 //	obj.logger.Info("setting foo", "value", targetValue)
 //
-// ***REMOVED*** Best Practices
+// # Best Practices
 //
 // Logger has very few hard rules, with the goal that LogSink implementations
 // might have a lot of freedom to differentiate.  There are, however, some
@@ -132,7 +132,7 @@ limitations under the License.
 // will never crash. For cases where passing a logger is optional, a pointer to Logger
 // should be used.
 //
-// ***REMOVED*** Key Naming Conventions
+// # Key Naming Conventions
 //
 // Keys are not strictly required to conform to any specification or regex, but
 // it is recommended that they:
@@ -163,7 +163,7 @@ limitations under the License.
 // would be necessary to represent at least message and timestamp as ordinary
 // named values).
 //
-// ***REMOVED*** Break Glass
+// # Break Glass
 //
 // Implementations may choose to give callers access to the underlying
 // logging implementation.  The recommended pattern for this is:

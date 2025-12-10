@@ -32,7 +32,7 @@
 // they need to count every allocation and when they'd prefer a more familiar,
 // loosely typed API.
 //
-// ***REMOVED*** Choosing a Logger
+// # Choosing a Logger
 //
 // In contexts where performance is nice, but not critical, use the
 // SugaredLogger. It's 4-10x faster than other structured logging packages and
@@ -76,7 +76,7 @@
 //	sugar := logger.Sugar()
 //	plain := sugar.Desugar()
 //
-// ***REMOVED*** Configuring Zap
+// # Configuring Zap
 //
 // The simplest way to build a Logger is to use zap's opinionated presets:
 // NewExample, NewProduction, and NewDevelopment. These presets build a logger
@@ -98,7 +98,7 @@
 // go.uber.org/zap/zapcore. See the package-level AdvancedConfiguration
 // example for sample code.
 //
-// ***REMOVED*** Extending Zap
+// # Extending Zap
 //
 // The zap package itself is a relatively thin wrapper around the interfaces
 // in go.uber.org/zap/zapcore. Extending zap to support a new encoding (e.g.,
@@ -110,7 +110,7 @@
 // Similarly, package authors can use the high-performance Encoder and Core
 // implementations in the zapcore package to build their own loggers.
 //
-// ***REMOVED*** Frequently Asked Questions
+// # Frequently Asked Questions
 //
 // An FAQ covering everything from installation errors to design decisions is
 // available at https://github.com/uber-go/zap/blob/master/FAQ.md.

@@ -673,9 +673,9 @@ func newMapFromParts(fd *sys.FD, name string, typ MapType, keySize, valueSize, m
 
 func (m *Map) String() string {
 	if m.name != "" {
-		return fmt.Sprintf("%s(%s)***REMOVED***%v", m.typ, m.name, m.fd)
+		return fmt.Sprintf("%s(%s)#%v", m.typ, m.name, m.fd)
 	}
-	return fmt.Sprintf("%s***REMOVED***%v", m.typ, m.fd)
+	return fmt.Sprintf("%s#%v", m.typ, m.fd)
 }
 
 // Type returns the underlying type of the map.
@@ -1476,7 +1476,7 @@ func (m *Map) Clone() (*Map, error) {
 // You can Clone a map to pin it to a different path.
 //
 // This requires bpffs to be mounted above fileName.
-// See https://docs.cilium.io/en/stable/network/kubernetes/configuration/***REMOVED***mounting-bpffs-with-systemd
+// See https://docs.cilium.io/en/stable/network/kubernetes/configuration/#mounting-bpffs-with-systemd
 func (m *Map) Pin(fileName string) error {
 	if err := sys.Pin(m.pinnedPath, fileName, m.fd); err != nil {
 		return err

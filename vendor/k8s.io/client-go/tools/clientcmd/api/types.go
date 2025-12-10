@@ -241,9 +241,9 @@ type ExecConfig struct {
 	//   cluster:
 	//     ...
 	//     extensions:
-	//     - name: client.authentication.k8s.io/exec  ***REMOVED*** reserved extension name for per cluster exec config
+	//     - name: client.authentication.k8s.io/exec  # reserved extension name for per cluster exec config
 	//       extension:
-	//         audience: 06e3fbd18de8  ***REMOVED*** arbitrary config
+	//         audience: 06e3fbd18de8  # arbitrary config
 	//
 	// In some environments, the user config may be exactly the same across many clusters
 	// (i.e. call this exec plugin) minus some details that are specific to each cluster
@@ -306,7 +306,7 @@ func (c ExecConfig) String() string {
 	if c.Config != nil {
 		config = "runtime.Object(--- REDACTED ---)"
 	}
-	return fmt.Sprintf("api.ExecConfig{Command: %q, Args: %***REMOVED***v, Env: %s, APIVersion: %q, ProvideClusterInfo: %t, Config: %s, StdinUnavailable: %t}", c.Command, args, env, c.APIVersion, c.ProvideClusterInfo, config, c.StdinUnavailable)
+	return fmt.Sprintf("api.ExecConfig{Command: %q, Args: %#v, Env: %s, APIVersion: %q, ProvideClusterInfo: %t, Config: %s, StdinUnavailable: %t}", c.Command, args, env, c.APIVersion, c.ProvideClusterInfo, config, c.StdinUnavailable)
 }
 
 // ExecEnvVar is used for setting environment variables when executing an exec-based

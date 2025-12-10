@@ -154,7 +154,7 @@ func (p *TextParser) startOfLine() stateFn {
 		return nil
 	}
 	switch p.currentByte {
-	case '***REMOVED***':
+	case '#':
 		return p.startComment
 	case '\n':
 		return p.startOfLine // Empty line, start the next one.

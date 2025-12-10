@@ -44,14 +44,14 @@ type TypeMeta struct {
 	// Servers may infer this from the endpoint the client submits requests to.
 	// Cannot be updated.
 	// In CamelCase.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	Kind string `json:"kind,omitempty" protobuf:"bytes,1,opt,name=kind"`
 
 	// APIVersion defines the versioned schema of this representation of an object.
 	// Servers should convert recognized schemas to the latest internal value, and
 	// may reject unrecognized values.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***resources
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 	// +optional
 	APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,2,opt,name=apiVersion"`
 }
@@ -68,7 +68,7 @@ type ListMeta struct {
 	// Value must be treated as opaque by clients and passed unmodified back to the server.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***concurrency-control-and-consistency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	// +optional
 	ResourceVersion string `json:"resourceVersion,omitempty" protobuf:"bytes,2,opt,name=resourceVersion"`
 
@@ -114,7 +114,7 @@ type ObjectMeta struct {
 	// automatically. Name is primarily intended for creation idempotence and configuration
 	// definition.
 	// Cannot be updated.
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names***REMOVED***names
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
 	// +optional
 	Name string `json:"name,omitempty" protobuf:"bytes,1,opt,name=name"`
 
@@ -129,7 +129,7 @@ type ObjectMeta struct {
 	// If this field is specified and the generated name exists, the server will return a 409.
 	//
 	// Applied only if Name is not specified.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***idempotency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
 	// +optional
 	GenerateName string `json:"generateName,omitempty" protobuf:"bytes,2,opt,name=generateName"`
 
@@ -154,7 +154,7 @@ type ObjectMeta struct {
 	//
 	// Populated by the system.
 	// Read-only.
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names***REMOVED***uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	// +optional
 	UID types.UID `json:"uid,omitempty" protobuf:"bytes,5,opt,name=uid,casttype=k8s.io/kubernetes/pkg/types.UID"`
 
@@ -167,7 +167,7 @@ type ObjectMeta struct {
 	// Populated by the system.
 	// Read-only.
 	// Value must be treated as opaque by clients and .
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***concurrency-control-and-consistency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	// +optional
 	ResourceVersion string `json:"resourceVersion,omitempty" protobuf:"bytes,6,opt,name=resourceVersion"`
 
@@ -183,7 +183,7 @@ type ObjectMeta struct {
 	// Populated by the system.
 	// Read-only.
 	// Null for lists.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	CreationTimestamp Time `json:"creationTimestamp,omitempty" protobuf:"bytes,8,opt,name=creationTimestamp"`
 
@@ -204,7 +204,7 @@ type ObjectMeta struct {
 	//
 	// Populated by the system when a graceful deletion is requested.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	DeletionTimestamp *Time `json:"deletionTimestamp,omitempty" protobuf:"bytes,9,opt,name=deletionTimestamp"`
 
@@ -296,13 +296,13 @@ type OwnerReference struct {
 	// API version of the referent.
 	APIVersion string `json:"apiVersion" protobuf:"bytes,5,opt,name=apiVersion"`
 	// Kind of the referent.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind string `json:"kind" protobuf:"bytes,1,opt,name=kind"`
 	// Name of the referent.
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names***REMOVED***names
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
 	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
 	// UID of the referent.
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names***REMOVED***uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	UID types.UID `json:"uid" protobuf:"bytes,4,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
 	// If true, this reference points to the managing controller.
 	// +optional
@@ -310,7 +310,7 @@ type OwnerReference struct {
 	// If true, AND if the owner has the "foregroundDeletion" finalizer, then
 	// the owner cannot be deleted from the key-value store until this
 	// reference is removed.
-	// See https://kubernetes.io/docs/concepts/architecture/garbage-collection/***REMOVED***foreground-deletion
+	// See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion
 	// for how the garbage collector interacts with this field and enforces the foreground deletion.
 	// Defaults to false.
 	// To set this field, a user needs "delete" permission of the owner,
@@ -351,7 +351,7 @@ type ListOptions struct {
 	AllowWatchBookmarks bool `json:"allowWatchBookmarks,omitempty" protobuf:"varint,9,opt,name=allowWatchBookmarks"`
 
 	// resourceVersion sets a constraint on what resource versions a request may be served from.
-	// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 	// details.
 	//
 	// Defaults to unset
@@ -361,7 +361,7 @@ type ListOptions struct {
 	// resourceVersionMatch determines how resourceVersion is applied to list calls.
 	// It is highly recommended that resourceVersionMatch be set for list calls where
 	// resourceVersion is set
-	// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 	// details.
 	//
 	// Defaults to unset
@@ -461,7 +461,7 @@ const (
 // "NotOlderThan" matches data at least as new as the provided resourceVersion.
 // "Exact" matches data at the exact resourceVersion provided.
 //
-// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 // details.
 type ResourceVersionMatch string
 
@@ -481,7 +481,7 @@ const (
 type GetOptions struct {
 	TypeMeta `json:",inline"`
 	// resourceVersion sets a constraint on what resource versions a request may be served from.
-	// See https://kubernetes.io/docs/reference/using-api/api-concepts/***REMOVED***resource-versions for
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
 	// details.
 	//
 	// Defaults to unset
@@ -606,7 +606,7 @@ type CreateOptions struct {
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,
-	// as defined by https://golang.org/pkg/unicode/***REMOVED***IsPrint.
+	// as defined by https://golang.org/pkg/unicode/#IsPrint.
 	// +optional
 	FieldManager string `json:"fieldManager,omitempty" protobuf:"bytes,3,name=fieldManager"`
 
@@ -656,7 +656,7 @@ type PatchOptions struct {
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,
-	// as defined by https://golang.org/pkg/unicode/***REMOVED***IsPrint. This
+	// as defined by https://golang.org/pkg/unicode/#IsPrint. This
 	// field is required for apply requests
 	// (application/apply-patch) but optional for non-apply patch
 	// types (JsonPatch, MergePatch, StrategicMergePatch).
@@ -706,7 +706,7 @@ type ApplyOptions struct {
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,
-	// as defined by https://golang.org/pkg/unicode/***REMOVED***IsPrint. This
+	// as defined by https://golang.org/pkg/unicode/#IsPrint. This
 	// field is required.
 	FieldManager string `json:"fieldManager" protobuf:"bytes,3,name=fieldManager"`
 }
@@ -735,7 +735,7 @@ type UpdateOptions struct {
 	// fieldManager is a name associated with the actor or entity
 	// that is making these changes. The value must be less than or
 	// 128 characters long, and only contain printable characters,
-	// as defined by https://golang.org/pkg/unicode/***REMOVED***IsPrint.
+	// as defined by https://golang.org/pkg/unicode/#IsPrint.
 	// +optional
 	FieldManager string `json:"fieldManager,omitempty" protobuf:"bytes,2,name=fieldManager"`
 
@@ -775,13 +775,13 @@ type Preconditions struct {
 type Status struct {
 	TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// Status of the operation.
 	// One of: "Success" or "Failure".
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	Status string `json:"status,omitempty" protobuf:"bytes,2,opt,name=status"`
 	// A human-readable description of the status of this operation.
@@ -821,12 +821,12 @@ type StatusDetails struct {
 	Group string `json:"group,omitempty" protobuf:"bytes,2,opt,name=group"`
 	// The kind attribute of the resource associated with the status StatusReason.
 	// On some operations may differ from the requested resource Kind.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	Kind string `json:"kind,omitempty" protobuf:"bytes,3,opt,name=kind"`
 	// UID of the resource.
 	// (when there is a single resource which can be described).
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names***REMOVED***uids
+	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
 	// +optional
 	UID types.UID `json:"uid,omitempty" protobuf:"bytes,6,opt,name=uid,casttype=k8s.io/apimachinery/pkg/types.UID"`
 	// The Causes array includes more details associated with the StatusReason
@@ -1096,7 +1096,7 @@ const (
 type List struct {
 	TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
@@ -1432,7 +1432,7 @@ func (f FieldsV1) String() string {
 type Table struct {
 	TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	ListMeta `json:"metadata,omitempty"`
 
@@ -1452,13 +1452,13 @@ type TableColumnDefinition struct {
 	Name string `json:"name"`
 	// type is an OpenAPI type definition for this column, such as number, integer, string, or
 	// array.
-	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md***REMOVED***data-types for more.
+	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.
 	Type string `json:"type"`
 	// format is an optional OpenAPI type modifier for this column. A format modifies the type and
 	// imposes additional rules, like date or time formatting for a string. The 'name' format is applied
 	// to the primary identifier column which has type 'string' to assist in clients identifying column
 	// is the resource name.
-	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md***REMOVED***data-types for more.
+	// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more.
 	Format string `json:"format"`
 	// description is a human readable description of this column.
 	Description string `json:"description"`
@@ -1568,7 +1568,7 @@ type TableOptions struct {
 type PartialObjectMetadata struct {
 	TypeMeta `json:",inline"`
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 }
@@ -1578,7 +1578,7 @@ type PartialObjectMetadata struct {
 type PartialObjectMetadataList struct {
 	TypeMeta `json:",inline"`
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 

@@ -231,7 +231,7 @@ func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {
 		return getdirentries(fd, buf, (*uint64)(unsafe.Pointer(basep)))
 	}
 	// The syscall needs a 64-bit base. On 32-bit machines
-	// we can't just use the basep passed in. See ***REMOVED***32498.
+	// we can't just use the basep passed in. See #32498.
 	var base uint64 = uint64(*basep)
 	n, err = getdirentries(fd, buf, &base)
 	*basep = uintptr(base)

@@ -102,10 +102,10 @@ func (d *Definitions) parseReference(s *openapi_v2.Schema, path *Path) (Schema, 
 	}
 
 	// TODO(wrong): $refs outside of the definitions are completely valid. We can ignore them (would be incomplete), but we cannot return an error.
-	if !strings.HasPrefix(s.GetXRef(), "***REMOVED***/definitions/") {
+	if !strings.HasPrefix(s.GetXRef(), "#/definitions/") {
 		return nil, newSchemaError(path, "unallowed reference to non-definition %q", s.GetXRef())
 	}
-	reference := strings.TrimPrefix(s.GetXRef(), "***REMOVED***/definitions/")
+	reference := strings.TrimPrefix(s.GetXRef(), "#/definitions/")
 	if _, ok := d.models[reference]; !ok {
 		return nil, newSchemaError(path, "unknown model in reference: %q", reference)
 	}
@@ -279,7 +279,7 @@ func (d *Definitions) parseArbitrary(s *openapi_v2.Schema, path *Path) (Schema, 
 func (d *Definitions) ParseSchema(s *openapi_v2.Schema, path *Path) (Schema, error) {
 	if s.GetXRef() != "" {
 		// TODO(incomplete): ignoring the rest of s is wrong. As long as there are no conflict, everything from s must be considered
-		// Reference: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md***REMOVED***path-item-object
+		// Reference: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
 		return d.parseReference(s, path)
 	}
 	objectTypes := s.GetType().GetValue()

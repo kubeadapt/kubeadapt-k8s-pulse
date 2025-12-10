@@ -1,4 +1,4 @@
-***REMOVED*** Contributing to SpdyStream
+# Contributing to SpdyStream
 
 Want to hack on spdystream? Awesome! Here are instructions to get you
 started.

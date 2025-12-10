@@ -25,7 +25,7 @@ import (
 
 var (
 	// ciphers maps strings into tls package cipher constants in
-	// https://golang.org/pkg/crypto/tls/***REMOVED***pkg-constants
+	// https://golang.org/pkg/crypto/tls/#pkg-constants
 	ciphers         = map[string]uint16{}
 	insecureCiphers = map[string]uint16{}
 )

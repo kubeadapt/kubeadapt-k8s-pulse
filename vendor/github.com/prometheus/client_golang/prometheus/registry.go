@@ -755,10 +755,10 @@ func (gs Gatherers) Gather() ([]*dto.MetricFamily, error) {
 			multiErr := MultiError{}
 			if errors.As(err, &multiErr) {
 				for _, err := range multiErr {
-					errs = append(errs, fmt.Errorf("[from Gatherer ***REMOVED***%d] %w", i+1, err))
+					errs = append(errs, fmt.Errorf("[from Gatherer #%d] %w", i+1, err))
 				}
 			} else {
-				errs = append(errs, fmt.Errorf("[from Gatherer ***REMOVED***%d] %w", i+1, err))
+				errs = append(errs, fmt.Errorf("[from Gatherer #%d] %w", i+1, err))
 			}
 		}
 		for _, mf := range mfs {
@@ -907,7 +907,7 @@ func checkMetricConsistency(
 		}
 		if !utf8.ValidString(labelPair.GetValue()) {
 			return fmt.Errorf(
-				"collected metric %q { %s} has a label named %q whose value is not utf8: %***REMOVED***v",
+				"collected metric %q { %s} has a label named %q whose value is not utf8: %#v",
 				name, dtoMetric, labelName, labelPair.GetValue())
 		}
 		previousLabelName = labelName

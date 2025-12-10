@@ -12,7 +12,7 @@ import (
 
 // These replacements permit compatibility with old numeric entities that
 // assumed Windows-1252 encoding.
-// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***consume-a-character-reference
+// https://html.spec.whatwg.org/multipage/syntax.html#consume-a-character-reference
 var replacementTable = [...]rune{
 	'\u20AC', // First entry is what 0x80 should be replaced with.
 	'\u0081',
@@ -55,7 +55,7 @@ var replacementTable = [...]rune{
 // Precondition: b[src] == '&' && dst <= src.
 // attribute should be true if parsing an attribute value.
 func unescapeEntity(b []byte, dst, src int, attribute bool) (dst1, src1 int) {
-	// https://html.spec.whatwg.org/multipage/syntax.html***REMOVED***consume-a-character-reference
+	// https://html.spec.whatwg.org/multipage/syntax.html#consume-a-character-reference
 
 	// i starts at 1 because we already know that s[0] == '&'.
 	i, s := 1, b[src:]
@@ -65,8 +65,8 @@ func unescapeEntity(b []byte, dst, src int, attribute bool) (dst1, src1 int) {
 		return dst + 1, src + 1
 	}
 
-	if s[i] == '***REMOVED***' {
-		if len(s) <= 3 { // We need to have at least "&***REMOVED***.".
+	if s[i] == '#' {
+		if len(s) <= 3 { // We need to have at least "&#.".
 			b[dst] = b[src]
 			return dst + 1, src + 1
 		}
@@ -287,17 +287,17 @@ func escape(w writer, s string) error {
 		case '&':
 			esc = "&amp;"
 		case '\'':
-			// "&***REMOVED***39;" is shorter than "&apos;" and apos was not in HTML until HTML5.
-			esc = "&***REMOVED***39;"
+			// "&#39;" is shorter than "&apos;" and apos was not in HTML until HTML5.
+			esc = "&#39;"
 		case '<':
 			esc = "&lt;"
 		case '>':
 			esc = "&gt;"
 		case '"':
-			// "&***REMOVED***34;" is shorter than "&quot;".
-			esc = "&***REMOVED***34;"
+			// "&#34;" is shorter than "&quot;".
+			esc = "&#34;"
 		case '\r':
-			esc = "&***REMOVED***13;"
+			esc = "&#13;"
 		default:
 			panic("unrecognized escape character")
 		}
@@ -326,7 +326,7 @@ func EscapeString(s string) string {
 
 // UnescapeString unescapes entities like "&lt;" to become "<". It unescapes a
 // larger range of entities than EscapeString escapes. For example, "&aacute;"
-// unescapes to "á", as does "&***REMOVED***225;" and "&xE1;".
+// unescapes to "á", as does "&#225;" and "&xE1;".
 // UnescapeString(EscapeString(s)) == s always holds, but the converse isn't
 // always true.
 func UnescapeString(s string) string {

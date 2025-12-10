@@ -36,7 +36,7 @@
 // The Timestamp message represents a timestamp,
 // an instant in time since the Unix epoch (January 1st, 1970).
 //
-// ***REMOVED*** Conversion to a Go Time
+// # Conversion to a Go Time
 //
 // The AsTime method can be used to convert a Timestamp message to a
 // standard Go time.Time value in UTC:
@@ -58,7 +58,7 @@
 //		... // handle error
 //	}
 //
-// ***REMOVED*** Conversion from a Go Time
+// # Conversion from a Go Time
 //
 // The timestamppb.New function can be used to construct a Timestamp message
 // from a standard Go time.Time value:
@@ -94,7 +94,7 @@ import (
 // restricting to that range, we ensure that we can convert to and from [RFC
 // 3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
 //
-// ***REMOVED*** Examples
+// # Examples
 //
 // Example 1: Compute Timestamp from POSIX `time()`.
 //
@@ -143,7 +143,7 @@ import (
 //	timestamp = Timestamp()
 //	timestamp.GetCurrentTime()
 //
-// ***REMOVED*** JSON Mapping
+// # JSON Mapping
 //
 // In JSON format, the Timestamp type is encoded as a string in the
 // [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
@@ -164,10 +164,10 @@ import (
 // [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
 // method. In Python, a standard `datetime.datetime` object can be converted
 // to this format using
-// [`strftime`](https://docs.python.org/2/library/time.html***REMOVED***time.strftime) with
+// [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
 // the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
 // the Joda Time's [`ISODateTimeFormat.dateTime()`](
-// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html***REMOVED***dateTime()
+// http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
 // ) to obtain a formatter capable of generating timestamps in this format.
 type Timestamp struct {
 	state         protoimpl.MessageState

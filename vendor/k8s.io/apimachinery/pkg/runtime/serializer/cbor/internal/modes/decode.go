@@ -99,7 +99,7 @@ var Decode cbor.DecMode = func() cbor.DecMode {
 
 		// Allow CBOR byte strings to be decoded into string destination values. If a byte
 		// string is enclosed in an "expected later encoding" tag
-		// (https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***section-3.4.5.2), then the text
+		// (https://www.rfc-editor.org/rfc/rfc8949.html#section-3.4.5.2), then the text
 		// encoding indicated by that tag (e.g. base64) will be applied to the contents of
 		// the byte string.
 		ByteStringToString: cbor.ByteStringToStringAllowedWithExpectedLaterEncoding,

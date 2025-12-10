@@ -81,7 +81,7 @@ type DiagOptions struct {
 	CBORSequence bool
 
 	// FloatPrecisionIndicator specifies appending a suffix to indicate float precision.
-	// Refer to https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***name-encoding-indicators.
+	// Refer to https://www.rfc-editor.org/rfc/rfc8949.html#name-encoding-indicators.
 	FloatPrecisionIndicator bool
 
 	// MaxNestedLevels specifies the max nested levels allowed for any combination of CBOR array, maps, and tags.
@@ -168,7 +168,7 @@ var defaultDiagMode, _ = DiagOptions{}.diagMode()
 // Diagnose returns extended diagnostic notation (EDN) of CBOR data items
 // using the default diagnostic mode.
 //
-// Refer to https://www.rfc-editor.org/rfc/rfc8949.html***REMOVED***name-diagnostic-notation.
+// Refer to https://www.rfc-editor.org/rfc/rfc8949.html#name-diagnostic-notation.
 func Diagnose(data []byte) (string, error) {
 	return defaultDiagMode.Diagnose(data)
 }
@@ -677,7 +677,7 @@ func (di *diagnose) encodeFloat(ai byte, val uint64) error {
 		}
 	}
 	// Use ES6 number to string conversion which should match most JSON generators.
-	// Inspired by https://github.com/golang/go/blob/4df10fba1687a6d4f51d7238a403f8f2298f6a16/src/encoding/json/encode.go***REMOVED***L585
+	// Inspired by https://github.com/golang/go/blob/4df10fba1687a6d4f51d7238a403f8f2298f6a16/src/encoding/json/encode.go#L585
 	const bitSize = 64
 	b := make([]byte, 0, 32)
 	if abs := math.Abs(f64); abs != 0 && (abs < 1e-6 || abs >= 1e21) {

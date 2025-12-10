@@ -1,19 +1,19 @@
-***REMOVED*** Contributing to Cobra
+# Contributing to Cobra
 
 Thank you so much for contributing to Cobra. We appreciate your time and help.
 Here are some guidelines to help you get started.
 
-***REMOVED******REMOVED*** Code of Conduct
+## Code of Conduct
 
 Be kind and respectful to the members of the community. Take time to educate
 others who are seeking help. Harassment of any kind will not be tolerated.
 
-***REMOVED******REMOVED*** Questions
+## Questions
 
 If you have questions regarding Cobra, feel free to ask it in the community
-[***REMOVED***cobra Slack channel][cobra-slack]
+[#cobra Slack channel][cobra-slack]
 
-***REMOVED******REMOVED*** Filing a bug or feature
+## Filing a bug or feature
 
 1. Before filing an issue, please check the existing issues to see if a
    similar one was already opened. If there is one already opened, feel free
@@ -26,7 +26,7 @@ If you have questions regarding Cobra, feel free to ask it in the community
    a clear title and description of what the feature is and why it would be
    beneficial to the project and its users.
 
-***REMOVED******REMOVED*** Submitting changes
+## Submitting changes
 
 1. CLA: Upon submitting a Pull Request (PR), contributors will be prompted to
    sign a CLA. Please sign the CLA :slightly_smiling_face:
@@ -35,7 +35,7 @@ If you have questions regarding Cobra, feel free to ask it in the community
 1. Since this is golang project, ensure the new code is properly formatted to
    ensure code consistency. Run `make all`.
 
-***REMOVED******REMOVED******REMOVED*** Quick steps to contribute
+### Quick steps to contribute
 
 1. Fork the project.
 1. Download your fork to your PC (`git clone https://github.com/your_username/cobra && cd cobra`)

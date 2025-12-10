@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// MediaType a struct that allows you to specify content format, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***mediaTypeObject
+// MediaType a struct that allows you to specify content format, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#mediaTypeObject
 //
 // Note that this struct is actually a thin wrapper around MediaTypeProps to make it referable and extensible
 type MediaType struct {
@@ -86,7 +86,7 @@ func (m *MediaType) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.
 	return nil
 }
 
-// MediaTypeProps a struct that allows you to specify content format, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***mediaTypeObject
+// MediaTypeProps a struct that allows you to specify content format, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#mediaTypeObject
 type MediaTypeProps struct {
 	// Schema holds the schema defining the type used for the media type
 	Schema *spec.Schema `json:"schema,omitempty"`

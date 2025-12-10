@@ -1,6 +1,6 @@
-***REMOVED*** See the OWNERS docs at https://go.k8s.io/owners
+# See the OWNERS docs at https://go.k8s.io/owners
 
-***REMOVED*** Disable inheritance as this is an api owners file
+# Disable inheritance as this is an api owners file
 options:
   no_parent_owners: true
 approvers:

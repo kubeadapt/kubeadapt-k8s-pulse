@@ -835,7 +835,7 @@ func (p Patch) ApplyIndent(doc []byte, indent string) ([]byte, error) {
 	return json.Marshal(pd)
 }
 
-// From http://tools.ietf.org/html/rfc6901***REMOVED***section-4 :
+// From http://tools.ietf.org/html/rfc6901#section-4 :
 //
 // Evaluation of each reference token begins by decoding any escaped
 // character sequence.  This is performed by first transforming any

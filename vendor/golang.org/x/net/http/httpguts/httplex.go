@@ -14,7 +14,7 @@ import (
 
 var isTokenTable = [256]bool{
 	'!':  true,
-	'***REMOVED***':  true,
+	'#':  true,
 	'$':  true,
 	'%':  true,
 	'&':  true,
@@ -128,7 +128,7 @@ func trimOWS(x string) string {
 }
 
 // headerValueContainsToken reports whether v (assumed to be a
-// 0***REMOVED***element, in the ABNF extension described in RFC 7230 section 7)
+// 0#element, in the ABNF extension described in RFC 7230 section 7)
 // contains token amongst its comma-separated tokens, ASCII
 // case-insensitively.
 func headerValueContainsToken(v string, token string) bool {
@@ -167,13 +167,13 @@ func tokenEqual(t1, t2 string) bool {
 }
 
 // isLWS reports whether b is linear white space, according
-// to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html***REMOVED***sec2.2
+// to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.2
 //
 //	LWS            = [CRLF] 1*( SP | HT )
 func isLWS(b byte) bool { return b == ' ' || b == '\t' }
 
 // isCTL reports whether b is a control byte, according
-// to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html***REMOVED***sec2.2
+// to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.2
 //
 //	CTL            = <any US-ASCII control character
 //	                 (octets 0 - 31) and DEL (127)>
@@ -191,7 +191,7 @@ func isCTL(b byte) bool {
 //	header-field   = field-name ":" OWS field-value OWS
 //	field-name     = token
 //	token          = 1*tchar
-//	tchar = "!" / "***REMOVED***" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /
+//	tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /
 //	        "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
 func ValidHeaderFieldName(v string) bool {
 	if len(v) == 0 {
@@ -209,11 +209,11 @@ func ValidHeaderFieldName(v string) bool {
 func ValidHostHeader(h string) bool {
 	// The latest spec is actually this:
 	//
-	// http://tools.ietf.org/html/rfc7230***REMOVED***section-5.4
+	// http://tools.ietf.org/html/rfc7230#section-5.4
 	//     Host = uri-host [ ":" port ]
 	//
 	// Where uri-host is:
-	//     http://tools.ietf.org/html/rfc3986***REMOVED***section-3.2.2
+	//     http://tools.ietf.org/html/rfc3986#section-3.2.2
 	//
 	// But we're going to be much more lenient for now and just
 	// search for any byte that's not a valid byte in any of those
@@ -263,7 +263,7 @@ var validHostByte = [256]bool{
 }
 
 // ValidHeaderFieldValue reports whether v is a valid "field-value" according to
-// http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html***REMOVED***sec4.2 :
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2 :
 //
 //	message-header = field-name ":" [ field-value ]
 //	field-value    = *( field-content | LWS )
@@ -271,7 +271,7 @@ var validHostByte = [256]bool{
 //	                 and consisting of either *TEXT or combinations
 //	                 of token, separators, and quoted-string>
 //
-// http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html***REMOVED***sec2.2 :
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.2 :
 //
 //	TEXT           = <any OCTET except CTLs,
 //	                  but including LWS>

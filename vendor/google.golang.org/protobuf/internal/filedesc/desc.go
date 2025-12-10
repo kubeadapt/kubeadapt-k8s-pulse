@@ -79,25 +79,25 @@ type (
 
 	EditionFeatures struct {
 		// IsFieldPresence is true if field_presence is EXPLICIT
-		// https://protobuf.dev/editions/features/***REMOVED***field_presence
+		// https://protobuf.dev/editions/features/#field_presence
 		IsFieldPresence bool
 		// IsFieldPresence is true if field_presence is LEGACY_REQUIRED
-		// https://protobuf.dev/editions/features/***REMOVED***field_presence
+		// https://protobuf.dev/editions/features/#field_presence
 		IsLegacyRequired bool
 		// IsOpenEnum is true if enum_type is OPEN
-		// https://protobuf.dev/editions/features/***REMOVED***enum_type
+		// https://protobuf.dev/editions/features/#enum_type
 		IsOpenEnum bool
 		// IsPacked is true if repeated_field_encoding is PACKED
-		// https://protobuf.dev/editions/features/***REMOVED***repeated_field_encoding
+		// https://protobuf.dev/editions/features/#repeated_field_encoding
 		IsPacked bool
 		// IsUTF8Validated is true if utf_validation is VERIFY
-		// https://protobuf.dev/editions/features/***REMOVED***utf8_validation
+		// https://protobuf.dev/editions/features/#utf8_validation
 		IsUTF8Validated bool
 		// IsDelimitedEncoded is true if message_encoding is DELIMITED
-		// https://protobuf.dev/editions/features/***REMOVED***message_encoding
+		// https://protobuf.dev/editions/features/#message_encoding
 		IsDelimitedEncoded bool
 		// IsJSONCompliant is true if json_format is ALLOW
-		// https://protobuf.dev/editions/features/***REMOVED***json_format
+		// https://protobuf.dev/editions/features/#json_format
 		IsJSONCompliant bool
 		// GenerateLegacyUnmarshalJSON determines if the plugin generates the
 		// UnmarshalJSON([]byte) error method for enums.

@@ -27,7 +27,7 @@ const (
 	XDP_DIAG_STATS                // when using XDP_SHOW_STATS
 )
 
-// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L21
+// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L21
 type XDPDiagInfoResp struct {
 	XDPDiagMsg *XDPSocket
 	XDPInfo    *XDPInfo

@@ -86,8 +86,8 @@ func (v *Error) ErrorBody() string {
 			// fallback to raw struct
 			// TODO: internal types have panic guards against json.Marshalling to prevent
 			// accidental use of internal types in external serialized form.  For now, use
-			// %***REMOVED***v, although it would be better to show a more expressive output in the future
-			s = fmt.Sprintf("%s: %***REMOVED***v", v.Type, value)
+			// %#v, although it would be better to show a more expressive output in the future
+			s = fmt.Sprintf("%s: %#v", v.Type, value)
 		}
 	}
 	if len(v.Detail) != 0 {

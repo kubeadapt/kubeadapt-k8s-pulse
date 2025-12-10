@@ -27,7 +27,7 @@ import (
 // It combines what previously was the Resource Listing and API Declaration (version 1.2 and earlier)
 // together into one document.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***swagger-object-
+// For more information: http://goo.gl/8us55a#swagger-object-
 type Swagger struct {
 	VendorExtensible
 	SwaggerProps
@@ -79,7 +79,7 @@ func (s *Swagger) UnmarshalJSON(data []byte) error {
 func (s *Swagger) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decoder) error {
 	// Note: If you're willing to make breaking changes, it is possible to
 	// optimize this and other usages of this pattern:
-	// https://github.com/kubernetes/kube-openapi/pull/319***REMOVED***discussion_r983165948
+	// https://github.com/kubernetes/kube-openapi/pull/319#discussion_r983165948
 	var x struct {
 		Extensions
 		SwaggerProps
@@ -272,14 +272,14 @@ func (s *SchemaOrStringArray) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, de
 // An object to hold data types that can be consumed and produced by operations.
 // These data types can be primitives, arrays or models.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***definitionsObject
+// For more information: http://goo.gl/8us55a#definitionsObject
 type Definitions map[string]Schema
 
 // SecurityDefinitions a declaration of the security schemes available to be used in the specification.
 // This does not enforce the security schemes on the operations and only serves to provide
 // the relevant details for each scheme.
 //
-// For more information: http://goo.gl/8us55a***REMOVED***securityDefinitionsObject
+// For more information: http://goo.gl/8us55a#securityDefinitionsObject
 type SecurityDefinitions map[string]*SecurityScheme
 
 // StringOrArray represents a value that can either be a string

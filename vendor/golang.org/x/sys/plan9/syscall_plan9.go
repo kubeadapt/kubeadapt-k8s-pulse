@@ -95,12 +95,12 @@ func readnum(path string) (uint, error) {
 }
 
 func Getpid() (pid int) {
-	n, _ := readnum("***REMOVED***c/pid")
+	n, _ := readnum("#c/pid")
 	return int(n)
 }
 
 func Getppid() (ppid int) {
-	n, _ := readnum("***REMOVED***c/ppid")
+	n, _ := readnum("#c/ppid")
 	return int(n)
 }
 

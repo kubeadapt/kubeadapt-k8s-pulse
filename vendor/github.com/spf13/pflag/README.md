@@ -2,7 +2,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/spf13/pflag)](https://goreportcard.com/report/github.com/spf13/pflag)
 [![GoDoc](https://godoc.org/github.com/spf13/pflag?status.svg)](https://godoc.org/github.com/spf13/pflag)
 
-***REMOVED******REMOVED*** Description
+## Description
 
 pflag is a drop-in replacement for Go's flag package, implementing
 POSIX/GNU-style --flags.
@@ -16,7 +16,7 @@ for command-line options][1]. For a more precise description, see the
 pflag is available under the same style of BSD license as the Go language,
 which can be found in the LICENSE file.
 
-***REMOVED******REMOVED*** Installation
+## Installation
 
 pflag is available using the standard `go get` command.
 
@@ -28,7 +28,7 @@ Run tests by running:
 
     go test github.com/spf13/pflag
 
-***REMOVED******REMOVED*** Usage
+## Usage
 
 pflag is a drop-in replacement of Go's native flag package. If you import
 pflag under the name "flag" then all code should continue to function
@@ -123,7 +123,7 @@ in a command-line interface. The methods of FlagSet are
 analogous to the top-level functions for the command-line
 flag set.
 
-***REMOVED******REMOVED*** Setting no option default values for flags
+## Setting no option default values for flags
 
 After you create a flag it is possible to set the pflag.NoOptDefVal for
 the given flag. Doing this changes the meaning of the flag slightly. If
@@ -143,7 +143,7 @@ Would result in something like
 | --flagname       | ip=4321         |
 | [nothing]        | ip=1234         |
 
-***REMOVED******REMOVED*** Command line flag syntax
+## Command line flag syntax
 
 ```
 --flag    // boolean flags, or flags with no option default values
@@ -184,11 +184,11 @@ Boolean flags (in their long form) accept 1, 0, t, f, true, false,
 TRUE, FALSE, True, False.
 Duration flags accept any input valid for time.ParseDuration.
 
-***REMOVED******REMOVED*** Mutating or "Normalizing" Flag names
+## Mutating or "Normalizing" Flag names
 
 It is possible to set a custom flag name 'normalization function.' It allows flag names to be mutated both when created in the code and when used on the command line to some 'normalized' form. The 'normalized' form is used for comparison. Two examples of using the custom normalization func follow.
 
-**Example ***REMOVED***1**: You want -, _, and . in flags to compare the same. aka --my-flag == --my_flag == --my.flag
+**Example #1**: You want -, _, and . in flags to compare the same. aka --my-flag == --my_flag == --my.flag
 
 ``` go
 func wordSepNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
@@ -203,7 +203,7 @@ func wordSepNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
 myFlagSet.SetNormalizeFunc(wordSepNormalizeFunc)
 ```
 
-**Example ***REMOVED***2**: You want to alias two flags. aka --old-flag-name == --new-flag-name
+**Example #2**: You want to alias two flags. aka --old-flag-name == --new-flag-name
 
 ``` go
 func aliasNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
@@ -218,17 +218,17 @@ func aliasNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
 myFlagSet.SetNormalizeFunc(aliasNormalizeFunc)
 ```
 
-***REMOVED******REMOVED*** Deprecating a flag or its shorthand
+## Deprecating a flag or its shorthand
 It is possible to deprecate a flag, or just its shorthand. Deprecating a flag/shorthand hides it from help text and prints a usage message when the deprecated flag/shorthand is used.
 
-**Example ***REMOVED***1**: You want to deprecate a flag named "badflag" as well as inform the users what flag they should use instead.
+**Example #1**: You want to deprecate a flag named "badflag" as well as inform the users what flag they should use instead.
 ```go
 // deprecate a flag by specifying its name and a usage message
 flags.MarkDeprecated("badflag", "please use --good-flag instead")
 ```
 This hides "badflag" from help text, and prints `Flag --badflag has been deprecated, please use --good-flag instead` when "badflag" is used.
 
-**Example ***REMOVED***2**: You want to keep a flag name "noshorthandflag" but deprecate its shortname "n".
+**Example #2**: You want to keep a flag name "noshorthandflag" but deprecate its shortname "n".
 ```go
 // deprecate a flag shorthand by specifying its flag name and a usage message
 flags.MarkShorthandDeprecated("noshorthandflag", "please use --noshorthandflag only")
@@ -237,7 +237,7 @@ This hides the shortname "n" from help text, and prints `Flag shorthand -n has b
 
 Note that usage message is essential here, and it should not be empty.
 
-***REMOVED******REMOVED*** Hidden flags
+## Hidden flags
 It is possible to mark a flag as hidden, meaning it will still function as normal, however will not show up in usage/help text.
 
 **Example**: You have a flag named "secretFlag" that you need for internal use only and don't want it showing up in help text, or for its usage text to be available.
@@ -246,7 +246,7 @@ It is possible to mark a flag as hidden, meaning it will still function as norma
 flags.MarkHidden("secretFlag")
 ```
 
-***REMOVED******REMOVED*** Disable sorting of flags
+## Disable sorting of flags
 `pflag` allows you to disable sorting of flags for help and usage message.
 
 **Example**:
@@ -265,7 +265,7 @@ flags.PrintDefaults()
 ```
 
 
-***REMOVED******REMOVED*** Supporting Go flags when using pflag
+## Supporting Go flags when using pflag
 In order to support flags defined using Go's `flag` package, they must be added to the `pflag` flagset. This is usually necessary
 to support flags defined by third-party dependencies (e.g. `golang/glog`).
 
@@ -284,7 +284,7 @@ func main() {
 }
 ```
 
-***REMOVED******REMOVED*** More info
+## More info
 
 You can see the full reference documentation of the pflag package
 [at godoc.org][3], or through go's standard documentation system by

@@ -139,7 +139,7 @@ type ProgramSpec struct {
 	// License of the program. Some helpers are only available if
 	// the license is deemed compatible with the GPL.
 	//
-	// See https://www.kernel.org/doc/html/latest/process/license-rules.html***REMOVED***id1
+	// See https://www.kernel.org/doc/html/latest/process/license-rules.html#id1
 	License string
 
 	// Version used by Kprobe programs.
@@ -245,8 +245,8 @@ var (
 	// This log message was introduced by ebb676daa1a3 ("bpf: Print function name in
 	// addition to function id") which first appeared in v4.10 and has remained
 	// unchanged since.
-	coreBadCall  = []byte(fmt.Sprintf("invalid func unknown***REMOVED***%d\n", btf.COREBadRelocationSentinel))
-	kfuncBadCall = []byte(fmt.Sprintf("invalid func unknown***REMOVED***%d\n", kfuncCallPoisonBase))
+	coreBadCall  = []byte(fmt.Sprintf("invalid func unknown#%d\n", btf.COREBadRelocationSentinel))
+	kfuncBadCall = []byte(fmt.Sprintf("invalid func unknown#%d\n", kfuncCallPoisonBase))
 )
 
 func newProgramWithOptions(spec *ProgramSpec, opts ProgramOptions, c *btf.Cache) (*Program, error) {
@@ -567,7 +567,7 @@ func newProgramFromFD(fd *sys.FD) (*Program, error) {
 
 func (p *Program) String() string {
 	if p.name != "" {
-		return fmt.Sprintf("%s(%s)***REMOVED***%v", p.typ, p.name, p.fd)
+		return fmt.Sprintf("%s(%s)#%v", p.typ, p.name, p.fd)
 	}
 	return fmt.Sprintf("%s(%v)", p.typ, p.fd)
 }
@@ -642,7 +642,7 @@ func (p *Program) Clone() (*Program, error) {
 // the new path already exists. Re-pinning across filesystems is not supported.
 //
 // This requires bpffs to be mounted above fileName.
-// See https://docs.cilium.io/en/stable/network/kubernetes/configuration/***REMOVED***mounting-bpffs-with-systemd
+// See https://docs.cilium.io/en/stable/network/kubernetes/configuration/#mounting-bpffs-with-systemd
 func (p *Program) Pin(fileName string) error {
 	if err := sys.Pin(p.pinnedPath, fileName, p.fd); err != nil {
 		return err
@@ -1066,7 +1066,7 @@ func findProgramTargetInKernel(name string, progType ProgramType, attachType Att
 	if errors.Is(err, btf.ErrNotFound) {
 		return nil, 0, &internal.UnsupportedFeatureError{Name: featureName}
 	}
-	// See cilium/ebpf***REMOVED***894. Until we can disambiguate between equally-named kernel
+	// See cilium/ebpf#894. Until we can disambiguate between equally-named kernel
 	// symbols, we should explicitly refuse program loads. They will not reliably
 	// do what the caller intended.
 	if errors.Is(err, btf.ErrMultipleMatches) {

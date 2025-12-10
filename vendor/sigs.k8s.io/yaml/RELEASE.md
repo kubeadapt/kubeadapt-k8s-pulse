@@ -1,4 +1,4 @@
-***REMOVED*** Release Process
+# Release Process
 
 The `yaml` Project is released on an as-needed basis. The process is as follows:
 

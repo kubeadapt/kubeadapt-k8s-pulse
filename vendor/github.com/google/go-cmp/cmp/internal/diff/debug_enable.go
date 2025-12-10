@@ -18,24 +18,24 @@ import (
 //	go test -tags=cmp_debug -v
 //
 // Example output:
-//	=== RUN   TestDifference/***REMOVED***34
+//	=== RUN   TestDifference/#34
 //	┌───────────────────────────────┐
 //	│ \ · · · · · · · · · · · · · · │
-//	│ · ***REMOVED*** · · · · · · · · · · · · · │
+//	│ · # · · · · · · · · · · · · · │
 //	│ · \ · · · · · · · · · · · · · │
 //	│ · · \ · · · · · · · · · · · · │
-//	│ · · · X ***REMOVED*** · · · · · · · · · · │
-//	│ · · · ***REMOVED*** \ · · · · · · · · · · │
-//	│ · · · · · ***REMOVED*** ***REMOVED*** · · · · · · · · │
-//	│ · · · · · ***REMOVED*** \ · · · · · · · · │
+//	│ · · · X # · · · · · · · · · · │
+//	│ · · · # \ · · · · · · · · · · │
+//	│ · · · · · # # · · · · · · · · │
+//	│ · · · · · # \ · · · · · · · · │
 //	│ · · · · · · · \ · · · · · · · │
 //	│ · · · · · · · · \ · · · · · · │
 //	│ · · · · · · · · · \ · · · · · │
-//	│ · · · · · · · · · · \ · · ***REMOVED*** · │
-//	│ · · · · · · · · · · · \ ***REMOVED*** ***REMOVED*** · │
-//	│ · · · · · · · · · · · ***REMOVED*** ***REMOVED*** ***REMOVED*** · │
-//	│ · · · · · · · · · · ***REMOVED*** ***REMOVED*** ***REMOVED*** ***REMOVED*** · │
-//	│ · · · · · · · · · ***REMOVED*** ***REMOVED*** ***REMOVED*** ***REMOVED*** ***REMOVED*** · │
+//	│ · · · · · · · · · · \ · · # · │
+//	│ · · · · · · · · · · · \ # # · │
+//	│ · · · · · · · · · · · # # # · │
+//	│ · · · · · · · · · · # # # # · │
+//	│ · · · · · · · · · # # # # # · │
 //	│ · · · · · · · · · · · · · · \ │
 //	└───────────────────────────────┘
 //	[.Y..M.XY......YXYXY.|]
@@ -45,7 +45,7 @@ import (
 // is the top-left, while the ends are the bottom-right. The '·' represents
 // an unexplored node in the graph. The '\' indicates that the two symbols
 // from list X and Y are equal. The 'X' indicates that two symbols are similar
-// (but not exactly equal) to each other. The '***REMOVED***' indicates that the two symbols
+// (but not exactly equal) to each other. The '#' indicates that the two symbols
 // are different (and not similar). The algorithm traverses this graph trying to
 // make the paths starting in the top-left and the bottom-right connect.
 //
@@ -91,7 +91,7 @@ func (dbg *debugger) Begin(nx, ny int, f EqualFunc, p1, p2 *EditScript) EqualFun
 		case r.Similar():
 			cell[0] = 'X'
 		default:
-			cell[0] = '***REMOVED***'
+			cell[0] = '#'
 		}
 		return
 	}

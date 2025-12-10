@@ -1,0 +1,151 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the eBPF Agent
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees:
+  - ugurcancaykara
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature!
+        Please describe the problem you're trying to solve and your proposed solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: |
+        A clear description of the problem or use case this feature would address.
+        What are you trying to accomplish? Why is this needed?
+      placeholder: |
+        Example: "I need to track per-service bandwidth usage, but currently only raw IP metrics are available..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: A clear description of what you want to happen.
+      placeholder: |
+        Describe your proposed solution...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: |
+        What other approaches have you considered?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of the agent would this feature affect?
+      multiple: true
+      options:
+        - "Kernel space (eBPF/TC hooks)"
+        - "Userspace collector"
+        - "Prometheus metrics"
+        - "Configuration"
+        - "Build/CI system"
+        - "Documentation"
+        - "Other"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: change-type
+    attributes:
+      label: Type of Change
+      description: What kind of change does this require?
+      options:
+        - "New metric (additional data exported)"
+        - "New configuration option"
+        - "Performance improvement"
+        - "New protocol support (e.g., QUIC, SCTP)"
+        - "Integration (e.g., new exporter format)"
+        - "Developer experience improvement"
+        - "Other"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking-change
+    attributes:
+      label: Breaking Change?
+      description: Would this change break existing functionality or require migration?
+      options:
+        - "No - backwards compatible"
+        - "Yes - breaking change (explain in additional context)"
+        - "Unknown / Not sure"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kernel-impact
+    attributes:
+      label: Kernel/BPF Impact
+      description: |
+        Does this require changes to eBPF code?
+        Reference: [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - TC hooks run in kernel space
+      options:
+        - "No kernel changes needed"
+        - "Requires BPF map changes"
+        - "Requires TC hook changes"
+        - "Requires new BPF program"
+        - "Unknown / Needs investigation"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: kernel-compat
+    attributes:
+      label: Kernel Compatibility Consideration
+      description: |
+        The agent supports kernels 5.10+. Please consider compatibility.
+        Reference: [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - Kernel version guards
+      options:
+        - label: I understand this feature must work on kernel 5.10+
+        - label: This feature may require newer kernel features (explain in additional context)
+
+  - type: textarea
+    id: metrics-example
+    attributes:
+      label: Example Metrics Output (if applicable)
+      description: |
+        If this feature involves new metrics, show what the output would look like.
+        Current metrics format: `kubeadapt_connection_traffic_bytes_total{src_ip, dst_ip, protocol, ...}`
+      render: prometheus
+      placeholder: |
+        # Example new metric
+        kubeadapt_new_metric{label1="value1"} 123
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, mockups, or references about the feature request.
+      placeholder: |
+        Any additional information, links to related issues, etc.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be interested in contributing this feature?
+      options:
+        - label: I would like to implement this feature myself
+        - label: I can help with testing
+        - label: I can help with documentation

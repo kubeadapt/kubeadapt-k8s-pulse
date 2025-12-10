@@ -25,10 +25,10 @@ spec:
       hostPID: true
       containers:
       - name: ebpf-agent
-        image: localhost/ebpf-agent:test  ***REMOVED*** E2E test image loaded into Kind cluster
-        imagePullPolicy: Never            ***REMOVED*** Use locally loaded image, don't pull
+        image: localhost/ebpf-agent:test  # E2E test image loaded into Kind cluster
+        imagePullPolicy: Never            # Use locally loaded image, don't pull
         env:
-        ***REMOVED*** DaemonSet pod identity (for Prometheus metric labels)
+        # DaemonSet pod identity (for Prometheus metric labels)
         - name: DAEMONSET_POD_UID
           valueFrom:
             fieldRef:
@@ -55,18 +55,18 @@ spec:
           value: "9090"
         - name: EBPF_COLLECTION_INTERVAL
           value: "25s"
-        ***REMOVED*** Enable BPF map dumping for e2e test debugging
-        ***REMOVED*** Map dumping is synchronized with collection cycle (25s interval)
+        # Enable BPF map dumping for e2e test debugging
+        # Map dumping is synchronized with collection cycle (25s interval)
         - name: EBPF_DUMP_BPF_MAPS
           value: "true"
         securityContext:
-          ***REMOVED*** eBPF agents require privileged mode for:
-          ***REMOVED*** - BPF syscalls and map operations
-          ***REMOVED*** - Bidirectional mount propagation for BPF maps
-          ***REMOVED*** - Kernel tracepoint attachment
+          # eBPF agents require privileged mode for:
+          # - BPF syscalls and map operations
+          # - Bidirectional mount propagation for BPF maps
+          # - Kernel tracepoint attachment
           privileged: true
           readOnlyRootFilesystem: true
-          runAsNonRoot: false  ***REMOVED*** BPF requires root
+          runAsNonRoot: false  # BPF requires root
           runAsUser: 0
         resources:
           limits:
@@ -137,34 +137,34 @@ spec:
       - name: tmp
         emptyDir: {}
       tolerations:
-      ***REMOVED*** Run on all nodes including masters
+      # Run on all nodes including masters
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
       - effect: NoSchedule
         key: node-role.kubernetes.io/control-plane
-      ***REMOVED*** Tolerate unschedulable nodes
+      # Tolerate unschedulable nodes
       - key: node.kubernetes.io/unschedulable
         operator: Exists
         effect: NoSchedule
-      ***REMOVED*** Tolerate not-ready nodes
+      # Tolerate not-ready nodes
       - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoExecute
         tolerationSeconds: 300
-      ***REMOVED*** Tolerate unreachable nodes
+      # Tolerate unreachable nodes
       - key: node.kubernetes.io/unreachable
         operator: Exists
         effect: NoExecute
         tolerationSeconds: 300
-      ***REMOVED*** Tolerate disk pressure
+      # Tolerate disk pressure
       - key: node.kubernetes.io/disk-pressure
         operator: Exists
         effect: NoSchedule
-      ***REMOVED*** Tolerate memory pressure
+      # Tolerate memory pressure
       - key: node.kubernetes.io/memory-pressure
         operator: Exists
         effect: NoSchedule
-      ***REMOVED*** Tolerate PID pressure
+      # Tolerate PID pressure
       - key: node.kubernetes.io/pid-pressure
         operator: Exists
         effect: NoSchedule
@@ -188,4 +188,4 @@ spec:
     port: 9090
     targetPort: 9090
     protocol: TCP
-  clusterIP: None  ***REMOVED*** Headless service for per-pod scraping
+  clusterIP: None  # Headless service for per-pod scraping

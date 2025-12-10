@@ -1,7 +1,7 @@
 version: build-{build}.{branch}
 
 clone_folder: C:\gopath\src\github.com\pkg\errors
-shallow_clone: true ***REMOVED*** for startup speed
+shallow_clone: true # for startup speed
 
 environment:
   GOPATH: C:\gopath
@@ -9,13 +9,13 @@ environment:
 platform:
   - x64
 
-***REMOVED*** http://www.appveyor.com/docs/installed-software
+# http://www.appveyor.com/docs/installed-software
 install:
-  ***REMOVED*** some helpful output for debugging builds
+  # some helpful output for debugging builds
   - go version
   - go env
-  ***REMOVED*** pre-installed MinGW at C:\MinGW is 32bit only
-  ***REMOVED*** but MSYS2 at C:\msys64 has mingw64
+  # pre-installed MinGW at C:\MinGW is 32bit only
+  # but MSYS2 at C:\msys64 has mingw64
   - set PATH=C:\msys64\mingw64\bin;%PATH%
   - gcc --version
   - g++ --version
@@ -27,6 +27,6 @@ test_script:
   - set PATH=C:\gopath\bin;%PATH%
   - go test -v ./...
 
-***REMOVED***artifacts:
-***REMOVED***  - path: '%GOPATH%\bin\*.exe'
+#artifacts:
+#  - path: '%GOPATH%\bin\*.exe'
 deploy: off

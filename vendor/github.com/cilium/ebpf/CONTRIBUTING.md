@@ -1,4 +1,4 @@
-***REMOVED*** Contributing to ebpf-go
+# Contributing to ebpf-go
 
 Want to contribute to ebpf-go? There are a few things you need to know.
 

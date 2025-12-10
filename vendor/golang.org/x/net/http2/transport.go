@@ -119,7 +119,7 @@ type Transport struct {
 	// payload that the sender is willing to receive. If 0, no setting is
 	// sent, and the value is provided by the peer, which should be 16384
 	// according to the spec:
-	// https://datatracker.ietf.org/doc/html/rfc7540***REMOVED***section-6.5.2.
+	// https://datatracker.ietf.org/doc/html/rfc7540#section-6.5.2.
 	// Values are bounded in the range 16k to 16M.
 	MaxReadFrameSize uint32
 
@@ -403,7 +403,7 @@ type ClientConn struct {
 	// rstStreamPingsBlocked works around an unfortunate gRPC behavior.
 	// gRPC strictly limits the number of PING frames that it will receive.
 	// The default is two pings per two hours, but the limit resets every time
-	// the gRPC endpoint sends a HEADERS or DATA frame. See golang/go***REMOVED***70575.
+	// the gRPC endpoint sends a HEADERS or DATA frame. See golang/go#70575.
 	//
 	// rstStreamPingsBlocked is set after receiving a response to a PING frame
 	// bundled with an RST_STREAM (see pendingResets below), and cleared after
@@ -743,7 +743,7 @@ func canRetryError(err error) bool {
 	}
 	if se, ok := err.(StreamError); ok {
 		if se.Code == ErrCodeProtocol && se.Cause == errFromPeer {
-			// See golang/go***REMOVED***47635, golang/go***REMOVED***42777
+			// See golang/go#47635, golang/go#42777
 			return true
 		}
 		return se.Code == ErrCodeRefusedStream
@@ -1091,7 +1091,7 @@ func (cc *ClientConn) idleStateLocked() (st clientConnIdleState) {
 	// If this connection has never been used for a request and is closed,
 	// then let it take a request (which will fail).
 	// If the conn was closed for idleness, we're racing the idle timer;
-	// don't try to use the conn. (Issue ***REMOVED***70515.)
+	// don't try to use the conn. (Issue #70515.)
 	//
 	// This avoids a situation where an error early in a connection's lifetime
 	// goes unreported.
@@ -1384,7 +1384,7 @@ func (cc *ClientConn) roundTrip(req *http.Request, streamf func(*clientStream)) 
 		//
 		// Closing the body before returning avoids a race condition
 		// with net/http checking its readTrackingBody to see if the
-		// body was read from or closed. See golang/go***REMOVED***60041.
+		// body was read from or closed. See golang/go#60041.
 		//
 		// The body is closed in a separate goroutine without the
 		// connection mutex held, but dropping the mutex before waiting
@@ -2632,7 +2632,7 @@ func (b transportResponseBody) Close() error {
 	select {
 	case <-cs.donec:
 	case <-cs.ctx.Done():
-		// See golang/go***REMOVED***49366: The net/http package can cancel the
+		// See golang/go#49366: The net/http package can cancel the
 		// request context after the response body is fully read.
 		// Don't treat this as an error.
 		return nil

@@ -25,7 +25,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// Operation describes a single API operation on a path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***operationObject
+// Operation describes a single API operation on a path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#operationObject
 //
 // Note that this struct is actually a thin wrapper around OperationProps to make it referable and extensible
 type Operation struct {
@@ -83,7 +83,7 @@ func (o *Operation) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.
 	return nil
 }
 
-// OperationProps describes a single API operation on a path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***operationObject
+// OperationProps describes a single API operation on a path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#operationObject
 type OperationProps struct {
 	// Tags holds a list of tags for API documentation control
 	Tags []string `json:"tags,omitempty"`

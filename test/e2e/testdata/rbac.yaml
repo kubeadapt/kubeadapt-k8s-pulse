@@ -1,4 +1,4 @@
-***REMOVED*** KubeAdapt eBPF Agent RBAC for E2E Tests
+# KubeAdapt eBPF Agent RBAC for E2E Tests
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -16,19 +16,19 @@ metadata:
     app.kubernetes.io/name: kubeadapt
     app.kubernetes.io/component: ebpf-agent
 rules:
-  ***REMOVED*** Pod information for connection-to-pod correlation
+  # Pod information for connection-to-pod correlation
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"]
-  ***REMOVED*** Node information for host network correlation
+  # Node information for host network correlation
   - apiGroups: [""]
     resources: ["nodes"]
     verbs: ["get", "list", "watch"]
-  ***REMOVED*** Namespace information for filtering
+  # Namespace information for filtering
   - apiGroups: [""]
     resources: ["namespaces"]
     verbs: ["get", "list", "watch"]
-  ***REMOVED*** Service information for service-level metrics
+  # Service information for service-level metrics
   - apiGroups: [""]
     resources: ["services"]
     verbs: ["get", "list", "watch"]

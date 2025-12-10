@@ -1,6 +1,6 @@
-***REMOVED*** Contributing to KubeAdapt eBPF Agent
+# Contributing to KubeAdapt eBPF Agent
 
-***REMOVED******REMOVED*** Prerequisites
+## Prerequisites
 
 Before you start, make sure you have:
 
@@ -10,17 +10,17 @@ Before you start, make sure you have:
 
 **macOS developers**: You don't need LLVM, clang, or Linux kernel headers locally - Docker handles BPF compilation.
 
-***REMOVED******REMOVED*** Quick Start
+## Quick Start
 
 ```bash
-***REMOVED*** Clone and setup
+# Clone and setup
 git clone <repository-url>
 cd ebpf-agent
 
-***REMOVED*** Initialize and build
+# Initialize and build
 make quickstart
 
-***REMOVED*** Run the agent
+# Run the agent
 make run-local
 ```
 
@@ -29,33 +29,33 @@ Access points:
 - Health: `http://localhost:9090/health`
 - Prometheus: `http://localhost:9091`
 
-***REMOVED******REMOVED*** Step-by-Step Setup
+## Step-by-Step Setup
 
 ```bash
-***REMOVED*** 1. Initialize development environment
+# 1. Initialize development environment
 make init
 
-***REMOVED*** 2. Install Go tools
+# 2. Install Go tools
 make deps
 
-***REMOVED*** 3. Generate BPF code
+# 3. Generate BPF code
 make generate
 
-***REMOVED*** 4. Build the Go binary
+# 4. Build the Go binary
 make build
 
-***REMOVED*** 5. Run tests
+# 5. Run tests
 make test
 
-***REMOVED*** 6. Run the full stack
+# 6. Run the full stack
 make run-local
 ```
 
 ---
 
-***REMOVED******REMOVED*** Development Environment
+## Development Environment
 
-***REMOVED******REMOVED******REMOVED*** macOS vs Linux
+### macOS vs Linux
 
 **On macOS**: Code editing, Git, Go compilation, unit tests, linting run natively.
 
@@ -63,7 +63,7 @@ make run-local
 
 eBPF requires Linux kernel - Docker provides a consistent Linux environment for cross-platform development.
 
-***REMOVED******REMOVED******REMOVED*** Dockerfiles
+### Dockerfiles
 
 | Dockerfile | Purpose | Command |
 |------------|---------|---------|
@@ -73,44 +73,44 @@ eBPF requires Linux kernel - Docker provides a consistent Linux environment for 
 
 ---
 
-***REMOVED******REMOVED*** Development Workflows
+## Development Workflows
 
-***REMOVED******REMOVED******REMOVED*** Fixing Go Code
+### Fixing Go Code
 
 ```bash
-***REMOVED*** Edit the file, then:
-make test   ***REMOVED*** Run unit tests
-make lint   ***REMOVED*** Check code style
-make build  ***REMOVED*** Build binary
-make run-local  ***REMOVED*** Test in full environment
+# Edit the file, then:
+make test   # Run unit tests
+make lint   # Check code style
+make build  # Build binary
+make run-local  # Test in full environment
 ```
 
-***REMOVED******REMOVED******REMOVED*** Modifying BPF Code
+### Modifying BPF Code
 
 ```bash
-***REMOVED*** Edit bpf/network_monitor.c, then:
-make generate    ***REMOVED*** Regenerate Go bindings
-make test-docker ***REMOVED*** Test BPF loading (needs Linux kernel)
-make run-local   ***REMOVED*** Full stack test
+# Edit bpf/network_monitor.c, then:
+make generate    # Regenerate Go bindings
+make test-docker # Test BPF loading (needs Linux kernel)
+make run-local   # Full stack test
 ```
 
-***REMOVED******REMOVED******REMOVED*** Hot-Reload Development
+### Hot-Reload Development
 
 ```bash
-***REMOVED*** Terminal 1: Start dev mode with hot-reload
+# Terminal 1: Start dev mode with hot-reload
 make dev
 
-***REMOVED*** Terminal 2: Watch logs
+# Terminal 2: Watch logs
 docker-compose logs -f ebpf-dev
 
-***REMOVED*** Now edit Go files - changes trigger automatic rebuilds
+# Now edit Go files - changes trigger automatic rebuilds
 ```
 
 ---
 
-***REMOVED******REMOVED*** Testing
+## Testing
 
-***REMOVED******REMOVED******REMOVED*** Test Levels
+### Test Levels
 
 | Level | Command | What it tests |
 |-------|---------|---------------|
@@ -118,7 +118,7 @@ docker-compose logs -f ebpf-dev
 | Integration | `make test-docker` | BPF loading, map operations |
 | E2E | `make test-e2e` | Full system in Kind cluster |
 
-***REMOVED******REMOVED******REMOVED*** Test Selection
+### Test Selection
 
 | I changed... | Run this |
 |--------------|----------|
@@ -126,19 +126,19 @@ docker-compose logs -f ebpf-dev
 | BPF C code | `make test-docker` |
 | Kubernetes integration | `make test-e2e` |
 
-***REMOVED******REMOVED******REMOVED*** Coverage
+### Coverage
 
 ```bash
-make test-coverage  ***REMOVED*** Generates HTML coverage report
+make test-coverage  # Generates HTML coverage report
 ```
 
 Aim for >70% coverage on new code.
 
 ---
 
-***REMOVED******REMOVED*** Debugging
+## Debugging
 
-***REMOVED******REMOVED******REMOVED*** Health Check
+### Health Check
 
 ```bash
 curl localhost:9090/health
@@ -146,44 +146,44 @@ curl localhost:9090/health/ready
 curl localhost:9090/health/live
 ```
 
-***REMOVED******REMOVED******REMOVED*** Check Logs
+### Check Logs
 
 ```bash
-***REMOVED*** Local
+# Local
 docker-compose logs -f ebpf-agent
 
-***REMOVED*** Kubernetes
+# Kubernetes
 kubectl logs -n kubeadapt -l app.kubernetes.io/name=ebpf-agent -f
 ```
 
-***REMOVED******REMOVED******REMOVED*** Debug BPF Programs
+### Debug BPF Programs
 
 ```bash
-***REMOVED*** List loaded BPF programs
+# List loaded BPF programs
 docker-compose exec ebpf-agent bpftool prog list
 
-***REMOVED*** Check BPF maps
+# Check BPF maps
 docker-compose exec ebpf-agent bpftool map list
 
-***REMOVED*** Dump map contents
+# Dump map contents
 docker-compose exec ebpf-agent bpftool map dump id <map-id>
 ```
 
-***REMOVED******REMOVED******REMOVED*** Performance Profiling
+### Performance Profiling
 
 ```bash
-***REMOVED*** CPU profiling
+# CPU profiling
 curl localhost:9090/debug/pprof/profile?seconds=30 > cpu.prof
 go tool pprof cpu.prof
 
-***REMOVED*** Memory profiling
+# Memory profiling
 curl localhost:9090/debug/pprof/heap > mem.prof
 go tool pprof mem.prof
 ```
 
 ---
 
-***REMOVED******REMOVED*** Docker Services
+## Docker Services
 
 | Service | Purpose | Port |
 |---------|---------|------|
@@ -192,16 +192,16 @@ go tool pprof mem.prof
 | `bpf-builder` | BPF compilation | - |
 | `prometheus` | Metrics collection | 9091 |
 
-***REMOVED******REMOVED******REMOVED*** Build Commands
+### Build Commands
 
 ```bash
-make docker-build   ***REMOVED*** Single-arch (local testing)
-make docker-buildx  ***REMOVED*** Multi-arch (production: amd64 + arm64)
+make docker-build   # Single-arch (local testing)
+make docker-buildx  # Multi-arch (production: amd64 + arm64)
 ```
 
 ---
 
-***REMOVED******REMOVED*** Troubleshooting
+## Troubleshooting
 
 | Error | Solution |
 |-------|----------|
@@ -215,21 +215,21 @@ make docker-buildx  ***REMOVED*** Multi-arch (production: amd64 + arm64)
 
 ---
 
-***REMOVED******REMOVED*** Code Quality
+## Code Quality
 
-***REMOVED******REMOVED******REMOVED*** Before Committing
+### Before Committing
 
 ```bash
-make fmt   ***REMOVED*** Format code (gofmt, goimports, clang-format)
-make lint  ***REMOVED*** Run linters (golangci-lint)
+make fmt   # Format code (gofmt, goimports, clang-format)
+make lint  # Run linters (golangci-lint)
 ```
 
-***REMOVED******REMOVED******REMOVED*** Style Guidelines
+### Style Guidelines
 
 - **Go**: Standard Go conventions, `gofmt` formatting
 - **BPF C**: Linux kernel coding style, tabs for indentation
 
-***REMOVED******REMOVED******REMOVED*** Test Standards
+### Test Standards
 
 - New features: >70% coverage
 - Bug fixes: Add regression test
@@ -237,20 +237,20 @@ make lint  ***REMOVED*** Run linters (golangci-lint)
 
 ---
 
-***REMOVED******REMOVED*** Submitting Your Work
+## Submitting Your Work
 
-***REMOVED******REMOVED******REMOVED*** Pre-Submit Checklist
+### Pre-Submit Checklist
 
 ```bash
-make fmt          ***REMOVED*** Format code
-make lint         ***REMOVED*** Run linters
-make test         ***REMOVED*** Unit tests
-make test-docker  ***REMOVED*** Integration tests (if BPF changed)
-make docker-build ***REMOVED*** Build image
-make run-local    ***REMOVED*** Test locally
+make fmt          # Format code
+make lint         # Run linters
+make test         # Unit tests
+make test-docker  # Integration tests (if BPF changed)
+make docker-build # Build image
+make run-local    # Test locally
 ```
 
-***REMOVED******REMOVED******REMOVED*** Commit Message Format
+### Commit Message Format
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -267,7 +267,7 @@ fix(metrics): correct byte counter overflow
 refactor(collector): simplify aggregation logic
 ```
 
-***REMOVED******REMOVED******REMOVED*** Pull Request Process
+### Pull Request Process
 
 1. Fork and create a feature branch
 2. Make changes and test thoroughly
@@ -276,7 +276,7 @@ refactor(collector): simplify aggregation logic
 
 ---
 
-***REMOVED******REMOVED*** FAQ
+## FAQ
 
 **Q: Where do I start with eBPF?**
 A: Read `bpf/network_monitor.c`, then `internal/bpf/loader.go`.
@@ -289,7 +289,7 @@ A: Little-Endian (x86_64, ARM64) and Big-Endian architectures.
 
 ---
 
-***REMOVED******REMOVED*** Security
+## Security
 
 Never commit credentials, tokens, or secrets. Use environment variables or Kubernetes secrets.
 
@@ -297,6 +297,6 @@ Report security issues to security@kubeadapt.io (not public GitHub issues).
 
 ---
 
-***REMOVED******REMOVED*** License
+## License
 
 Contributions are licensed under the project's Apache 2.0 license.

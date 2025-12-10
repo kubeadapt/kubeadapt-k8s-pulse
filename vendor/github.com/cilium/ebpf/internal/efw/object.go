@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// https://github.com/microsoft/ebpf-for-windows/blob/9d9003c39c3fd75be5225ac0fce30077d6bf0604/include/ebpf_core_structs.h***REMOVED***L15
+// https://github.com/microsoft/ebpf-for-windows/blob/9d9003c39c3fd75be5225ac0fce30077d6bf0604/include/ebpf_core_structs.h#L15
 const _EBPF_MAX_PIN_PATH_LENGTH = 256
 
 /*

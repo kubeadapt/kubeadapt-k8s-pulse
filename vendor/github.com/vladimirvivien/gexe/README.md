@@ -1,14 +1,14 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/vladimirvivien/gexe.svg)](https://pkg.go.dev/github.com/vladimirvivien/gexe)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vladimirvivien/echo)](https://goreportcard.com/report/github.com/vladimirvivien/echo)
 ![Build](https://github.com/vladimirvivien/gexe/actions/workflows/build.yml/badge.svg)
-***REMOVED*** Project `gexe`
+# Project `gexe`
 Package with script-like API for system operation and automation!
 
 The goal of project `gexe` is to make it simple to write code for system operation and task automation using a script-like API that offers the security and the type safety of the Go programming language (see [/examples](/examples/)).
 
 > NOTE: this project got renamed from Echo to Gexe (see Project Name Change)
 
-***REMOVED******REMOVED*** What can you do with `gexe`?
+## What can you do with `gexe`?
 * Parse and execute OS plain text commands, as you would in a shell.
 * Support for variable expansion in command string (i.e. `gexe.Run("echo $HOME")`)
 * Ability to pipe processes: `gexe.Pipe("cat /etc/hosts", "wc -l")`
@@ -18,14 +18,14 @@ The goal of project `gexe` is to make it simple to write code for system operati
 * Easily read and write file content using different sources (string, bytes, io.Writer, etc)
 * Integrate with your shell script using `go run`
 
-***REMOVED******REMOVED*** Using `gexe`
+## Using `gexe`
 
-***REMOVED******REMOVED******REMOVED*** Get the package
+### Get the package
 ```bash
 go get github.com/vladimirvivien/gexe
 ```
 
-***REMOVED******REMOVED******REMOVED*** Run a process
+### Run a process
 The following executes command `echo "Hello World!"` and prints the result:
 ```go
 fmt.Println(gexe.Run(`echo "Hello World!"`))
@@ -43,10 +43,10 @@ if proc.Err() != nil {
 fmt.Println(proc.Result())
 ```
 
-***REMOVED******REMOVED*** Examples
+## Examples
 Find more examples [here](./examples/)!
 
-***REMOVED******REMOVED******REMOVED*** Building project `$gexe` with `gexe`
+### Building project `$gexe` with `gexe`
 This example shows how `gexe` can be used to build Go project binaries for multiple
 platforms and OSes. Note the followings:
 * The command string is naturally expressed as you would in a shell.
@@ -70,7 +70,7 @@ func main() {
 ```
 > See [./examples/build/main.go](./examples/build/main.go)
 
-***REMOVED******REMOVED******REMOVED*** Long-running process
+### Long-running process
 This example shows how `gexe` can be used to launch a long-running process and stream
 its output. The code invokes the `ping` command, streams its output, displays the result,
 and then kills the process after 5 seconds.
@@ -100,7 +100,7 @@ func main() {
 }
 ```
 
-***REMOVED******REMOVED******REMOVED*** Using a shell
+### Using a shell
 This example uses the `git` command to print logs and commit info by using `/bin/sh` to start a shell for command piping:
 
 ```go
@@ -114,8 +114,8 @@ func main() {
 }
 ```
 
-***REMOVED*** Project Name Change
+# Project Name Change
 Originally this project was named `echo`.  However, another Go project by that name has gotten really popular.
 So this project was renamed `gexe` (pronounced Jesse).
-***REMOVED*** License
+# License
 MIT

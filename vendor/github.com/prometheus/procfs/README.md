@@ -1,4 +1,4 @@
-***REMOVED*** procfs
+# procfs
 
 This package provides functions to retrieve system, kernel, and process
 metrics from the pseudo-filesystems /proc and /sys.
@@ -10,7 +10,7 @@ backwards-incompatible ways without warnings. Use it at your own risk.
 [![CircleCI](https://circleci.com/gh/prometheus/procfs/tree/master.svg?style=svg)](https://circleci.com/gh/prometheus/procfs/tree/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/prometheus/procfs)](https://goreportcard.com/report/github.com/prometheus/procfs)
 
-***REMOVED******REMOVED*** Usage
+## Usage
 
 The procfs library is organized by packages based on whether the gathered data is coming from
 /proc, /sys, or both.  Each package contains an `FS` type which represents the path to either /proc, 
@@ -30,19 +30,19 @@ Some sub-packages such as `blockdevice`, require access to both the proc and sys
     stats, err := fs.ProcDiskstats()
 ```
 
-***REMOVED******REMOVED*** Package Organization
+## Package Organization
 
 The packages in this project are organized according to (1) whether the data comes from the `/proc` or
 `/sys` filesystem and (2) the type of information being retrieved.  For example, most process information
 can be gathered from the functions in the root `procfs` package.  Information about block devices such as disk drives
 is available in the `blockdevices` sub-package.
 
-***REMOVED******REMOVED*** Building and Testing
+## Building and Testing
 
 The procfs library is intended to be built as part of another application, so there are no distributable binaries.  
 However, most of the API includes unit tests which can be run with `make test`.
 
-***REMOVED******REMOVED******REMOVED*** Updating Test Fixtures
+### Updating Test Fixtures
 
 The procfs library includes a set of test fixtures which include many example files from
 the `/proc` and `/sys` filesystems.  These fixtures are included as a [ttar](https://github.com/ideaship/ttar) file

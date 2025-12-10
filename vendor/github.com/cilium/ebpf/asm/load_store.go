@@ -90,7 +90,7 @@ func (op AtomicOp) String() string {
 	case storeRelease:
 		name = "StRel"
 	default:
-		name = fmt.Sprintf("AtomicOp(%***REMOVED***x)", uint32(op))
+		name = fmt.Sprintf("AtomicOp(%#x)", uint32(op))
 	}
 
 	return name

@@ -4,7 +4,7 @@
 
 //go:build gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for ppc64, AIX are implemented in runtime/syscall_aix.go

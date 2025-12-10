@@ -362,9 +362,9 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 			}
 
 			// Check if the character is in the allowed range:
-			//      ***REMOVED***x9 | ***REMOVED***xA | ***REMOVED***xD | [***REMOVED***x20-***REMOVED***x7E]               (8 bit)
-			//      | ***REMOVED***x85 | [***REMOVED***xA0-***REMOVED***xD7FF] | [***REMOVED***xE000-***REMOVED***xFFFD]    (16 bit)
-			//      | [***REMOVED***x10000-***REMOVED***x10FFFF]                        (32 bit)
+			//      #x9 | #xA | #xD | [#x20-#x7E]               (8 bit)
+			//      | #x85 | [#xA0-#xD7FF] | [#xE000-#xFFFD]    (16 bit)
+			//      | [#x10000-#x10FFFF]                        (32 bit)
 			switch {
 			case value == 0x09:
 			case value == 0x0A:

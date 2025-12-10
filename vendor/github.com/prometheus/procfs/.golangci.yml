@@ -16,7 +16,7 @@ linter-settings:
   godot:
     capital: true
     exclude:
-    ***REMOVED*** Ignore "See: URL"
+    # Ignore "See: URL"
     - 'See:'
   misspell:
     locale: US

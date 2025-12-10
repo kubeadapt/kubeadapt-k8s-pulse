@@ -727,7 +727,7 @@ func initClock() {
 	clockFactor = float64(vals[2]) / TIME_UNITS_PER_SEC
 	tickInUsec = float64(vals[0]) / float64(vals[1]) * clockFactor
 	if vals[2] == 1000000 {
-		// ref https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/lib/utils.c***REMOVED***n963
+		// ref https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/lib/utils.c#n963
 		hz = float64(vals[3])
 	} else {
 		hz = 100
@@ -786,7 +786,7 @@ func latency(rate uint64, limit, buffer uint32) float64 {
 }
 
 func Xmittime(rate uint64, size uint32) uint32 {
-	// https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/tc/tc_core.c***REMOVED***n62
+	// https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/tc/tc_core.c#n62
 	return time2Tick(uint32(TIME_UNITS_PER_SEC * (float64(size) / float64(rate))))
 }
 

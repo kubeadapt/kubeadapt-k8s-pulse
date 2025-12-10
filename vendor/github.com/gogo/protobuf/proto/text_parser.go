@@ -138,8 +138,8 @@ func isQuote(c byte) bool {
 
 func (p *textParser) skipWhitespace() {
 	i := 0
-	for i < len(p.s) && (isWhitespace(p.s[i]) || p.s[i] == '***REMOVED***') {
-		if p.s[i] == '***REMOVED***' {
+	for i < len(p.s) && (isWhitespace(p.s[i]) || p.s[i] == '#') {
+		if p.s[i] == '#' {
 			// comment; skip to end of line or input
 			for i < len(p.s) && p.s[i] != '\n' {
 				i++
@@ -202,7 +202,7 @@ func (p *textParser) advance() {
 			i++
 		}
 		if i == 0 {
-			p.errorf("unexpected byte %***REMOVED***x", p.s[0])
+			p.errorf("unexpected byte %#x", p.s[0])
 			return
 		}
 		p.cur.value, p.s = p.s[0:i], p.s[i:len(p.s)]

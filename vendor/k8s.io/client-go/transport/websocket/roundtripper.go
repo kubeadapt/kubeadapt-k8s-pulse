@@ -209,7 +209,7 @@ func RoundTripperFor(config *restclient.Config) (http.RoundTripper, ConnectionHo
 // a WebSocket connection. Upon success, it returns the negotiated connection.
 // The round tripper rt must use the WebSocket round tripper wsRt - see RoundTripperFor.
 func Negotiate(rt http.RoundTripper, connectionInfo ConnectionHolder, req *http.Request, protocols ...string) (*gwebsocket.Conn, error) {
-	// Plumb protocols to RoundTripper***REMOVED***RoundTrip
+	// Plumb protocols to RoundTripper#RoundTrip
 	req.Header[wsstream.WebSocketProtocolHeader] = protocols
 	resp, err := rt.RoundTrip(req)
 	if err != nil {

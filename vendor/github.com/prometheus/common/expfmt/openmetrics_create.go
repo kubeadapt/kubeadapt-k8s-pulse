@@ -38,7 +38,7 @@ type EncoderOption func(*encoderOption)
 
 // WithCreatedLines is an EncoderOption that configures the OpenMetrics encoder
 // to include _created lines (See
-// https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md***REMOVED***counter-1).
+// https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#counter-1).
 // Created timestamps can improve the accuracy of series reset detection, but
 // come with a bandwidth cost.
 //
@@ -85,7 +85,7 @@ func WithUnit() EncoderOption {
 //
 // This function fulfills the type 'expfmt.encoder'.
 //
-// Note that OpenMetrics requires a final `***REMOVED*** EOF` line. Since this function acts
+// Note that OpenMetrics requires a final `# EOF` line. Since this function acts
 // on individual metric families, it is the responsibility of the caller to
 // append this line to 'out' once all metric families have been written.
 // Conveniently, this can be done by calling FinalizeOpenMetrics.
@@ -95,14 +95,14 @@ func WithUnit() EncoderOption {
 // Prometheus to OpenMetrics or vice versa:
 //
 //   - Counters are expected to have the `_total` suffix in their metric name. In
-//     the output, the suffix will be truncated from the `***REMOVED*** TYPE`, `***REMOVED*** HELP` and `***REMOVED*** UNIT`
+//     the output, the suffix will be truncated from the `# TYPE`, `# HELP` and `# UNIT`
 //     lines. A counter with a missing `_total` suffix is not an error. However,
 //     its type will be set to `unknown` in that case to avoid invalid OpenMetrics
 //     output.
 //
-//   - According to the OM specs, the `***REMOVED*** UNIT` line is optional, but if populated,
+//   - According to the OM specs, the `# UNIT` line is optional, but if populated,
 //     the unit has to be present in the metric name as its suffix:
-//     (see https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md***REMOVED***unit).
+//     (see https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#unit).
 //     However, in order to accommodate any potential scenario where such a change in the
 //     metric name is not desirable, the users are here given the choice of either explicitly
 //     opt in, in case they wish for the unit to be included in the output AND in the metric name
@@ -158,7 +158,7 @@ func MetricFamilyToOpenMetrics(out io.Writer, in *dto.MetricFamily, options ...E
 
 	// Comments, first HELP, then TYPE.
 	if in.Help != nil {
-		n, err = w.WriteString("***REMOVED*** HELP ")
+		n, err = w.WriteString("# HELP ")
 		written += n
 		if err != nil {
 			return
@@ -184,7 +184,7 @@ func MetricFamilyToOpenMetrics(out io.Writer, in *dto.MetricFamily, options ...E
 			return
 		}
 	}
-	n, err = w.WriteString("***REMOVED*** TYPE ")
+	n, err = w.WriteString("# TYPE ")
 	written += n
 	if err != nil {
 		return
@@ -217,7 +217,7 @@ func MetricFamilyToOpenMetrics(out io.Writer, in *dto.MetricFamily, options ...E
 		return
 	}
 	if toOM.withUnit && in.Unit != nil {
-		n, err = w.WriteString("***REMOVED*** UNIT ")
+		n, err = w.WriteString("# UNIT ")
 		written += n
 		if err != nil {
 			return
@@ -391,9 +391,9 @@ func MetricFamilyToOpenMetrics(out io.Writer, in *dto.MetricFamily, options ...E
 	return
 }
 
-// FinalizeOpenMetrics writes the final `***REMOVED*** EOF\n` line required by OpenMetrics.
+// FinalizeOpenMetrics writes the final `# EOF\n` line required by OpenMetrics.
 func FinalizeOpenMetrics(w io.Writer) (written int, err error) {
-	return w.Write([]byte("***REMOVED*** EOF\n"))
+	return w.Write([]byte("# EOF\n"))
 }
 
 // writeOpenMetricsSample writes a single sample in OpenMetrics text format to
@@ -615,7 +615,7 @@ func writeOpenMetricsCreated(w enhancedWriter,
 // function returns the number of bytes written and any error encountered.
 func writeExemplar(w enhancedWriter, e *dto.Exemplar) (int, error) {
 	written := 0
-	n, err := w.WriteString(" ***REMOVED*** ")
+	n, err := w.WriteString(" # ")
 	written += n
 	if err != nil {
 		return written, err

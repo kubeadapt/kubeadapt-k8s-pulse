@@ -123,7 +123,7 @@ func configureCRTErrorReporting() error {
 		return nil
 	}
 
-	// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtsetreportmode?view=msvc-170***REMOVED***remarks
+	// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtsetreportmode?view=msvc-170#remarks
 	// for defaults.
 	if err := reportToFile(_CRT_ASSERT, _CRTDBG_MODE_WNDW); err != nil {
 		return err

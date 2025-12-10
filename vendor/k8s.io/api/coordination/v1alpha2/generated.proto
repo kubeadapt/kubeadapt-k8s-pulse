@@ -32,12 +32,12 @@ option go_package = "k8s.io/api/coordination/v1alpha2";
 // LeaseCandidate defines a candidate for a Lease object.
 // Candidates are created such that coordinated leader election will pick the best leader from the list of candidates.
 message LeaseCandidate {
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // spec contains the specification of the Lease.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
   // +optional
   optional LeaseCandidateSpec spec = 2;
 }
@@ -45,7 +45,7 @@ message LeaseCandidate {
 // LeaseCandidateList is a list of Lease objects.
 message LeaseCandidateList {
   // Standard list metadata.
-  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata
+  // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
   // +optional
   optional .k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 1;
 

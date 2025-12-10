@@ -4,13 +4,13 @@
 
 //go:build gccgo && !aix && !hurd
 
-***REMOVED***include <errno.h>
-***REMOVED***include <stdint.h>
-***REMOVED***include <unistd.h>
+#include <errno.h>
+#include <stdint.h>
+#include <unistd.h>
 
-***REMOVED***define _STRINGIFY2_(x) ***REMOVED***x
-***REMOVED***define _STRINGIFY_(x) _STRINGIFY2_(x)
-***REMOVED***define GOSYM_PREFIX _STRINGIFY_(__USER_LABEL_PREFIX__)
+#define _STRINGIFY2_(x) #x
+#define _STRINGIFY_(x) _STRINGIFY2_(x)
+#define GOSYM_PREFIX _STRINGIFY_(__USER_LABEL_PREFIX__)
 
 // Call syscall from C code because the gccgo support for calling from
 // Go to C does not support varargs functions.

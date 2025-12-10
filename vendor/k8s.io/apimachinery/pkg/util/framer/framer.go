@@ -145,7 +145,7 @@ func (r *jsonFrameReader) Read(data []byte) (int, error) {
 		return n, io.ErrShortBuffer
 	}
 
-	// RawMessage***REMOVED***Unmarshal appends to data - we reset the slice down to 0 and will either see
+	// RawMessage#Unmarshal appends to data - we reset the slice down to 0 and will either see
 	// data written to data, or be larger than data and a different array.
 	m := json.RawMessage(data[:0])
 	if err := r.decoder.Decode(&m); err != nil {

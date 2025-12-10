@@ -6,11 +6,11 @@ on:
       - main
       - develop
     tags:
-      - 'v*.*.*'  ***REMOVED*** Trigger on version tags
+      - 'v*.*.*'  # Trigger on version tags
 
 permissions:
   id-token: write
-  contents: write  ***REMOVED*** Needed for creating releases
+  contents: write  # Needed for creating releases
 
 jobs:
   build-and-push:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  ***REMOVED*** Needed for git describe
+          fetch-depth: 0  # Needed for git describe
 
       - name: Determine Registry Configuration
         id: registry_config
@@ -43,11 +43,11 @@ jobs:
         run: |
           is_release="false"
 
-          ***REMOVED*** Check if this is a tag push
+          # Check if this is a tag push
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            tag="${GITHUB_REF***REMOVED***refs/tags/}"
+            tag="${GITHUB_REF#refs/tags/}"
 
-            ***REMOVED*** Validate tag format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2
+            # Validate tag format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2
             if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+|-beta[0-9]+)?$ ]]; then
               echo "❌ ERROR: '$tag' is NOT a valid release tag"
               echo "Expected format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2"
@@ -57,11 +57,11 @@ jobs:
             echo "✅ '$tag' is a valid release tag"
             is_release="true"
           elif [[ "$GITHUB_REF" == refs/heads/develop ]]; then
-            ***REMOVED*** Develop branch: use dev-{short-sha}
+            # Develop branch: use dev-{short-sha}
             tag="dev-${GITHUB_SHA::7}"
             echo "Generated tag for develop branch: $tag"
           else
-            ***REMOVED*** Main branch: use main-{short-sha}
+            # Main branch: use main-{short-sha}
             tag="main-${GITHUB_SHA::7}"
             echo "Generated tag for main branch: $tag"
           fi
@@ -70,7 +70,7 @@ jobs:
           echo "is_release=$is_release" >> $GITHUB_OUTPUT
           echo "IMAGE_TAG=$tag" >> $GITHUB_ENV
 
-      ***REMOVED*** === PUBLIC ECR (main + releases) ===
+      # === PUBLIC ECR (main + releases) ===
       - name: Configure AWS Credentials (Public ECR)
         if: steps.registry_config.outputs.registry_type == 'public'
         uses: aws-actions/configure-aws-credentials@v4
@@ -84,7 +84,7 @@ jobs:
         with:
           registry-type: public
 
-      ***REMOVED*** === PRIVATE ECR (develop) ===
+      # === PRIVATE ECR (develop) ===
       - name: Configure AWS Credentials (Private ECR)
         if: steps.registry_config.outputs.registry_type == 'private'
         uses: aws-actions/configure-aws-credentials@v4
@@ -104,7 +104,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      ***REMOVED*** === BUILD & PUSH: PUBLIC ECR ===
+      # === BUILD & PUSH: PUBLIC ECR ===
       - name: Build and Push Multi-Arch Image (Public ECR)
         if: steps.registry_config.outputs.registry_type == 'public'
         env:
@@ -124,7 +124,7 @@ jobs:
             --provenance=false \
             .
 
-      ***REMOVED*** === BUILD & PUSH: PRIVATE ECR ===
+      # === BUILD & PUSH: PRIVATE ECR ===
       - name: Build and Push Multi-Arch Image (Private ECR)
         if: steps.registry_config.outputs.registry_type == 'private'
         env:
@@ -174,25 +174,44 @@ jobs:
         run: |
           mkdir -p release-assets
 
-          ***REMOVED*** Extract binaries for each architecture from the multi-arch image
+          # Extract binaries for each architecture from the multi-arch image
           for arch in amd64 arm64; do
             echo "Extracting binary for linux/$arch..."
 
-            ***REMOVED*** Create a container from the specific platform variant
+            # Create a container from the specific platform variant
             container_id=$(docker create --platform linux/$arch \
               public.ecr.aws/${ECR_REPO}:${IMAGE_TAG})
 
-            ***REMOVED*** Copy the binary out
+            # Copy the binary out
             docker cp $container_id:/usr/local/bin/ebpf-agent \
               release-assets/ebpf-agent-linux-$arch
 
-            ***REMOVED*** Cleanup
+            # Cleanup
             docker rm $container_id
 
             echo "✓ Extracted ebpf-agent-linux-$arch"
           done
 
           ls -lh release-assets/
+
+      # Generate SBOM for supply chain security (release only)
+      - name: Generate SBOM (SPDX format)
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+          format: spdx-json
+          output-file: release-assets/sbom.spdx.json
+          artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.spdx.json
+
+      - name: Generate SBOM (CycloneDX format)
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+          format: cyclonedx-json
+          output-file: release-assets/sbom.cyclonedx.json
+          artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.cyclonedx.json
 
       - name: Create GitHub Release
         if: steps.image_tag.outputs.is_release == 'true'
@@ -203,22 +222,24 @@ jobs:
           files: |
             release-assets/ebpf-agent-linux-amd64
             release-assets/ebpf-agent-linux-arm64
+            release-assets/sbom.spdx.json
+            release-assets/sbom.cyclonedx.json
           body: |
-            ***REMOVED******REMOVED*** KubeAdapt eBPF Agent ${{ steps.image_tag.outputs.tag }}
+            ## KubeAdapt eBPF Agent ${{ steps.image_tag.outputs.tag }}
 
-            ***REMOVED******REMOVED******REMOVED*** 🐳 Container Images
+            ### 🐳 Container Images
             - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}`
             - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:latest` (updated)
 
-            ***REMOVED******REMOVED******REMOVED*** 📦 Binaries
+            ### 📦 Binaries
             Pre-built binaries for Linux amd64 and arm64 are attached to this release.
 
-            ***REMOVED******REMOVED******REMOVED*** 🚀 Quick Start
+            ### 🚀 Quick Start
             ```bash
-            ***REMOVED*** Pull the container image
+            # Pull the container image
             docker pull public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
 
-            ***REMOVED*** Or download the binary directly
+            # Or download the binary directly
             curl -LO https://github.com/${{ github.repository }}/releases/download/${{ steps.image_tag.outputs.tag }}/ebpf-agent-linux-amd64
             chmod +x ebpf-agent-linux-amd64
             ```
@@ -232,7 +253,7 @@ jobs:
           IS_RELEASE: ${{ steps.image_tag.outputs.is_release }}
           GITHUB_REPO: ${{ github.repository }}
         run: |
-          echo "***REMOVED******REMOVED******REMOVED*** 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [[ "${REGISTRY_TYPE}" == "public" ]]; then
@@ -257,6 +278,6 @@ jobs:
 
           if [[ "${IS_RELEASE}" == "true" ]]; then
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "***REMOVED******REMOVED******REMOVED*** 📦 GitHub Release" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 GitHub Release" >> $GITHUB_STEP_SUMMARY
             echo "Release created: https://github.com/${GITHUB_REPO}/releases/tag/${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
           fi

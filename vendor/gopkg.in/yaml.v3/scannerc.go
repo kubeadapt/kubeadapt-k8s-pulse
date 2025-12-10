@@ -54,27 +54,27 @@ import (
 //
 // Now, tokens:
 //
-//      STREAM-START(encoding)          ***REMOVED*** The stream start.
-//      STREAM-END                      ***REMOVED*** The stream end.
-//      VERSION-DIRECTIVE(major,minor)  ***REMOVED*** The '%YAML' directive.
-//      TAG-DIRECTIVE(handle,prefix)    ***REMOVED*** The '%TAG' directive.
-//      DOCUMENT-START                  ***REMOVED*** '---'
-//      DOCUMENT-END                    ***REMOVED*** '...'
-//      BLOCK-SEQUENCE-START            ***REMOVED*** Indentation increase denoting a block
-//      BLOCK-MAPPING-START             ***REMOVED*** sequence or a block mapping.
-//      BLOCK-END                       ***REMOVED*** Indentation decrease.
-//      FLOW-SEQUENCE-START             ***REMOVED*** '['
-//      FLOW-SEQUENCE-END               ***REMOVED*** ']'
-//      BLOCK-SEQUENCE-START            ***REMOVED*** '{'
-//      BLOCK-SEQUENCE-END              ***REMOVED*** '}'
-//      BLOCK-ENTRY                     ***REMOVED*** '-'
-//      FLOW-ENTRY                      ***REMOVED*** ','
-//      KEY                             ***REMOVED*** '?' or nothing (simple keys).
-//      VALUE                           ***REMOVED*** ':'
-//      ALIAS(anchor)                   ***REMOVED*** '*anchor'
-//      ANCHOR(anchor)                  ***REMOVED*** '&anchor'
-//      TAG(handle,suffix)              ***REMOVED*** '!handle!suffix'
-//      SCALAR(value,style)             ***REMOVED*** A scalar.
+//      STREAM-START(encoding)          # The stream start.
+//      STREAM-END                      # The stream end.
+//      VERSION-DIRECTIVE(major,minor)  # The '%YAML' directive.
+//      TAG-DIRECTIVE(handle,prefix)    # The '%TAG' directive.
+//      DOCUMENT-START                  # '---'
+//      DOCUMENT-END                    # '...'
+//      BLOCK-SEQUENCE-START            # Indentation increase denoting a block
+//      BLOCK-MAPPING-START             # sequence or a block mapping.
+//      BLOCK-END                       # Indentation decrease.
+//      FLOW-SEQUENCE-START             # '['
+//      FLOW-SEQUENCE-END               # ']'
+//      BLOCK-SEQUENCE-START            # '{'
+//      BLOCK-SEQUENCE-END              # '}'
+//      BLOCK-ENTRY                     # '-'
+//      FLOW-ENTRY                      # ','
+//      KEY                             # '?' or nothing (simple keys).
+//      VALUE                           # ':'
+//      ALIAS(anchor)                   # '*anchor'
+//      ANCHOR(anchor)                  # '&anchor'
+//      TAG(handle,suffix)              # '!handle!suffix'
+//      SCALAR(value,style)             # A scalar.
 //
 // The following two tokens are "virtual" tokens denoting the beginning and the
 // end of the stream:
@@ -188,7 +188,7 @@ import (
 //
 //      2. A tagged scalar:
 //
-//          !!float "3.14"  ***REMOVED*** A good approximation.
+//          !!float "3.14"  # A good approximation.
 //
 //      Tokens:
 //
@@ -199,7 +199,7 @@ import (
 //
 //      3. Various scalar styles:
 //
-//          --- ***REMOVED*** Implicit empty plain scalars do not produce tokens.
+//          --- # Implicit empty plain scalars do not produce tokens.
 //          --- a plain scalar
 //          --- 'a single-quoted scalar'
 //          --- "a double-quoted scalar"
@@ -263,7 +263,7 @@ import (
 //      2. A flow mapping:
 //
 //          {
-//              a simple key: a value,  ***REMOVED*** Note that the KEY token is produced.
+//              a simple key: a value,  # Note that the KEY token is produced.
 //              ? a complex key: another value,
 //          }
 //
@@ -351,7 +351,7 @@ import (
 //
 //      2. Block mappings:
 //
-//          a simple key: a value   ***REMOVED*** The KEY token is produced here.
+//          a simple key: a value   # The KEY token is produced here.
 //          ? a complex key
 //          : another value
 //          a mapping:
@@ -485,7 +485,7 @@ import (
 // mapping.  In this case, the token BLOCK-SEQUENCE-START is not produced:
 //
 //      key:
-//      - item 1    ***REMOVED*** BLOCK-SEQUENCE-START is NOT produced here.
+//      - item 1    # BLOCK-SEQUENCE-START is NOT produced here.
 //      - item 2
 //
 // Tokens:
@@ -842,7 +842,7 @@ func yaml_parser_fetch_next_token(parser *yaml_parser_t) (ok bool) {
 	// A plain scalar may start with any non-blank characters except
 	//
 	//      '-', '?', ':', ',', '[', ']', '{', '}',
-	//      '***REMOVED***', '&', '*', '!', '|', '>', '\'', '\"',
+	//      '#', '&', '*', '!', '|', '>', '\'', '\"',
 	//      '%', '@', '`'.
 	//
 	// In the block context (and, for the '-' indicator, in the flow context
@@ -855,13 +855,13 @@ func yaml_parser_fetch_next_token(parser *yaml_parser_t) (ok bool) {
 	// The last rule is more restrictive than the specification requires.
 	// [Go] TODO Make this logic more reasonable.
 	//switch parser.buffer[parser.buffer_pos] {
-	//case '-', '?', ':', ',', '?', '-', ',', ':', ']', '[', '}', '{', '&', '***REMOVED***', '!', '*', '>', '|', '"', '\'', '@', '%', '-', '`':
+	//case '-', '?', ':', ',', '?', '-', ',', ':', ']', '[', '}', '{', '&', '#', '!', '*', '>', '|', '"', '\'', '@', '%', '-', '`':
 	//}
 	if !(is_blankz(parser.buffer, parser.buffer_pos) || parser.buffer[parser.buffer_pos] == '-' ||
 		parser.buffer[parser.buffer_pos] == '?' || parser.buffer[parser.buffer_pos] == ':' ||
 		parser.buffer[parser.buffer_pos] == ',' || parser.buffer[parser.buffer_pos] == '[' ||
 		parser.buffer[parser.buffer_pos] == ']' || parser.buffer[parser.buffer_pos] == '{' ||
-		parser.buffer[parser.buffer_pos] == '}' || parser.buffer[parser.buffer_pos] == '***REMOVED***' ||
+		parser.buffer[parser.buffer_pos] == '}' || parser.buffer[parser.buffer_pos] == '#' ||
 		parser.buffer[parser.buffer_pos] == '&' || parser.buffer[parser.buffer_pos] == '*' ||
 		parser.buffer[parser.buffer_pos] == '!' || parser.buffer[parser.buffer_pos] == '|' ||
 		parser.buffer[parser.buffer_pos] == '>' || parser.buffer[parser.buffer_pos] == '\'' ||
@@ -1565,7 +1565,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 		// Check if we just had a line comment under a sequence entry that
 		// looks more like a header to the following content. Similar to this:
 		//
-		// - ***REMOVED*** The comment
+		// - # The comment
 		//   - Some data
 		//
 		// If so, transform the line comment to a head comment and reposition.
@@ -1586,7 +1586,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 		}
 
 		// Eat a comment until a line break.
-		if parser.buffer[parser.buffer_pos] == '***REMOVED***' {
+		if parser.buffer[parser.buffer_pos] == '#' {
 			if !yaml_parser_scan_comments(parser, scan_mark) {
 				return false
 			}
@@ -1614,7 +1614,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 // Scan a YAML-DIRECTIVE or TAG-DIRECTIVE token.
 //
 // Scope:
-//      %YAML    1.1    ***REMOVED*** a comment \n
+//      %YAML    1.1    # a comment \n
 //      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //      %TAG    !yaml!  tag:yaml.org,2002:  \n
 //      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1685,7 +1685,7 @@ func yaml_parser_scan_directive(parser *yaml_parser_t, token *yaml_token_t) bool
 		}
 	}
 
-	if parser.buffer[parser.buffer_pos] == '***REMOVED***' {
+	if parser.buffer[parser.buffer_pos] == '#' {
 		// [Go] Discard this inline comment for the time being.
 		//if !yaml_parser_scan_line_comment(parser, start_mark) {
 		//	return false
@@ -1719,7 +1719,7 @@ func yaml_parser_scan_directive(parser *yaml_parser_t, token *yaml_token_t) bool
 // Scan the directive name.
 //
 // Scope:
-//      %YAML   1.1     ***REMOVED*** a comment \n
+//      %YAML   1.1     # a comment \n
 //       ^^^^
 //      %TAG    !yaml!  tag:yaml.org,2002:  \n
 //       ^^^
@@ -1758,7 +1758,7 @@ func yaml_parser_scan_directive_name(parser *yaml_parser_t, start_mark yaml_mark
 // Scan the value of VERSION-DIRECTIVE.
 //
 // Scope:
-//      %YAML   1.1     ***REMOVED*** a comment \n
+//      %YAML   1.1     # a comment \n
 //           ^^^^^^
 func yaml_parser_scan_version_directive_value(parser *yaml_parser_t, start_mark yaml_mark_t, major, minor *int8) bool {
 	// Eat whitespaces.
@@ -1797,9 +1797,9 @@ const max_number_length = 2
 // Scan the version number of VERSION-DIRECTIVE.
 //
 // Scope:
-//      %YAML   1.1     ***REMOVED*** a comment \n
+//      %YAML   1.1     # a comment \n
 //              ^
-//      %YAML   1.1     ***REMOVED*** a comment \n
+//      %YAML   1.1     # a comment \n
 //                ^
 func yaml_parser_scan_version_directive_number(parser *yaml_parser_t, start_mark yaml_mark_t, number *int8) bool {
 
@@ -2259,7 +2259,7 @@ func yaml_parser_scan_block_scalar(parser *yaml_parser_t, token *yaml_token_t, l
 			return false
 		}
 	}
-	if parser.buffer[parser.buffer_pos] == '***REMOVED***' {
+	if parser.buffer[parser.buffer_pos] == '#' {
 		if !yaml_parser_scan_line_comment(parser, start_mark) {
 			return false
 		}
@@ -2523,17 +2523,17 @@ func yaml_parser_scan_flow_scalar(parser *yaml_parser_t, token *yaml_token_t, si
 					s = append(s, '\'')
 				case '\\':
 					s = append(s, '\\')
-				case 'N': // NEL (***REMOVED***x85)
+				case 'N': // NEL (#x85)
 					s = append(s, '\xC2')
 					s = append(s, '\x85')
-				case '_': // ***REMOVED***xA0
+				case '_': // #xA0
 					s = append(s, '\xC2')
 					s = append(s, '\xA0')
-				case 'L': // LS (***REMOVED***x2028)
+				case 'L': // LS (#x2028)
 					s = append(s, '\xE2')
 					s = append(s, '\x80')
 					s = append(s, '\xA8')
-				case 'P': // PS (***REMOVED***x2029)
+				case 'P': // PS (#x2029)
 					s = append(s, '\xE2')
 					s = append(s, '\x80')
 					s = append(s, '\xA9')
@@ -2715,7 +2715,7 @@ func yaml_parser_scan_plain_scalar(parser *yaml_parser_t, token *yaml_token_t) b
 		}
 
 		// Check for a comment.
-		if parser.buffer[parser.buffer_pos] == '***REMOVED***' {
+		if parser.buffer[parser.buffer_pos] == '#' {
 			break
 		}
 
@@ -2846,7 +2846,7 @@ func yaml_parser_scan_line_comment(parser *yaml_parser_t, token_mark yaml_mark_t
 		if is_blank(parser.buffer, parser.buffer_pos+peek) {
 			continue
 		}
-		if parser.buffer[parser.buffer_pos+peek] == '***REMOVED***' {
+		if parser.buffer[parser.buffer_pos+peek] == '#' {
 			seen := parser.mark.index+peek
 			for {
 				if parser.unread < 1 && !yaml_parser_update_buffer(parser, 1) {
@@ -2983,7 +2983,7 @@ func yaml_parser_scan_comments(parser *yaml_parser_t, scan_mark yaml_mark_t) boo
 			text = nil
 		}
 
-		if parser.buffer[parser.buffer_pos+peek] != '***REMOVED***' {
+		if parser.buffer[parser.buffer_pos+peek] != '#' {
 			break
 		}
 

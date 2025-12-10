@@ -21,7 +21,7 @@
 // All exported functions and methods are safe to be used concurrently unless
 // specified otherwise.
 //
-// ***REMOVED*** A Basic Example
+// # A Basic Example
 //
 // As a starting point, a very basic usage example:
 //
@@ -80,7 +80,7 @@
 // It register the metrics using a custom registry and exposes them via an HTTP server
 // on the /metrics endpoint.
 //
-// ***REMOVED*** Metrics
+// # Metrics
 //
 // The number of exported identifiers in this package might appear a bit
 // overwhelming. However, in addition to the basic plumbing shown in the example
@@ -111,7 +111,7 @@
 // To create instances of Metrics and their vector versions, you need a suitable
 // …Opts struct, i.e. GaugeOpts, CounterOpts, SummaryOpts, or HistogramOpts.
 //
-// ***REMOVED*** Custom Collectors and constant Metrics
+// # Custom Collectors and constant Metrics
 //
 // While you could create your own implementations of Metric, most likely you
 // will only ever implement the Collector interface on your own. At a first
@@ -152,7 +152,7 @@
 // a metric, GaugeFunc, CounterFunc, or UntypedFunc might be interesting
 // shortcuts.
 //
-// ***REMOVED*** Advanced Uses of the Registry
+// # Advanced Uses of the Registry
 //
 // While MustRegister is the by far most common way of registering a Collector,
 // sometimes you might want to handle the errors the registration might cause.
@@ -187,23 +187,23 @@
 // NewProcessCollector). With a custom registry, you are in control and decide
 // yourself about the Collectors to register.
 //
-// ***REMOVED*** HTTP Exposition
+// # HTTP Exposition
 //
 // The Registry implements the Gatherer interface. The caller of the Gather
 // method can then expose the gathered metrics in some way. Usually, the metrics
 // are served via HTTP on the /metrics endpoint. That's happening in the example
 // above. The tools to expose metrics via HTTP are in the promhttp sub-package.
 //
-// ***REMOVED*** Pushing to the Pushgateway
+// # Pushing to the Pushgateway
 //
 // Function for pushing to the Pushgateway can be found in the push sub-package.
 //
-// ***REMOVED*** Graphite Bridge
+// # Graphite Bridge
 //
 // Functions and examples to push metrics from a Gatherer to Graphite can be
 // found in the graphite sub-package.
 //
-// ***REMOVED*** Other Means of Exposition
+// # Other Means of Exposition
 //
 // More ways of exposing metrics can easily be added by following the approaches
 // of the existing implementations.

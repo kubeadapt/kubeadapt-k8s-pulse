@@ -45,8 +45,8 @@ const WebSocketProtocolHeader = "Sec-Websocket-Protocol"
 // Example client session:
 //
 //	CONNECT http://server.com with subprotocol "channel.k8s.io"
-//	WRITE []byte{0, 102, 111, 111, 10} ***REMOVED*** send "foo\n" on channel 0 (STDIN)
-//	READ  []byte{1, 10}                ***REMOVED*** receive "\n" on channel 1 (STDOUT)
+//	WRITE []byte{0, 102, 111, 111, 10} # send "foo\n" on channel 0 (STDIN)
+//	READ  []byte{1, 10}                # receive "\n" on channel 1 (STDOUT)
 //	CLOSE
 const ChannelWebSocketProtocol = "channel.k8s.io"
 
@@ -60,8 +60,8 @@ const ChannelWebSocketProtocol = "channel.k8s.io"
 // Example client session:
 //
 //	CONNECT http://server.com with subprotocol "base64.channel.k8s.io"
-//	WRITE []byte{48, 90, 109, 57, 118, 67, 103, 111, 61} ***REMOVED*** send "foo\n" (base64: "Zm9vCgo=") on channel '0' (STDIN)
-//	READ  []byte{49, 67, 103, 61, 61} ***REMOVED*** receive "\n" (base64: "Cg==") on channel '1' (STDOUT)
+//	WRITE []byte{48, 90, 109, 57, 118, 67, 103, 111, 61} # send "foo\n" (base64: "Zm9vCgo=") on channel '0' (STDIN)
+//	READ  []byte{49, 67, 103, 61, 61} # receive "\n" (base64: "Cg==") on channel '1' (STDOUT)
 //	CLOSE
 const Base64ChannelWebSocketProtocol = "base64.channel.k8s.io"
 
@@ -215,7 +215,7 @@ func (conn *Conn) SetWriteDeadline(duration time.Duration) {
 // Open the connection and create channels for reading and writing. It returns
 // the selected subprotocol, a slice of channels and an error.
 func (conn *Conn) Open(w http.ResponseWriter, req *http.Request) (string, []io.ReadWriteCloser, error) {
-	// serveHTTPComplete is channel that is closed/selected when "websocket***REMOVED***ServeHTTP" finishes.
+	// serveHTTPComplete is channel that is closed/selected when "websocket#ServeHTTP" finishes.
 	serveHTTPComplete := make(chan struct{})
 	// Ensure panic in spawned goroutine is propagated into the parent goroutine.
 	panicChan := make(chan any, 1)
@@ -232,7 +232,7 @@ func (conn *Conn) Open(w http.ResponseWriter, req *http.Request) (string, []io.R
 		websocket.Server{Handshake: conn.handshake, Handler: conn.handle}.ServeHTTP(w, req)
 	}()
 
-	// In normal circumstances, "websocket.Server***REMOVED***ServeHTTP" calls "initialize" which closes
+	// In normal circumstances, "websocket.Server#ServeHTTP" calls "initialize" which closes
 	// "conn.ready" and then blocks until serving is complete.
 	select {
 	case <-conn.ready:

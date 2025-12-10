@@ -25,14 +25,14 @@ func Fuzz(data []byte) (score int) {
 
 		m, err := Marshal(v)
 		if err != nil {
-			fmt.Printf("v=%***REMOVED***v\n", v)
+			fmt.Printf("v=%#v\n", v)
 			panic(err)
 		}
 
 		u := ctor()
 		err = Unmarshal(m, u)
 		if err != nil {
-			fmt.Printf("v=%***REMOVED***v\n", v)
+			fmt.Printf("v=%#v\n", v)
 			fmt.Printf("m=%s\n", m)
 			panic(err)
 		}

@@ -512,10 +512,10 @@ var (
 // returning an error if the header does not contain a correctly formatted warning.
 // Any remaining content in the header is returned.
 func ParseWarningHeader(header string) (result WarningHeader, remainder string, err error) {
-	// https://tools.ietf.org/html/rfc2616***REMOVED***section-14.46
+	// https://tools.ietf.org/html/rfc2616#section-14.46
 	//   updated by
-	// https://tools.ietf.org/html/rfc7234***REMOVED***section-5.5
-	//   https://tools.ietf.org/html/rfc7234***REMOVED***appendix-A
+	// https://tools.ietf.org/html/rfc7234#section-5.5
+	//   https://tools.ietf.org/html/rfc7234#appendix-A
 	//     Some requirements regarding production and processing of the Warning
 	//     header fields have been relaxed, as it is not widely implemented.
 	//     Furthermore, the Warning header field no longer uses RFC 2047

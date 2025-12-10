@@ -6,7 +6,7 @@
 package unix
 
 /*
-***REMOVED***include <stdint.h>
+#include <stdint.h>
 int utimes(uintptr_t, uintptr_t);
 int utimensat(int, uintptr_t, uintptr_t, int);
 int getcwd(uintptr_t, size_t);
@@ -82,7 +82,7 @@ int lstat(uintptr_t, uintptr_t);
 int pause();
 int pread64(int, uintptr_t, size_t, long long);
 int pwrite64(int, uintptr_t, size_t, long long);
-***REMOVED***define c_select select
+#define c_select select
 int select(int, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
 int pselect(int, uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
 int setregid(int, int);

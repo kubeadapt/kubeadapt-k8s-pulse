@@ -1,10 +1,10 @@
-***REMOVED*** netns - network namespaces in go ***REMOVED***
+# netns - network namespaces in go #
 
 The netns package provides an ultra-simple interface for handling
 network namespaces in go. Changing namespaces requires elevated
 privileges, so in most cases this code needs to be run as root.
 
-***REMOVED******REMOVED*** Local Build and Test ***REMOVED******REMOVED***
+## Local Build and Test ##
 
 You can use go get command:
 
@@ -14,7 +14,7 @@ Testing (requires root):
 
     sudo -E go test github.com/vishvananda/netns
 
-***REMOVED******REMOVED*** Example ***REMOVED******REMOVED***
+## Example ##
 
 ```go
 package main

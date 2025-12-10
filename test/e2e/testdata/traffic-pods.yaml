@@ -1,14 +1,14 @@
-***REMOVED*** Traffic generation pods for E2E testing
-***REMOVED*** These pods are used to generate network traffic with proper zone labels
-***REMOVED*** for validating cross-AZ and same-AZ traffic detection
+# Traffic generation pods for E2E testing
+# These pods are used to generate network traffic with proper zone labels
+# for validating cross-AZ and same-AZ traffic detection
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: traffic-test
 ---
-***REMOVED*** Traffic Generator Pod A - Zone us-west-2a
-***REMOVED*** Used as source for cross-zone traffic testing
+# Traffic Generator Pod A - Zone us-west-2a
+# Used as source for cross-zone traffic testing
 apiVersion: v1
 kind: Pod
 metadata:
@@ -22,7 +22,7 @@ spec:
   nodeSelector:
     topology.kubernetes.io/zone: us-west-2a
   tolerations:
-    ***REMOVED*** Allow scheduling on control-plane node
+    # Allow scheduling on control-plane node
     - effect: NoSchedule
       key: node-role.kubernetes.io/control-plane
       operator: Exists
@@ -39,7 +39,7 @@ spec:
         limits:
           memory: "128Mi"
           cpu: "2000m"
-      ***REMOVED*** Install curl and other tools for traffic generation
+      # Install curl and other tools for traffic generation
       command: ["/bin/sh"]
       args:
         - "-c"
@@ -59,7 +59,7 @@ spec:
         initialDelaySeconds: 10
         periodSeconds: 10
 ---
-***REMOVED*** Service for Traffic Generator A
+# Service for Traffic Generator A
 apiVersion: v1
 kind: Service
 metadata:
@@ -77,8 +77,8 @@ spec:
       name: http
   type: ClusterIP
 ---
-***REMOVED*** Traffic Generator Pod B - Zone us-west-2b (different from A)
-***REMOVED*** Used as destination for cross-zone traffic and source for same-zone traffic
+# Traffic Generator Pod B - Zone us-west-2b (different from A)
+# Used as destination for cross-zone traffic and source for same-zone traffic
 apiVersion: v1
 kind: Pod
 metadata:
@@ -123,7 +123,7 @@ spec:
         initialDelaySeconds: 10
         periodSeconds: 10
 ---
-***REMOVED*** Service for Traffic Generator B
+# Service for Traffic Generator B
 apiVersion: v1
 kind: Service
 metadata:
@@ -141,8 +141,8 @@ spec:
       name: http
   type: ClusterIP
 ---
-***REMOVED*** Traffic Generator Pod C - Zone us-west-2b (same zone as B)
-***REMOVED*** Used as destination for same-zone traffic testing
+# Traffic Generator Pod C - Zone us-west-2b (same zone as B)
+# Used as destination for same-zone traffic testing
 apiVersion: v1
 kind: Pod
 metadata:
@@ -187,7 +187,7 @@ spec:
         initialDelaySeconds: 10
         periodSeconds: 10
 ---
-***REMOVED*** Service for Traffic Generator C
+# Service for Traffic Generator C
 apiVersion: v1
 kind: Service
 metadata:
@@ -205,8 +205,8 @@ spec:
       name: http
   type: ClusterIP
 ---
-***REMOVED*** Traffic Generator Pod D - Zone us-west-2b (same zone as B and C for same-AZ testing)
-***REMOVED*** Used as additional source/destination for same-zone traffic testing
+# Traffic Generator Pod D - Zone us-west-2b (same zone as B and C for same-AZ testing)
+# Used as additional source/destination for same-zone traffic testing
 apiVersion: v1
 kind: Pod
 metadata:
@@ -251,7 +251,7 @@ spec:
         initialDelaySeconds: 10
         periodSeconds: 10
 ---
-***REMOVED*** Service for Traffic Generator D
+# Service for Traffic Generator D
 apiVersion: v1
 kind: Service
 metadata:

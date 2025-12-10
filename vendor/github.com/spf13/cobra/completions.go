@@ -731,11 +731,11 @@ To load completions in your current shell session:
 
 To load completions for every new session, execute once:
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Linux:
+#### Linux:
 
 	%[1]s completion bash > /etc/bash_completion.d/%[1]s
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** macOS:
+#### macOS:
 
 	%[1]s completion bash > $(brew --prefix)/etc/bash_completion.d/%[1]s
 
@@ -768,11 +768,11 @@ To load completions in your current shell session:
 
 To load completions for every new session, execute once:
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** Linux:
+#### Linux:
 
 	%[1]s completion zsh > "${fpath[1]}/_%[1]s"
 
-***REMOVED******REMOVED******REMOVED******REMOVED*** macOS:
+#### macOS:
 
 	%[1]s completion zsh > $(brew --prefix)/share/zsh/site-functions/_%[1]s
 

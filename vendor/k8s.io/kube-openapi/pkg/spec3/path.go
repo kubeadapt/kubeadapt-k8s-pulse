@@ -27,7 +27,7 @@ import (
 	"k8s.io/kube-openapi/pkg/validation/spec"
 )
 
-// Paths describes the available paths and operations for the API, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***pathsObject
+// Paths describes the available paths and operations for the API, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#pathsObject
 type Paths struct {
 	Paths map[string]*Path
 	spec.VendorExtensible
@@ -159,7 +159,7 @@ func (p *Paths) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Deco
 	}
 }
 
-// Path describes the operations available on a single path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***pathItemObject
+// Path describes the operations available on a single path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#pathItemObject
 //
 // Note that this struct is actually a thin wrapper around PathProps to make it referable and extensible
 type Path struct {
@@ -234,7 +234,7 @@ func (p *Path) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decod
 	return nil
 }
 
-// PathProps describes the operations available on a single path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md***REMOVED***pathItemObject
+// PathProps describes the operations available on a single path, more at https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#pathItemObject
 type PathProps struct {
 	// Summary holds a summary for all operations in this path
 	Summary string `json:"summary,omitempty"`

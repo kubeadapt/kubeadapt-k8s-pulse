@@ -148,7 +148,7 @@ func makeInconsistentCardinalityError(fqName string, labels, labelValues []strin
 func validateValuesInLabels(labels Labels, expectedNumberOfValues int) error {
 	if len(labels) != expectedNumberOfValues {
 		return fmt.Errorf(
-			"%w: expected %d label values but got %d in %***REMOVED***v",
+			"%w: expected %d label values but got %d in %#v",
 			errInconsistentCardinality, expectedNumberOfValues,
 			len(labels), labels,
 		)
@@ -168,7 +168,7 @@ func validateLabelValues(vals []string, expectedNumberOfValues int) error {
 		// The call below makes vals escape, copy them to avoid that.
 		vals := append([]string(nil), vals...)
 		return fmt.Errorf(
-			"%w: expected %d label values but got %d in %***REMOVED***v",
+			"%w: expected %d label values but got %d in %#v",
 			errInconsistentCardinality, expectedNumberOfValues,
 			len(vals), vals,
 		)

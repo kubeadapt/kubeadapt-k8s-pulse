@@ -25,11 +25,11 @@ import (
 )
 
 // Paths holds the relative paths to the individual endpoints.
-// The path is appended to the [`basePath`](http://goo.gl/8us55a***REMOVED***swaggerBasePath) in order
+// The path is appended to the [`basePath`](http://goo.gl/8us55a#swaggerBasePath) in order
 // to construct the full URL.
-// The Paths may be empty, due to [ACL constraints](http://goo.gl/8us55a***REMOVED***securityFiltering).
+// The Paths may be empty, due to [ACL constraints](http://goo.gl/8us55a#securityFiltering).
 //
-// For more information: http://goo.gl/8us55a***REMOVED***pathsObject
+// For more information: http://goo.gl/8us55a#pathsObject
 type Paths struct {
 	VendorExtensible
 	Paths map[string]PathItem `json:"-"` // custom serializer to flatten this, each entry must start with "/"

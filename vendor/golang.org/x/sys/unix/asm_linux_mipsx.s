@@ -4,7 +4,7 @@
 
 //go:build linux && (mips || mipsle) && gc
 
-***REMOVED***include "textflag.h"
+#include "textflag.h"
 
 //
 // System calls for mips, Linux

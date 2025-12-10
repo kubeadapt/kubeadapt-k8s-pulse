@@ -14,7 +14,7 @@ const (
 	sizeofXDPSocket        = 0x10
 )
 
-// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h***REMOVED***L12
+// https://elixir.bootlin.com/linux/v6.2/source/include/uapi/linux/xdp_diag.h#L12
 type xdpSocketRequest struct {
 	Family   uint8
 	Protocol uint8

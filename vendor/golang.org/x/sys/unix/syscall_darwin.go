@@ -37,7 +37,7 @@ var libc_fdopendir_trampoline_addr uintptr
 func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {
 	// Simulate Getdirentries using fdopendir/readdir_r/closedir.
 	// We store the number of entries to skip in the seek
-	// offset of fd. See issue ***REMOVED***31368.
+	// offset of fd. See issue #31368.
 	// It's not the full required semantics, but should handle the case
 	// of calling Getdirentries or ReadDirent repeatedly.
 	// It won't handle assigning the results of lseek to *basep, or handle

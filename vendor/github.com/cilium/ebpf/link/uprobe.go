@@ -16,7 +16,7 @@ import (
 
 var (
 	uprobeRefCtrOffsetPMUPath = "/sys/bus/event_source/devices/uprobe/format/ref_ctr_offset"
-	// elixir.bootlin.com/linux/v5.15-rc7/source/kernel/events/core.c***REMOVED***L9799
+	// elixir.bootlin.com/linux/v5.15-rc7/source/kernel/events/core.c#L9799
 	uprobeRefCtrOffsetShift = 32
 	haveRefCtrOffsetPMU     = internal.NewFeatureTest("RefCtrOffsetPMU", func() error {
 		_, err := os.Stat(uprobeRefCtrOffsetPMUPath)

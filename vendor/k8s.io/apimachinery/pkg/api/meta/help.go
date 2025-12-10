@@ -184,7 +184,7 @@ func eachListItem(obj runtime.Object, fn func(runtime.Object) error, allocNew bo
 		default:
 			obj, ok := item.(runtime.Object)
 			if !ok {
-				return fmt.Errorf("%v: item[%v]: Expected object, got %***REMOVED***v(%s)", obj, i, raw.Interface(), raw.Kind())
+				return fmt.Errorf("%v: item[%v]: Expected object, got %#v(%s)", obj, i, raw.Interface(), raw.Kind())
 			}
 			if err := fn(obj); err != nil {
 				return err
@@ -252,12 +252,12 @@ func extractList(obj runtime.Object, allocNew bool) ([]runtime.Object, error) {
 			var ok bool
 			// reflect.New will guarantee that itemCopy must be a pointer.
 			if list[i], ok = itemCopy.Interface().(runtime.Object); !ok {
-				return nil, fmt.Errorf("%v: item[%v]: Expected object, got %***REMOVED***v(%s)", obj, i, raw.Interface(), raw.Kind())
+				return nil, fmt.Errorf("%v: item[%v]: Expected object, got %#v(%s)", obj, i, raw.Interface(), raw.Kind())
 			}
 		default:
 			var found bool
 			if list[i], found = raw.Addr().Interface().(runtime.Object); !found {
-				return nil, fmt.Errorf("%v: item[%v]: Expected object, got %***REMOVED***v(%s)", obj, i, raw.Interface(), raw.Kind())
+				return nil, fmt.Errorf("%v: item[%v]: Expected object, got %#v(%s)", obj, i, raw.Interface(), raw.Kind())
 			}
 		}
 	}

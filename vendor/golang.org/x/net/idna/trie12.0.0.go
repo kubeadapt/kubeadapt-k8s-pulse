@@ -9,7 +9,7 @@
 package idna
 
 // appendMapping appends the mapping for the respective rune. isMapped must be
-// true. A mapping is a categorization of a rune as defined in UTS ***REMOVED***46.
+// true. A mapping is a categorization of a rune as defined in UTS #46.
 func (c info) appendMapping(b []byte, s string) []byte {
 	index := int(c >> indexShift)
 	if c&xorBit == 0 {

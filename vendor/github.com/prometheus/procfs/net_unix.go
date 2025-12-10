@@ -23,8 +23,8 @@ import (
 )
 
 // For the proc file format details,
-// see https://elixir.bootlin.com/linux/v4.17/source/net/unix/af_unix.c***REMOVED***L2815
-// and https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/net.h***REMOVED***L48.
+// see https://elixir.bootlin.com/linux/v4.17/source/net/unix/af_unix.c#L2815
+// and https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/net.h#L48.
 
 // Constants for the various /proc/net/unix enumerations.
 // TODO: match against x/sys/unix or similar?

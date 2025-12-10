@@ -593,7 +593,7 @@ func stringEncoder(e *encodeState, v reflect.Value, opts encOpts) {
 // isValidNumber reports whether s is a valid JSON number literal.
 func isValidNumber(s string) bool {
 	// This function implements the JSON numbers grammar.
-	// See https://tools.ietf.org/html/rfc7159***REMOVED***section-6
+	// See https://tools.ietf.org/html/rfc7159#section-6
 	// and https://www.json.org/img/number.png
 
 	if s == "" {
@@ -907,7 +907,7 @@ func isValidTag(s string) bool {
 	}
 	for _, c := range s {
 		switch {
-		case strings.ContainsRune("!***REMOVED***$%&()*+-./:;<=>?@[]^_{|}~ ", c):
+		case strings.ContainsRune("!#$%&()*+-./:;<=>?@[]^_{|}~ ", c):
 			// Backslash and quote chars are reserved, but
 			// otherwise any punctuation chars are allowed
 			// in a tag name.
@@ -1010,7 +1010,7 @@ func appendString[Bytes []byte | string](dst []byte, src Bytes, escapeHTML bool)
 		// but don't work in JSONP, which has to be evaluated as JavaScript,
 		// and can lead to security holes there. It is valid JSON to
 		// escape them, so we do so unconditionally.
-		// See https://en.wikipedia.org/wiki/JSON***REMOVED***Safety.
+		// See https://en.wikipedia.org/wiki/JSON#Safety.
 		if c == '\u2028' || c == '\u2029' {
 			dst = append(dst, src[start:i]...)
 			dst = append(dst, '\\', 'u', '2', '0', '2', hex[c&0xF])

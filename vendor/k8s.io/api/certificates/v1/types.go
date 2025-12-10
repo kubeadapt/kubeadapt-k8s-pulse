@@ -74,7 +74,7 @@ type CertificateSigningRequestSpec struct {
 	//  3. "kubernetes.io/kubelet-serving" issues serving certificates that kubelets use to serve TLS endpoints, which kube-apiserver can connect to securely.
 	//   Requests for this signer are never auto-approved by kube-controller-manager, and can be issued by the "csrsigning" controller in kube-controller-manager.
 	//
-	// More details are available at https://k8s.io/docs/reference/access-authn-authz/certificate-signing-requests/***REMOVED***kubernetes-signers
+	// More details are available at https://k8s.io/docs/reference/access-authn-authz/certificate-signing-requests/#kubernetes-signers
 	//
 	// Custom signerNames can also be specified. The signer defines:
 	//  1. Trust distribution: how trust (CA bundles) are distributed.
@@ -278,8 +278,8 @@ type CertificateSigningRequestList struct {
 // KeyUsage specifies valid usage contexts for keys.
 // See:
 //
-//	https://tools.ietf.org/html/rfc5280***REMOVED***section-4.2.1.3
-//	https://tools.ietf.org/html/rfc5280***REMOVED***section-4.2.1.12
+//	https://tools.ietf.org/html/rfc5280#section-4.2.1.3
+//	https://tools.ietf.org/html/rfc5280#section-4.2.1.12
 //
 // +enum
 type KeyUsage string

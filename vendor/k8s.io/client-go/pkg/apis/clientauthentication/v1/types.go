@@ -112,9 +112,9 @@ type Cluster struct {
 	//   cluster:
 	//     ...
 	//     extensions:
-	//     - name: client.authentication.k8s.io/exec  ***REMOVED*** reserved extension name for per cluster exec config
+	//     - name: client.authentication.k8s.io/exec  # reserved extension name for per cluster exec config
 	//       extension:
-	//         audience: 06e3fbd18de8  ***REMOVED*** arbitrary config
+	//         audience: 06e3fbd18de8  # arbitrary config
 	//
 	// In some environments, the user config may be exactly the same across many clusters
 	// (i.e. call this exec plugin) minus some details that are specific to each cluster

@@ -670,7 +670,7 @@ func (d *decoder) mapping(n *node, out reflect.Value) (good bool) {
 				kkind = k.Elem().Kind()
 			}
 			if kkind == reflect.Map || kkind == reflect.Slice {
-				failf("invalid map key: %***REMOVED***v", k.Interface())
+				failf("invalid map key: %#v", k.Interface())
 			}
 			e := reflect.New(et).Elem()
 			if d.unmarshal(n.children[i+1], e) {
@@ -684,7 +684,7 @@ func (d *decoder) mapping(n *node, out reflect.Value) (good bool) {
 
 func (d *decoder) setMapIndex(n *node, out, k, v reflect.Value) {
 	if d.strict && out.MapIndex(k) != zeroValue {
-		d.terrors = append(d.terrors, fmt.Sprintf("line %d: key %***REMOVED***v already set in map", n.line+1, k.Interface()))
+		d.terrors = append(d.terrors, fmt.Sprintf("line %d: key %#v already set in map", n.line+1, k.Interface()))
 		return
 	}
 	out.SetMapIndex(k, v)

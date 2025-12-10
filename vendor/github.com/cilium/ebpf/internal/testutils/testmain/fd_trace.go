@@ -94,7 +94,7 @@ func formatFrames(fs *runtime.Frames) string {
 	var b bytes.Buffer
 	for {
 		f, more := fs.Next()
-		b.WriteString(fmt.Sprintf("\t%s+%***REMOVED***x\n\t\t%s:%d\n", f.Function, f.PC-f.Entry, f.File, f.Line))
+		b.WriteString(fmt.Sprintf("\t%s+%#x\n\t\t%s:%d\n", f.Function, f.PC-f.Entry, f.File, f.Line))
 		if !more {
 			break
 		}

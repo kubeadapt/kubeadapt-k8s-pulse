@@ -48,9 +48,9 @@ func NewShortcutExpander(delegate meta.RESTMapper, client discovery.DiscoveryInt
 func (e shortcutExpander) KindFor(resource schema.GroupVersionResource) (schema.GroupVersionKind, error) {
 	// expandResourceShortcut works with current API resources as read from discovery cache.
 	// In case of new CRDs this means we potentially don't have current state of discovery.
-	// In the current wiring in k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go***REMOVED***toRESTMapper,
+	// In the current wiring in k8s.io/cli-runtime/pkg/genericclioptions/config_flags.go#toRESTMapper,
 	// we are using DeferredDiscoveryRESTMapper which on KindFor failure will clear the
-	// cache and fetch all data from a cluster (see k8s.io/client-go/restmapper/discovery.go***REMOVED***KindFor).
+	// cache and fetch all data from a cluster (see k8s.io/client-go/restmapper/discovery.go#KindFor).
 	// Thus another call to expandResourceShortcut, after a NoMatchError should successfully
 	// read Kind to the user or an error.
 	gvk, err := e.RESTMapper.KindFor(e.expandResourceShortcut(resource))

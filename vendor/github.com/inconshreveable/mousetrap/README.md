@@ -1,11 +1,11 @@
-***REMOVED*** mousetrap
+# mousetrap
 
 mousetrap is a tiny library that answers a single question.
 
 On a Windows machine, was the process invoked by someone double clicking on
 the executable file while browsing in explorer?
 
-***REMOVED******REMOVED******REMOVED*** Motivation
+### Motivation
 
 Windows developers unfamiliar with command line tools will often "double-click"
 the executable for a tool. Because most CLI tools print the help and then exit
@@ -16,7 +16,7 @@ more helpful behavior and instructions on how to run the CLI tool. To see what
 this looks like, both from an organizational and a technical perspective, see
 https://inconshreveable.com/09-09-2014/sweat-the-small-stuff/
 
-***REMOVED******REMOVED******REMOVED*** The interface
+### The interface
 
 The library exposes a single interface:
 

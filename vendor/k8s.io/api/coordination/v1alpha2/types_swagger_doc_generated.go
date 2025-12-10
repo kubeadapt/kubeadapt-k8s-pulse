@@ -29,8 +29,8 @@ package v1alpha2
 // AUTO-GENERATED FUNCTIONS START HERE. DO NOT EDIT.
 var map_LeaseCandidate = map[string]string{
 	"":         "LeaseCandidate defines a candidate for a Lease object. Candidates are created such that coordinated leader election will pick the best leader from the list of candidates.",
-	"metadata": "More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
-	"spec":     "spec contains the specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***spec-and-status",
+	"metadata": "More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+	"spec":     "spec contains the specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
 }
 
 func (LeaseCandidate) SwaggerDoc() map[string]string {
@@ -39,7 +39,7 @@ func (LeaseCandidate) SwaggerDoc() map[string]string {
 
 var map_LeaseCandidateList = map[string]string{
 	"":         "LeaseCandidateList is a list of Lease objects.",
-	"metadata": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md***REMOVED***metadata",
+	"metadata": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"items":    "items is a list of schema objects.",
 }
 

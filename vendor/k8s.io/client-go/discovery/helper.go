@@ -56,7 +56,7 @@ func MatchesServerVersion(clientVersion apimachineryversion.Info, client Discove
 	}
 	// GitVersion includes GitCommit and GitTreeState, but best to be safe?
 	if clientVersion.GitVersion != sVer.GitVersion || clientVersion.GitCommit != sVer.GitCommit || clientVersion.GitTreeState != sVer.GitTreeState {
-		return fmt.Errorf("server version (%***REMOVED***v) differs from client version (%***REMOVED***v)", sVer, clientVersion)
+		return fmt.Errorf("server version (%#v) differs from client version (%#v)", sVer, clientVersion)
 	}
 
 	return nil

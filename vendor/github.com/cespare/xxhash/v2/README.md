@@ -1,4 +1,4 @@
-***REMOVED*** xxhash
+# xxhash
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/cespare/xxhash/v2.svg)](https://pkg.go.dev/github.com/cespare/xxhash/v2)
 [![Test](https://github.com/cespare/xxhash/actions/workflows/test.yml/badge.svg)](https://github.com/cespare/xxhash/actions/workflows/test.yml)
@@ -30,7 +30,7 @@ opts into using the Go code even on those architectures.
 
 [xxHash]: http://cyan4973.github.io/xxHash/
 
-***REMOVED******REMOVED*** Compatibility
+## Compatibility
 
 This package is in a module and the latest code is in version 2 of the module.
 You need a version of Go with at least "minimal module compatibility" to use
@@ -42,7 +42,7 @@ github.com/cespare/xxhash/v2:
 
 I recommend using the latest release of Go.
 
-***REMOVED******REMOVED*** Benchmarks
+## Benchmarks
 
 Here are some quick benchmarks comparing the pure-Go and assembly
 implementations of Sum64.
@@ -63,7 +63,7 @@ benchstat <(go test -tags purego -benchtime 500ms -count 15 -bench 'Sum64$')
 benchstat <(go test -benchtime 500ms -count 15 -bench 'Sum64$')
 ```
 
-***REMOVED******REMOVED*** Projects using this package
+## Projects using this package
 
 - [InfluxDB](https://github.com/influxdata/influxdb)
 - [Prometheus](https://github.com/prometheus/prometheus)
