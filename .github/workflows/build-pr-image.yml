@@ -51,7 +51,7 @@ jobs:
 
       - name: Comment on unauthorized attempt
         if: steps.check.outputs.authorized == 'false'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           ACTOR: ${{ github.actor }}
         with:
@@ -95,7 +95,7 @@ jobs:
 
     steps:
       - name: Checkout PR code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
@@ -112,7 +112,7 @@ jobs:
           echo "Generated PR image tag: ${TAG}"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -147,7 +147,7 @@ jobs:
             .
 
       - name: Comment on PR with image details
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}

@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           fetch-depth: 0  # Needed for git describe
 
@@ -73,7 +73,7 @@ jobs:
       # === PUBLIC ECR (main + releases) ===
       - name: Configure AWS Credentials (Public ECR)
         if: steps.registry_config.outputs.registry_type == 'public'
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -87,7 +87,7 @@ jobs:
       # === PRIVATE ECR (develop) ===
       - name: Configure AWS Credentials (Private ECR)
         if: steps.registry_config.outputs.registry_type == 'private'
-        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
           role-to-assume: ${{ secrets.AWS_PRIVATE_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_PRIVATE_REGION }}
@@ -215,7 +215,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.image_tag.outputs.is_release == 'true'
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         with:
           draft: false
           prerelease: ${{ contains(steps.image_tag.outputs.tag, '-rc') || contains(steps.image_tag.outputs.tag, '-beta') }}
