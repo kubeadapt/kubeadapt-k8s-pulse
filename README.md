@@ -34,12 +34,14 @@ helm repo add kubeadapt https://kubeadapt.github.io/kubeadapt-helm
 helm repo update
 
 # Install the eBPF agent
-helm install ebpf-agent kubeadapt/ebpf-agent \
+helm install kubeadapt-ebpf-agent kubeadapt/ebpf-agent \
   -n kubeadapt --create-namespace
 
 # Verify deployment
 kubectl get pods -n kubeadapt -l app.kubernetes.io/name=ebpf-agent
 ```
+
+> **Note:** Using `kubeadapt-ebpf-agent` as the release name ensures the service name matches Prometheus scrape configurations.
 
 For chart configuration options, see the [kubeadapt-helm repository](https://github.com/kubeadapt/kubeadapt-helm/tree/main/charts/ebpf-agent).
 
