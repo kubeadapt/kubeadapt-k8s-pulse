@@ -248,17 +248,19 @@ func (c *ConnectionCollector) initMetrics(registry *prometheus.Registry) {
 
 // Start begins the collection loop
 func (c *ConnectionCollector) Start(ctx context.Context) {
-	// Log kernel version and capabilities
+	// Log kernel version and capabilities at debug level
 	kernelVersion, err := system.GetKernelVersion()
 	if err != nil {
 		c.logger.Warn("Failed to detect kernel version", zap.Error(err))
-		c.logger.Info("Starting connection collector (read-then-delete pattern)",
-			zap.Duration("collection_interval", c.aggregationInterval))
-	} else {
-		c.logger.Info("Starting connection collector (read-then-delete pattern)",
-			zap.Duration("collection_interval", c.aggregationInterval),
-			zap.String("kernel_version", kernelVersion.String()))
 	}
+	c.logger.Debug("Starting connection collector (read-then-delete pattern)",
+		zap.Duration("collection_interval", c.aggregationInterval),
+		zap.String("kernel_version", func() string {
+			if kernelVersion != nil {
+				return kernelVersion.String()
+			}
+			return "unknown"
+		}()))
 
 	// Start collection loop
 	collectionTicker := time.NewTicker(c.aggregationInterval)

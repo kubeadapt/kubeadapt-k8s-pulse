@@ -78,7 +78,7 @@ func (m *Manager) getKernelVersionUint32() (uint32, error) {
 // LoadAndAttach loads BPF programs and attaches them to kernel hooks
 // filterMode: Network namespace filtering mode ("default", "strict", or "disabled")
 func (m *Manager) LoadAndAttach(filterMode string) error {
-	m.logger.Info("Loading BPF objects")
+	m.logger.Debug("Loading BPF objects")
 
 	// Load pre-compiled BPF programs
 	spec, err := loadNetwork()
@@ -93,7 +93,7 @@ func (m *Manager) LoadAndAttach(filterMode string) error {
 	if err != nil {
 		m.logger.Warn("Failed to get kernel version, will use auto-detection", zap.Error(err))
 	} else {
-		m.logger.Info("Setting kernel version on program specs",
+		m.logger.Debug("Setting kernel version on program specs",
 			zap.Uint32("kernel_version", kernelVersion))
 		for name, progSpec := range spec.Programs {
 			progSpec.KernelVersion = kernelVersion
@@ -129,7 +129,7 @@ func (m *Manager) LoadAndAttach(filterMode string) error {
 		if err != nil {
 			m.logger.Warn("Failed to get connection_flows map info", zap.Error(err))
 		} else {
-			m.logger.Info("Loaded connection_flows map",
+			m.logger.Debug("Loaded connection_flows map",
 				zap.Uint32("max_entries", info.MaxEntries),
 				zap.Uint32("key_size", info.KeySize),
 				zap.Uint32("value_size", info.ValueSize),
@@ -141,12 +141,6 @@ func (m *Manager) LoadAndAttach(filterMode string) error {
 	if err := m.attachTCHooks(coll); err != nil {
 		return fmt.Errorf("attaching TC hooks: %w", err)
 	}
-
-	m.logger.Info("TC BPF programs attached successfully",
-		zap.Int("programs", len(coll.Programs)),
-		zap.Int("maps", len(coll.Maps)),
-		zap.Int("links", len(m.links)),
-	)
 
 	// Initialize host network namespace filtering
 	// This MUST be called after BPF programs are loaded so the maps exist
@@ -177,7 +171,7 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 		return fmt.Errorf("getting network interfaces: %w", err)
 	}
 
-	m.logger.Info("Attaching TC hooks to network interfaces",
+	m.logger.Debug("Attaching TC hooks to network interfaces",
 		zap.Int("interface_count", len(interfaces)))
 
 	// Attach to each interface
@@ -258,7 +252,7 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 		return fmt.Errorf("failed to attach TC hooks to any network interface")
 	}
 
-	m.logger.Info("TC hooks attached successfully",
+	m.logger.Debug("TC hooks attached successfully",
 		zap.Int("total_filters", len(m.tcFilters)))
 
 	return nil

@@ -106,7 +106,7 @@ func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
 		return fmt.Errorf("failed to populate filter_mode_map: %w", err)
 	}
 
-	m.logger.Info("Initialized network namespace filtering",
+	m.logger.Debug("Initialized network namespace filtering",
 		zap.String("mode", filterMode),
 		zap.Uint32("mode_value", modeValue))
 

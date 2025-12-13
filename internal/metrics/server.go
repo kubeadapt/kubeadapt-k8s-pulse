@@ -119,7 +119,7 @@ func (s *Server) Start() error {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	s.logger.Info("Starting metrics server",
+	s.logger.Debug("Starting metrics server",
 		zap.Int("port", s.port),
 	)
 
@@ -159,7 +159,7 @@ func (s *Server) SetReady(ready bool) {
 	s.isReady = ready
 	if ready {
 		s.readyAt = time.Now()
-		s.logger.Info("Metrics server marked as ready")
+		s.logger.Debug("Metrics server marked as ready")
 	}
 }
 
@@ -171,7 +171,7 @@ func (s *Server) ReportBPFLoadSuccess(duration time.Duration) {
 	s.bpfLoadError = "none"
 	s.bpfLoadSuccessful = true
 	s.SetReady(true) // Mark server as ready when BPF loads successfully
-	s.logger.Info("BPF load status reported as successful",
+	s.logger.Debug("BPF load status reported as successful",
 		zap.Duration("duration", duration))
 }
 

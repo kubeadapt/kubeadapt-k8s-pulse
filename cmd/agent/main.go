@@ -192,10 +192,10 @@ func main() {
 				"Consider using INFO level in production.")
 		}
 
-		logger.Info("Connection tracking enabled (read-then-delete pattern with overflow ringbuffer)",
+		logger.Debug("Connection tracking enabled (read-then-delete pattern with overflow ringbuffer)",
 			zap.Duration("collection_interval", cfg.CollectionInterval))
 	} else {
-		logger.Info("Connection tracking disabled")
+		logger.Debug("Connection tracking disabled")
 	}
 
 	// Log startup complete
@@ -231,8 +231,8 @@ func checkKernelCompatibility(logger *zap.Logger) error {
 		// Not a fatal error - might be running on non-Linux or in container
 		logger.Warn("Could not detect kernel version", zap.Error(err))
 	} else {
-		// Log short kernel version at Info level
-		logger.Info("Detected kernel version", zap.String("version", kv.String()))
+		// Log kernel version at Debug level (info is too verbose for startup)
+		logger.Debug("Detected kernel version", zap.String("version", kv.String()))
 
 		// Log full kernel version at Debug level for troubleshooting
 		if versionData, err := os.ReadFile("/proc/version"); err == nil {
