@@ -298,7 +298,7 @@ func (m *Manager) StartRingbufReader(ctx context.Context, handler func(*FlowReco
 		}
 	}()
 
-	m.logger.Info("Starting overflow ringbuffer reader")
+	m.logger.Debug("Starting overflow ringbuffer reader")
 
 	// IMPORTANT: handler() is called synchronously in the read loop.
 	// Ring buffer reading will BLOCK if handler takes too long.

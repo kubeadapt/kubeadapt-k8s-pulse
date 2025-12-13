@@ -8,7 +8,6 @@ import (
 	_ "net/http/pprof" // Import pprof for profiling endpoints
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/kubeadapt/ebpf-agent/internal/collector"
 	"github.com/kubeadapt/ebpf-agent/internal/config"
 	"github.com/kubeadapt/ebpf-agent/internal/metrics"
+	"github.com/kubeadapt/ebpf-agent/internal/system"
 	"go.uber.org/zap"
 )
 
@@ -225,16 +225,19 @@ func main() {
 
 // checkKernelCompatibility verifies the kernel supports required eBPF features
 func checkKernelCompatibility(logger *zap.Logger) error {
-	// Simple kernel version check by reading /proc/version
-	versionData, err := os.ReadFile("/proc/version")
+	// Get kernel version using system package
+	kv, err := system.GetKernelVersion()
 	if err != nil {
-		// Not a fatal error - might be running on non-Linux or in container without /proc
-		logger.Warn("Could not read kernel version from /proc/version",
-			zap.Error(err))
+		// Not a fatal error - might be running on non-Linux or in container
+		logger.Warn("Could not detect kernel version", zap.Error(err))
 	} else {
-		// Log kernel version for debugging and support purposes
-		kernelVersion := strings.TrimSpace(string(versionData))
-		logger.Info("Detected kernel version", zap.String("version", kernelVersion))
+		// Log short kernel version at Info level
+		logger.Info("Detected kernel version", zap.String("version", kv.String()))
+
+		// Log full kernel version at Debug level for troubleshooting
+		if versionData, err := os.ReadFile("/proc/version"); err == nil {
+			logger.Debug("Full kernel version", zap.String("proc_version", string(versionData)))
+		}
 	}
 
 	// Check for BPF filesystem
