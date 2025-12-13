@@ -3,10 +3,9 @@ name: Build and Push eBPF Agent
 on:
   push:
     branches:
-      - main
       - develop
     tags:
-      - 'v*.*.*'  # Trigger on version tags
+      - 'v*.*.*'  # Trigger on version tags (main releases)
 
 permissions:
   id-token: write
@@ -43,7 +42,7 @@ jobs:
         run: |
           is_release="false"
 
-          # Check if this is a tag push
+          # Check if this is a tag push (release)
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             tag="${GITHUB_REF#refs/tags/}"
 
@@ -54,16 +53,23 @@ jobs:
               exit 1
             fi
 
-            echo "✅ '$tag' is a valid release tag"
+            # Verify tag is on main branch
+            if ! git branch -r --contains "$GITHUB_SHA" | grep -q "origin/main"; then
+              echo "❌ ERROR: Tag '$tag' is not on main branch"
+              echo "Release tags must be created from the main branch"
+              exit 1
+            fi
+
+            echo "✅ '$tag' is a valid release tag on main branch"
             is_release="true"
           elif [[ "$GITHUB_REF" == refs/heads/develop ]]; then
             # Develop branch: use dev-{short-sha}
             tag="dev-${GITHUB_SHA::7}"
             echo "Generated tag for develop branch: $tag"
           else
-            # Main branch: use main-{short-sha}
-            tag="main-${GITHUB_SHA::7}"
-            echo "Generated tag for main branch: $tag"
+            echo "❌ ERROR: Unexpected ref '$GITHUB_REF'"
+            echo "This workflow only supports: develop branch or version tags (v*.*.*)"
+            exit 1
           fi
 
           echo "tag=$tag" >> $GITHUB_OUTPUT
@@ -145,7 +151,7 @@ jobs:
             .
 
       - name: Tag as Latest (Public ECR)
-        if: steps.registry_config.outputs.registry_type == 'public' && ((github.ref == 'refs/heads/main' && github.event_name == 'push') || steps.image_tag.outputs.is_release == 'true')
+        if: steps.registry_config.outputs.registry_type == 'public' && steps.image_tag.outputs.is_release == 'true'
         env:
           ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
