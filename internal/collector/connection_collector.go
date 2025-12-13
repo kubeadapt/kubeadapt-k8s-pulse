@@ -256,7 +256,7 @@ func (c *ConnectionCollector) Start(ctx context.Context) {
 	c.logger.Debug("Starting connection collector (read-then-delete pattern)",
 		zap.Duration("collection_interval", c.aggregationInterval),
 		zap.String("kernel_version", func() string {
-			if kernelVersion != nil {
+			if err == nil {
 				return kernelVersion.String()
 			}
 			return "unknown"
