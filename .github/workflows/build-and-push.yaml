@@ -201,6 +201,7 @@ jobs:
           ls -lh release-assets/
 
       # Generate SBOM for supply chain security (release only)
+      # Note: upload-release-assets: false because we attach via softprops/action-gh-release
       - name: Generate SBOM (SPDX format)
         if: steps.image_tag.outputs.is_release == 'true'
         uses: anchore/sbom-action@43a17d6e7add2b5535efe4dcae9952337c479a93 # v0
@@ -209,6 +210,7 @@ jobs:
           format: spdx-json
           output-file: release-assets/sbom.spdx.json
           artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.spdx.json
+          upload-release-assets: false
 
       - name: Generate SBOM (CycloneDX format)
         if: steps.image_tag.outputs.is_release == 'true'
@@ -218,6 +220,7 @@ jobs:
           format: cyclonedx-json
           output-file: release-assets/sbom.cyclonedx.json
           artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.cyclonedx.json
+          upload-release-assets: false
 
       - name: Create GitHub Release
         if: steps.image_tag.outputs.is_release == 'true'
