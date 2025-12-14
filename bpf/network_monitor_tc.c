@@ -686,9 +686,9 @@ static __always_inline __u64 get_cgroup_id(struct __sk_buff *skb) {
 // CONFIGURABLE FILTERING MODES (set via EBPF_NETNS_FILTER_MODE):
 //
 // MODE 0 - "default" (RECOMMENDED):
-//   - Track: All Kubernetes pods (including hostNetwork:true)
-//   - Filter: Host system processes only
-//   - Method: Simple cgroup check (cgroup_id != 0 && cgroup_id != 1)
+//   - Track: Pod-to-pod veth traffic (cross-namespace communication)
+//   - Filter: Host processes (kubelet, systemd, local sockets)
+//   - Method: Accept only cgroup_id == 0 (veth traffic where skb->sk = NULL)
 //
 // MODE 1 - "disabled":
 //   - Track: Everything (no filtering)
@@ -707,19 +707,30 @@ static __always_inline int is_host_network_namespace_tc(struct __sk_buff *skb) {
     return 0; // Never filter - track all traffic (0 = false)
   }
 
-  // MODE 0: DEFAULT - Simple cgroup-based filtering (RECOMMENDED)
-  // Track all Kubernetes pods (including hostNetwork), filter only host
-  // processes
+  // MODE 0: DEFAULT - Veth-based filtering for K8s pod traffic (RECOMMENDED)
+  // Track: Cross-namespace veth traffic (pod-to-pod communication)
+  // Filter: Host processes (kubelet, systemd services, local sockets)
+  //
+  // Technical explanation:
+  // - bpf_skb_cgroup_id(skb) returns cgroup ID from skb->sk (socket)
+  // - For veth traffic (pod-to-pod), skb->sk = NULL because socket is in
+  //   different namespace, so cgroup_id = 0
+  // - For host processes, skb->sk is valid, so cgroup_id > 0
+  //
+  // cgroup_id values:
+  //   0 = No socket (veth/cross-namespace) → THIS IS POD TRAFFIC WE WANT
+  //   1 = Root cgroup (kubelet, containerd) → Filter
+  //  >1 = Systemd services, containers with local sockets → Filter
   __u64 cgroup_id = bpf_skb_cgroup_id(skb);
 
-  // Root cgroup (cgroup_id == 1) or invalid (0) = host system process → filter
-  // it Non-root cgroup = containerized process (K8s pod) → track it
-  if (cgroup_id == 0 || cgroup_id == 1) {
+  // Only accept veth traffic (cgroup_id == 0)
+  // This captures pod-to-pod traffic crossing namespace boundaries
+  if (cgroup_id != 0) {
     increase_counter(COUNTER_HOST_FILTERED);
     return 1; // Host process - skip tracking (1 = true)
   }
 
-  return 0; // K8s pod (any network mode) - track it (0 = false)
+  return 0; // Veth traffic (pod-to-pod) - track it (0 = false)
 }
 
 // Update connection statistics with interface deduplication
