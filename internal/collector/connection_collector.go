@@ -588,7 +588,7 @@ func (c *ConnectionCollector) StartOverflowHandler(ctx context.Context) error {
 // - We must use LittleEndian to correctly interpret the host-order uint32 back to IP bytes
 func uint32ToIPString(ip uint32) string {
 	bytes := make([]byte, 4)
-	binary.LittleEndian.PutUint32(bytes, ip) // ✅ Host byte order (little-endian on x86/ARM)
+	binary.LittleEndian.PutUint32(bytes, ip) // Host byte order (little-endian on x86/ARM)
 	return net.IP(bytes).String()
 }
 
@@ -606,7 +606,7 @@ func IPv6ToIPString(ipv6 [4]uint32) string {
 	// Convert each uint32 to bytes using LittleEndian (host byte order)
 	// This correctly handles both IPv4-mapped and native IPv6 addresses
 	for i := 0; i < 4; i++ {
-		binary.LittleEndian.PutUint32(bytes[i*4:], ipv6[i]) // ✅ Host byte order
+		binary.LittleEndian.PutUint32(bytes[i*4:], ipv6[i]) // Host byte order
 	}
 
 	return net.IP(bytes).String()

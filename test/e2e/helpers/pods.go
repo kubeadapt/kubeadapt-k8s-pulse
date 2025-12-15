@@ -188,7 +188,7 @@ func (p *PodHelper) WaitForReady(ctx context.Context, t TestingT, namespace, nam
 			}
 
 			// Pod is fully ready
-			t.Logf("✓ Pod %s/%s is ready (IP: %s)", namespace, name, pod.Status.PodIP)
+			t.Logf("Pod %s/%s is ready (IP: %s)", namespace, name, pod.Status.PodIP)
 			return nil
 		}
 	}
@@ -277,7 +277,7 @@ func (p *PodHelper) WaitForDaemonSetReady(ctx context.Context, t TestingT, names
 		case <-ticker.C:
 			err := p.DaemonSetReady(ctx, namespace, name)
 			if err == nil {
-				t.Logf("✓ DaemonSet %s/%s is ready", namespace, name)
+				t.Logf("DaemonSet %s/%s is ready", namespace, name)
 				return nil
 			}
 			lastError = err
@@ -328,7 +328,7 @@ func (p *PodHelper) WaitForDeploymentReady(ctx context.Context, t TestingT, name
 				continue
 			}
 
-			t.Logf("✓ Deployment %s/%s is ready", namespace, name)
+			t.Logf("Deployment %s/%s is ready", namespace, name)
 			return nil
 		}
 	}
@@ -370,7 +370,7 @@ func (p *PodHelper) WaitForPodCondition(ctx context.Context, t TestingT, namespa
 
 			for _, cond := range pod.Status.Conditions {
 				if cond.Type == conditionType && cond.Status == corev1.ConditionTrue {
-					t.Logf("✓ Pod %s/%s condition %s is true", namespace, name, conditionType)
+					t.Logf("Pod %s/%s condition %s is true", namespace, name, conditionType)
 					return nil
 				}
 			}
@@ -430,7 +430,7 @@ func (p *PodHelper) WaitForPodsReadyByLabel(ctx context.Context, t TestingT, nam
 			}
 
 			if allReady {
-				t.Logf("✓ All %d pods with label %s are ready", len(pods), labelSelector)
+				t.Logf("All %d pods with label %s are ready", len(pods), labelSelector)
 				return nil
 			}
 		}

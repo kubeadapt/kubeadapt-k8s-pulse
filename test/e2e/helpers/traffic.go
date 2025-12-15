@@ -113,7 +113,7 @@ func (tg *TrafficGenerator) GenerateBurstHTTPTraffic(ctx context.Context, namesp
 		return fmt.Errorf("executing burst curl in pod: %w", err)
 	}
 
-	tg.t.Logf("✓ Burst traffic generation completed in %v (~%.0f req/sec)", duration, float64(requests)/duration.Seconds())
+	tg.t.Logf("Burst traffic generation completed in %v (~%.0f req/sec)", duration, float64(requests)/duration.Seconds())
 	tg.t.Logf("  Stdout: %s", stdout)
 	return nil
 }
@@ -236,7 +236,7 @@ func (tg *TrafficGenerator) GenerateMixedProtocolTraffic(ctx context.Context, na
 		return fmt.Errorf("generating UDP traffic: %w", err)
 	}
 
-	tg.t.Log("✓ Mixed protocol traffic generation completed")
+	tg.t.Log("Mixed protocol traffic generation completed")
 	return nil
 }
 
@@ -292,7 +292,7 @@ func (tg *TrafficGenerator) waitForPodReady(ctx context.Context, namespace, podN
 		// Check readiness condition
 		for _, cond := range pod.Status.Conditions {
 			if cond.Type == corev1.PodReady && cond.Status == corev1.ConditionTrue {
-				tg.t.Logf("✓ Pod %s/%s is ready", namespace, podName)
+				tg.t.Logf("Pod %s/%s is ready", namespace, podName)
 				return
 			}
 		}

@@ -759,13 +759,13 @@ static __always_inline void update_stats(struct connection_key *key,
   if (stats) {
     // Existing connection - check if this is the same interface
     if (stats->if_index_first_seen == if_index) {
-      // ✅ SAME INTERFACE - Count this packet
+      // SAME INTERFACE - Count this packet
       __sync_fetch_and_add(&stats->bytes, bytes);
       __sync_fetch_and_add(&stats->packets, 1);
       stats->last_seen_ns = bpf_ktime_get_ns();
 
     } else if (if_index != 0) {
-      // ⚠️ DIFFERENT INTERFACE - Skip counting (multi-interface deduplication)
+      // DIFFERENT INTERFACE - Skip counting (multi-interface deduplication)
       // Only update timestamp to keep flow alive
       // Example: veth (counted) → docker0 (skipped) → eth0 (skipped)
       stats->last_seen_ns = bpf_ktime_get_ns();
@@ -780,7 +780,7 @@ static __always_inline void update_stats(struct connection_key *key,
         .packets = 1,
         .last_seen_ns = bpf_ktime_get_ns(),
         .cgroup_id = cgroup_id,
-        .if_index_first_seen = if_index, // ✅ Lock to first interface
+        .if_index_first_seen = if_index, // Lock to first interface
         .padding = {0},
     };
 
@@ -798,7 +798,7 @@ static __always_inline void update_stats(struct connection_key *key,
         event->timestamp_ns = bpf_ktime_get_ns();
         event->reason = OVERFLOW_REASON_MAP_FULL;
         __builtin_memset(event->padding, 0,
-                         sizeof(event->padding)); // ✅ FIX: Initialize padding
+                         sizeof(event->padding)); // Initialize padding
         bpf_ringbuf_submit(event, 0);
         increase_counter(COUNTER_OVERFLOW_EVENTS);
       }
@@ -813,7 +813,7 @@ static __always_inline void update_stats(struct connection_key *key,
         __sync_fetch_and_add(&stats->packets, 1);
         stats->last_seen_ns = bpf_ktime_get_ns();
       } else {
-        // ✅ ADD THIS: Re-lookup failed (rare race condition)
+        // Re-lookup failed (rare race condition)
         // Entry was deleted between EEXIST and re-lookup
         // Send to overflow ringbuffer for observability
         struct overflow_event *event = bpf_ringbuf_reserve(

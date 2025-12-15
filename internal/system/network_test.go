@@ -116,7 +116,7 @@ func TestCommonInterfaceNames(t *testing.T) {
 	// Log which common interfaces were found (informational only)
 	for name, found := range commonNames {
 		if found {
-			t.Logf("✓ Found common interface type: %s", name)
+			t.Logf("Found common interface type: %s", name)
 		}
 	}
 }
@@ -140,8 +140,8 @@ func TestLoopbackInterface(t *testing.T) {
 	// Most systems should have a loopback interface
 	// This is informational - not a hard requirement
 	if hasLoopback {
-		t.Log("✓ Loopback interface is UP")
+		t.Log("Loopback interface is UP")
 	} else {
-		t.Log("⚠ No loopback interface found (may be DOWN or have different name)")
+		t.Log("No loopback interface found (may be DOWN or have different name)")
 	}
 }

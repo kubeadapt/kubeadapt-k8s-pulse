@@ -131,7 +131,7 @@ func (p *PrometheusClient) WaitForMetric(ctx context.Context, metricName string,
 					_, _ = fmt.Sscanf(valueStr, "%f", &value)
 
 					if value >= minValue {
-						p.t.Logf("✓ Metric %s found with value %f >= %f", metricName, value, minValue)
+						p.t.Logf("Metric %s found with value %f >= %f", metricName, value, minValue)
 						return // Success!
 					}
 
@@ -202,7 +202,7 @@ func (p *PrometheusClient) WaitForReady(ctx context.Context) error {
 		_ = resp.Body.Close()
 
 		if resp.StatusCode == http.StatusOK {
-			p.t.Log("✓ Prometheus is ready")
+			p.t.Log("Prometheus is ready")
 			return
 		}
 
@@ -227,7 +227,7 @@ func (p *PrometheusClient) WaitForMetricInRange(ctx context.Context, metricName 
 				"Metric %s value %f not in range [%f, %f]", metricName, value, minValue, maxValue)
 		}
 
-		p.t.Logf("✓ Metric %s value %f is within range", metricName, value)
+		p.t.Logf("Metric %s value %f is within range", metricName, value)
 	}, test.Interval(5*time.Second))
 
 	return nil
@@ -259,7 +259,7 @@ func (p *PrometheusClient) WaitForMetricIncrease(ctx context.Context, metricName
 		return fmt.Errorf("metric %s did not increase: initial=%f, final=%f", metricName, initialValue, finalValue)
 	}
 
-	p.t.Logf("✓ Metric %s increased from %f to %f over %s", metricName, initialValue, finalValue, duration)
+	p.t.Logf("Metric %s increased from %f to %f over %s", metricName, initialValue, finalValue, duration)
 	return nil
 }
 
@@ -308,7 +308,7 @@ func (p *PrometheusClient) AssertCardinalityBelowLimit(ctx context.Context, metr
 		return fmt.Errorf("metric %s cardinality %d exceeds limit %d", metricName, cardinality, maxCardinality)
 	}
 
-	p.t.Logf("✓ Metric %s cardinality %d is below limit %d", metricName, cardinality, maxCardinality)
+	p.t.Logf("Metric %s cardinality %d is below limit %d", metricName, cardinality, maxCardinality)
 	return nil
 }
 
@@ -358,6 +358,6 @@ func (p *PrometheusClient) AssertMetricRate(ctx context.Context, metricName stri
 		return fmt.Errorf("metric %s rate %f not in expected range [%f, %f]", metricName, rate, minRate, maxRate)
 	}
 
-	p.t.Logf("✓ Metric %s rate %f is within range [%f, %f]", metricName, rate, minRate, maxRate)
+	p.t.Logf("Metric %s rate %f is within range [%f, %f]", metricName, rate, minRate, maxRate)
 	return nil
 }

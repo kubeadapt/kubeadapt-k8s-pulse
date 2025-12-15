@@ -162,11 +162,11 @@ func (c *Cluster) Run(m *testing.M) {
 	for _, dep := range c.orderedDeployments() {
 		// When order changes, wait for all previous deployments to be ready
 		if dep.Order != currentOrder {
-			fmt.Printf("→ Waiting for all %s deployments to be ready before proceeding...\n", orderName(currentOrder))
+			fmt.Printf("Waiting for all %s deployments to be ready before proceeding...\n", orderName(currentOrder))
 			envFuncs = append(envFuncs, readyFuncs...)
 			readyFuncs = nil
 			currentOrder = dep.Order
-			fmt.Printf("→ Starting %s deployments...\n", orderName(currentOrder))
+			fmt.Printf("Starting %s deployments...\n", orderName(currentOrder))
 		}
 
 		// Deploy manifest
@@ -180,7 +180,7 @@ func (c *Cluster) Run(m *testing.M) {
 
 	// Wait for final deployment order to be ready
 	if len(readyFuncs) > 0 {
-		fmt.Printf("→ Waiting for all %s deployments to be ready...\n", orderName(currentOrder))
+		fmt.Printf("Waiting for all %s deployments to be ready...\n", orderName(currentOrder))
 		envFuncs = append(envFuncs, readyFuncs...)
 	}
 
@@ -249,12 +249,12 @@ func (c *Cluster) loadLocalImage() env.Func {
 		// Kind's 'load docker-image' command handles this efficiently
 		ctx, err := envfuncs.LoadDockerImageToCluster(c.clusterName, agentContainerName)(ctx, cfg)
 		if err == nil {
-			fmt.Println("✓ Successfully loaded image from local Docker registry")
+			fmt.Println("Successfully loaded image from local Docker registry")
 			return ctx, nil
 		}
 
 		// Fallback: Create tar archive and load from it
-		fmt.Printf("⚠️  Failed to load from registry (%v)\n", err)
+		fmt.Printf("Failed to load from registry (%v)\n", err)
 		fmt.Println("Creating tar archive as fallback...")
 
 		archivePath := path.Join(c.baseDir, localArchiveName)
@@ -273,13 +273,13 @@ func (c *Cluster) loadLocalImage() env.Func {
 				"Output: %s", err, err, string(saveOutput))
 		}
 
-		fmt.Printf("✓ Created tar archive: %s\n", archivePath)
+		fmt.Printf("Created tar archive: %s\n", archivePath)
 		fmt.Println("Loading image from tar archive...")
 
 		// Load from the newly created tar
 		ctx, err = envfuncs.LoadImageArchiveToCluster(c.clusterName, archivePath)(ctx, cfg)
 		if err == nil {
-			fmt.Println("✓ Successfully loaded image from tar archive")
+			fmt.Println("Successfully loaded image from tar archive")
 			return ctx, nil
 		}
 
@@ -327,7 +327,7 @@ func deployManifest(dep Deployment) env.Func {
 			return ctx, fmt.Errorf("applying manifest %s: %w", dep.ManifestFile, err)
 		}
 
-		fmt.Printf("✓ Successfully deployed: %s\n", dep.ManifestFile)
+		fmt.Printf("Successfully deployed: %s\n", dep.ManifestFile)
 		return ctx, nil
 	}
 }
@@ -340,7 +340,7 @@ func withTimeout(ready *Readiness) env.Func {
 		for {
 			err := ready.Function(cfg)
 			if err == nil {
-				fmt.Printf("✓ Readiness check passed: %s\n", ready.Description)
+				fmt.Printf("Readiness check passed: %s\n", ready.Description)
 				return ctx, nil
 			}
 			if time.Since(start) > ready.Timeout {
@@ -390,7 +390,7 @@ func waitForDaemonSetWithAllPods(namespace, name string) func(*envconf.Config) e
 				namespace, name, ds.Status.NumberAvailable, ds.Status.DesiredNumberScheduled)
 		}
 
-		fmt.Printf("✓ DaemonSet %s/%s fully ready: %d/%d pods ready, updated, and available\n",
+		fmt.Printf("DaemonSet %s/%s fully ready: %d/%d pods ready, updated, and available\n",
 			namespace, name, ds.Status.NumberReady, ds.Status.DesiredNumberScheduled)
 
 		return nil
@@ -475,7 +475,7 @@ func waitForTestPods(namespace string) func(*envconf.Config) error {
 			}
 		}
 
-		fmt.Printf("✓ All %d test pods in namespace %s are ready\n", len(testPods), namespace)
+		fmt.Printf("All %d test pods in namespace %s are ready\n", len(testPods), namespace)
 		return nil
 	}
 }
@@ -536,7 +536,7 @@ func waitForTrafficPods(namespace string) func(*envconf.Config) error {
 			fmt.Printf("  Pod %s: ready on node %s with IP %s\n", podName, pod.Spec.NodeName, pod.Status.PodIP)
 		}
 
-		fmt.Printf("✓ All %d traffic generator pods in namespace %s are ready\n", len(trafficPods), namespace)
+		fmt.Printf("All %d traffic generator pods in namespace %s are ready\n", len(trafficPods), namespace)
 		return nil
 	}
 }

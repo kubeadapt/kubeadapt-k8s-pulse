@@ -50,17 +50,17 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 	rawIPTraffic := features.New("Raw IP Connection Metrics").
 		Assess("raw IP-based connection metrics are exported", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			t.Log("═══════════════════════════════════════════════════════════")
-			t.Log("→ Testing Raw IP Connection Metrics Export")
+			t.Log("Testing Raw IP Connection Metrics Export")
 			t.Log("═══════════════════════════════════════════════════════════")
 			t.Log("Setting up Prometheus client")
 			promClient := helpers.NewPrometheusClient(t, prometheusURL)
 
 			// Wait for Prometheus to be ready
-			t.Log("→ Waiting for Prometheus to become ready...")
+			t.Log("Waiting for Prometheus to become ready...")
 			if err := promClient.WaitForReady(ctx); err != nil {
 				t.Fatalf("Prometheus not ready: %v", err)
 			}
-			t.Log("✓ Prometheus is ready")
+			t.Log("Prometheus is ready")
 
 			// Create PodHelper for robust pod operations
 			podHelper, err := helpers.NewPodHelper(cfg)
@@ -77,20 +77,20 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 				t.Fatalf("Pod test-pod-b not ready: %v", err)
 			}
 
-			t.Logf("→ Generating traffic between pods (Pod A -> Pod B): %d requests", trafficRequests)
+			t.Logf("Generating traffic between pods (Pod A -> Pod B): %d requests", trafficRequests)
 			trafficGen := helpers.NewTrafficGenerator(t, cfg.Client().RESTConfig())
 
 			// Generate HTTP traffic from Pod A to Pod B
 			if err := trafficGen.GenerateHTTPTraffic(ctx, testNamespace, "test-pod-a", "test-service-b", trafficRequests); err != nil {
 				t.Fatalf("Failed to generate traffic: %v", err)
 			}
-			t.Logf("✓ Successfully generated %d HTTP requests", trafficRequests)
+			t.Logf("Successfully generated %d HTTP requests", trafficRequests)
 
-			t.Log("→ Waiting for metrics to be exported and scraped by Prometheus (45s)")
+			t.Log("Waiting for metrics to be exported and scraped by Prometheus (45s)")
 			t.Log("   Collection interval (30s) + Scrape interval (15s)")
 			time.Sleep(MetricsExportWaitTime)
 
-			t.Log("→ Querying Prometheus for raw IP-based connection metrics")
+			t.Log("Querying Prometheus for raw IP-based connection metrics")
 
 			// Verify connection traffic bytes metric exists (with any IP addresses)
 			if err = promClient.WaitForMetric(ctx,
@@ -115,10 +115,10 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			}
 
 			t.Log("")
-			t.Log("✅ Raw IP-based connection metrics successfully exported")
-			t.Log("   ✓ Traffic bytes metric: kubeadapt_connection_traffic_bytes")
-			t.Log("   ✓ Traffic packets metric: kubeadapt_connection_traffic_packets")
-			t.Log("   ✓ Agent exports raw IP connections (backend handles aggregation)")
+			t.Log("Raw IP-based connection metrics successfully exported")
+			t.Log("   Traffic bytes metric: kubeadapt_connection_traffic_bytes")
+			t.Log("   Traffic packets metric: kubeadapt_connection_traffic_packets")
+			t.Log("   Agent exports raw IP connections (backend handles aggregation)")
 			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
@@ -167,19 +167,19 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 				t.Fatalf("Connection traffic bytes metric not found: %v", err)
 			}
 
-			t.Log("✓ Multiple connection metrics successfully exported")
+			t.Log("Multiple connection metrics successfully exported")
 			return ctx
 		}).Feature()
 
 	bpfMapUtilization := features.New("BPF Map Utilization Metrics").
 		Assess("map utilization metrics are exposed", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			t.Log("═══════════════════════════════════════════════════════════")
-			t.Log("→ Testing BPF Map Utilization Metrics")
+			t.Log("Testing BPF Map Utilization Metrics")
 			t.Log("═══════════════════════════════════════════════════════════")
 			t.Log("Setting up Prometheus client")
 			promClient := helpers.NewPrometheusClient(t, prometheusURL)
 
-			t.Log("→ Verifying BPF map utilization metrics are exposed")
+			t.Log("Verifying BPF map utilization metrics are exposed")
 
 			// Query for map utilization metric
 			err := promClient.WaitForMetric(ctx,
@@ -209,10 +209,10 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			}
 
 			t.Log("")
-			t.Log("✅ BPF map utilization metrics verified")
-			t.Logf("   ✓ Current map utilization: %.2f%%", value)
-			t.Log("   ✓ Metric range valid: 0-100%")
-			t.Log("   ✓ Map: connection_flows (HASH)")
+			t.Log("BPF map utilization metrics verified")
+			t.Logf("   Current map utilization: %.2f%%", value)
+			t.Log("   Metric range valid: 0-100%")
+			t.Log("   Map: connection_flows (HASH)")
 			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
@@ -221,11 +221,11 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 	tcEgressOnlyValidation := features.New("TC Egress-Only Architecture Validation").
 		Assess("metrics do not have direction label (egress-only)", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			t.Log("═══════════════════════════════════════════════════════════")
-			t.Log("→ Validating TC Egress-Only Architecture")
+			t.Log("Validating TC Egress-Only Architecture")
 			t.Log("═══════════════════════════════════════════════════════════")
 			promClient := helpers.NewPrometheusClient(t, prometheusURL)
 
-			t.Log("→ Verifying metrics do NOT have direction label")
+			t.Log("Verifying metrics do NOT have direction label")
 
 			// Query connection traffic bytes metric
 			result, err := promClient.Query(ctx, "kubeadapt_connection_traffic_bytes_total")
@@ -240,15 +240,15 @@ func TestE2EMultiNodeCluster(t *testing.T) {
 			// Verify NO result has a "direction" label
 			for _, r := range result.Data.Result {
 				if _, hasDirection := r.Metric["direction"]; hasDirection {
-					t.Fatalf("❌ Metric has 'direction' label (should not exist with TC egress-only tracking)")
+					t.Fatalf("Metric has 'direction' label (should not exist with TC egress-only tracking)")
 				}
 			}
 
 			t.Log("")
-			t.Log("✅ TC Egress-Only Architecture Validated")
-			t.Log("   ✓ No direction label in metrics (egress-only tracking)")
-			t.Log("   ✓ TC hooks attached only to egress (no ingress)")
-			t.Log("   ✓ Interface deduplication via if_index_first_seen")
+			t.Log("TC Egress-Only Architecture Validated")
+			t.Log("   No direction label in metrics (egress-only tracking)")
+			t.Log("   TC hooks attached only to egress (no ingress)")
+			t.Log("   Interface deduplication via if_index_first_seen")
 			t.Log("═══════════════════════════════════════════════════════════")
 			return ctx
 		}).Feature()
@@ -293,7 +293,7 @@ func TestE2EPrometheusCardinality(t *testing.T) {
 				t.Fatalf("Cardinality check failed: %v", err)
 			}
 
-			t.Logf("✓ Metric cardinality is below limit of %d", maxCardinality)
+			t.Logf("Metric cardinality is below limit of %d", maxCardinality)
 			return ctx
 		}).Feature()
 

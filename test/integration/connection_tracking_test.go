@@ -125,7 +125,7 @@ func TestConnectionTracking(t *testing.T) {
 	require.True(t, ok, "total_connections_seen should be uint64")
 	assert.Greater(t, totalSeen, uint64(0), "Should have tracked at least one connection")
 
-	t.Log("✓ Connection tracking pipeline validated successfully")
+	t.Log("Connection tracking pipeline validated successfully")
 }
 
 // TestConnectionCleanup tests the read-then-delete pattern
@@ -203,7 +203,7 @@ func TestConnectionCleanup(t *testing.T) {
 	assert.Error(t, err, "Entry should have been deleted during collection cycle")
 	assert.ErrorIs(t, err, ebpf.ErrKeyNotExist, "Error should be ErrKeyNotExist")
 
-	t.Log("✓ Read-then-delete pattern working correctly")
+	t.Log("Read-then-delete pattern working correctly")
 }
 
 // TestHighVolumeConnections tests handling of many connections
@@ -439,7 +439,7 @@ func TestIPv6Connections(t *testing.T) {
 	assert.NotEmpty(t, srcIP, "Source IPv6 should be formatted")
 	assert.NotEmpty(t, dstIP, "Destination IPv6 should be formatted")
 
-	t.Logf("✓ IPv6 connection handled correctly: %s -> %s", srcIP, dstIP)
+	t.Logf("IPv6 connection handled correctly: %s -> %s", srcIP, dstIP)
 
 	// Cleanup
 	err = connMap.Delete(&testKey)
@@ -583,7 +583,7 @@ func TestMetricValueAssertions(t *testing.T) {
 	assert.GreaterOrEqual(t, actualTotalPackets, float64(expectedTotalPackets),
 		"Total packets should include at least our test traffic")
 
-	t.Log("✓ Metric value assertions validated")
+	t.Log("Metric value assertions validated")
 }
 
 // TestCgroupTracking tests that cgroup ID is captured correctly
@@ -640,7 +640,7 @@ func TestCgroupTracking(t *testing.T) {
 	assert.Equal(t, testStats.Bytes, retrievedStats.Bytes, "Bytes should match")
 	assert.Equal(t, testStats.Packets, retrievedStats.Packets, "Packets should match")
 
-	t.Logf("✓ Cgroup ID tracking validated: cgroup_id=%d", retrievedStats.CgroupID)
+	t.Logf("Cgroup ID tracking validated: cgroup_id=%d", retrievedStats.CgroupID)
 
 	// Cleanup
 	err = connMap.Delete(&testKey)
@@ -760,12 +760,12 @@ func TestMapOverflow(t *testing.T) {
 		assert.Greater(t, overflowCount, 0,
 			"Should have overflow events when exceeding map capacity")
 
-		t.Logf("✓ Map overflow handled correctly: %d in map, %d overflowed to ringbuffer",
+		t.Logf("Map overflow handled correctly: %d in map, %d overflowed to ringbuffer",
 			mapEntryCount, overflowCount)
 	} else {
 		// No overflow expected
 		assert.Equal(t, numConnections, insertedCount,
 			"Should insert all connections without overflow")
-		t.Log("✓ Map handled burst traffic correctly (no overflow)")
+		t.Log("Map handled burst traffic correctly (no overflow)")
 	}
 }

@@ -219,7 +219,7 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
     </style>
 </head>
 <body>
-    <h1>🚀 KubeAdapt eBPF Network Metrics Agent</h1>
+    <h1>KubeAdapt eBPF Network Metrics Agent</h1>
 
     <div class="info">
         <h2>Status</h2>
@@ -238,16 +238,16 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
     <div class="info">
         <h2>Endpoints</h2>
         <div class="metric">
-            <a href="/metrics">📊 /metrics</a> - Prometheus metrics
+            <a href="/metrics">/metrics</a> - Prometheus metrics
         </div>
         <div class="metric">
-            <a href="/health">🏥 /health</a> - Combined health status
+            <a href="/health">/health</a> - Combined health status
         </div>
         <div class="metric">
-            <a href="/health/live">💓 /health/live</a> - Liveness probe
+            <a href="/health/live">/health/live</a> - Liveness probe
         </div>
         <div class="metric">
-            <a href="/health/ready">✅ /health/ready</a> - Readiness probe
+            <a href="/health/ready">/health/ready</a> - Readiness probe
         </div>
     </div>
 

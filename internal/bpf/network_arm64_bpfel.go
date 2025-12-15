@@ -54,7 +54,7 @@ type networkSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type networkProgramSpecs struct {
-	TcEgress *ebpf.ProgramSpec `ebpf:"tc_egress"`
+	TcIngress *ebpf.ProgramSpec `ebpf:"tc_ingress"`
 }
 
 // networkMapSpecs contains maps before they are loaded into the kernel.
@@ -121,12 +121,12 @@ type networkVariables struct {
 //
 // It can be passed to loadNetworkObjects or ebpf.CollectionSpec.LoadAndAssign.
 type networkPrograms struct {
-	TcEgress *ebpf.Program `ebpf:"tc_egress"`
+	TcIngress *ebpf.Program `ebpf:"tc_ingress"`
 }
 
 func (p *networkPrograms) Close() error {
 	return _NetworkClose(
-		p.TcEgress,
+		p.TcIngress,
 	)
 }
 
