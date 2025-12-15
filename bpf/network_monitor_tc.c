@@ -15,7 +15,6 @@
 // - IPv6 parsing uses bpf_skb_load_bytes() instead of direct packet pointer
 //   arithmetic. This avoids BPF verifier precision tracking limitations with
 //   variable offsets through loop iterations (IPv6 extension header parsing).
-//   This pattern is inspired by Cilium's ctx_load_bytes() approach.
 // ───────────────────────────────────────────────────────────────────────────
 
 // Standard kernel type definitions
@@ -280,7 +279,6 @@ static __always_inline __u32 ipv6_authlen(const struct ipv6_opt_hdr *opthdr) {
 // packet pointer arithmetic. bpf_skb_load_bytes() performs bounds checking
 // internally, avoiding the verifier's precision tracking limitations.
 //
-// Inspired by Cilium's ctx_load_bytes() pattern for kernel compatibility.
 //
 // Parameters:
 //   - skb: pointer to __sk_buff (needed for bpf_skb_load_bytes)
@@ -838,24 +836,25 @@ static __always_inline void update_stats(struct connection_key *key,
 
 // ===== TC HOOK PROGRAM =====
 
-// TC Egress Hook (packets leaving the interface)
+// TC Ingress Hook (packets entering the host from pods - POD EGRESS)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CLASSIC TC ATTACHMENT:
 // - Uses netlink.FilterReplace (classic TC API) for Linux 5.8+ compatibility
-// - Section name "classifier/egress" is for classic TC (not TCX)
-// - Attached to clsact qdisc egress hook on all network interfaces
+// - Section name "classifier/ingress" is for classic TC (not TCX)
+// - Attached to clsact qdisc ingress hook on VETH interfaces only
 //
-// EGRESS-ONLY TRACKING:
-// This is the ONLY TC hook we attach (no ingress). This automatically prevents:
-// - Same-node Pod-to-Pod duplication (only sender tracked)
-// - Cross-node duplication (receiver never tracked)
-//
-// Interface deduplication (veth → docker0 → eth0) is handled by update_stats()
-// using if_index_first_seen to count packets only from the first interface.
+// POD EGRESS TRACKING (veth TC INGRESS):
+// - veth TC INGRESS = traffic from Pod TO Host = POD EGRESS
+// - Captures original Pod IP (before SNAT/masquerading)
+// - Only attaches to veth* interfaces (skips eth0, cni0, docker0)
+// This correctly captures:
+// - src_ip = Pod IP (original, pre-SNAT)
+// - dst_ip = Destination (external or another pod)
+// - direction = POD EGRESS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SEC("classifier/egress")
-int tc_egress(struct __sk_buff *skb) {
-  // ✅ NETWORK NAMESPACE FILTERING - Skip host traffic
+SEC("classifier/ingress")
+int tc_ingress(struct __sk_buff *skb) {
+  // Network namespace filtering - skip host traffic
   if (is_host_network_namespace_tc(skb)) {
     return TC_ACT_OK; // Skip host processes and optionally hostNetwork pods
   }
@@ -886,20 +885,25 @@ int tc_egress(struct __sk_buff *skb) {
 
 // ===== PROGRAM ATTACHMENT NOTES =====
 //
-// EGRESS-ONLY ARCHITECTURE:
-// This TC program (tc_egress) is attached ONLY to egress hooks using classic
-// TC attachment (netlink.FilterReplace) in loader.go. There is NO ingress hook,
-// which automatically prevents bidirectional duplication.
+// INGRESS-ONLY ARCHITECTURE (VETH ONLY):
+// This TC program (tc_ingress) is attached ONLY to INGRESS hooks on VETH interfaces
+// using classic TC attachment (netlink.FilterReplace) in loader.go.
+//
+// Why INGRESS on VETH = POD EGRESS:
+// - veth pair: pod side (eth0) ←→ host side (veth*)
+// - veth TC INGRESS = packets FROM pod TO host = POD EGRESS traffic
+// - Captures original Pod IP before SNAT/masquerading
+// - This is what Cilium does with "from-container" programs
 //
 // Why Classic TC instead of TCX?
 // - TCX requires Linux 6.6+ (too new for many production clusters)
 // - Classic TC works on Linux 5.8+ (wider compatibility)
-// - Section name "classifier/egress" is compatible with classic TC
+// - Section name "classifier/ingress" is compatible with classic TC
 // - Full helper support (bpf_skb_cgroup_id, etc.)
 //
-// DEDUPLICATION STRATEGY:
-// - Pod-to-Pod (same node): Prevented by egress-only (only sender tracked)
-// - Cross-node: Prevented by egress-only (receiver never tracked)
-// - Multi-interface paths: Prevented by if_index_first_seen (handled in update_stats)
+// VETH-ONLY ATTACHMENT:
+// - Only attaches to veth* and lxc* interfaces (container veth pairs)
+// - Skips eth0, cni0, docker0, and other bridge/physical interfaces
+// - Prevents duplicate counting on bridge/physical interface paths
 
 char LICENSE[] SEC("license") = "GPL";

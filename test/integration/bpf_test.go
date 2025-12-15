@@ -21,6 +21,10 @@ func TestBPFManagerLoadAndAttach(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	// Ensure a veth interface exists for TC hook attachment
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
+
 	logger := zaptest.NewLogger(t)
 
 	// Create BPF manager
@@ -76,6 +80,9 @@ func TestBPFManagerConcurrentAccess(t *testing.T) {
 	if os.Getuid() != 0 {
 		t.Skip("Test requires root privileges")
 	}
+
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
 
 	logger := zaptest.NewLogger(t)
 

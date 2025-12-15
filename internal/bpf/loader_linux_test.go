@@ -30,9 +30,9 @@ func TestBPFProgramLoading(t *testing.T) {
 	require.NotNil(t, spec, "BPF spec should not be nil")
 
 	// Verify expected programs exist
-	// EGRESS-ONLY: Only tc_egress program exists (no tc_ingress)
-	require.Contains(t, spec.Programs, "tc_egress", "tc_egress program should exist")
-	require.NotContains(t, spec.Programs, "tc_ingress", "tc_ingress should NOT exist (egress-only architecture)")
+	// INGRESS-ONLY ON VETH: tc_ingress captures POD EGRESS traffic
+	require.Contains(t, spec.Programs, "tc_ingress", "tc_ingress program should exist")
+	require.NotContains(t, spec.Programs, "tc_egress", "tc_egress should NOT exist (ingress-only architecture)")
 
 	// Verify expected maps exist
 	require.Contains(t, spec.Maps, "connection_flows", "connection_flows map should exist")
@@ -47,9 +47,9 @@ func TestBPFProgramLoading(t *testing.T) {
 	defer coll.Close()
 
 	// Verify programs loaded
-	// EGRESS-ONLY: Only tc_egress program should be loaded
-	require.NotNil(t, coll.Programs["tc_egress"], "tc_egress program should be loaded")
-	require.Nil(t, coll.Programs["tc_ingress"], "tc_ingress should NOT be loaded (egress-only architecture)")
+	// INGRESS-ONLY ON VETH: tc_ingress captures POD EGRESS traffic
+	require.NotNil(t, coll.Programs["tc_ingress"], "tc_ingress program should be loaded")
+	require.Nil(t, coll.Programs["tc_egress"], "tc_egress should NOT be loaded (ingress-only architecture)")
 
 	// Verify maps loaded
 	require.NotNil(t, coll.Maps["connection_flows"], "connection_flows map should be loaded")
@@ -291,6 +291,10 @@ func TestEmptyMapIteration(t *testing.T) {
 // TestFilterModeMapInitialization tests network namespace filter mode configuration
 func TestFilterModeMapInitialization(t *testing.T) {
 	require.NoError(t, rlimit.RemoveMemlock())
+
+	// Ensure a veth interface exists for TC hook attachment
+	cleanupVeth := ensureTestVethExists(t)
+	defer cleanupVeth()
 
 	logger := zaptest.NewLogger(t)
 	manager, err := NewManager(logger)

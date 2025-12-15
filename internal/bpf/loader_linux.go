@@ -6,6 +6,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"strings"
 	"unsafe"
 
 	"github.com/cilium/ebpf"
@@ -155,14 +156,14 @@ func (m *Manager) LoadAndAttach(filterMode string) error {
 }
 
 // attachTCHooks attaches classic TC (Traffic Control) hooks to network interfaces
-// EGRESS-ONLY: Only attaches egress hooks to prevent double-counting
-// Cross-node and same-node deduplication handled automatically by egress-only capture
-// Note: This uses the classic TC attachment method compatible with SEC("classifier/egress")
+// INGRESS-ONLY ON VETH: Only attaches to veth interfaces' ingress hook for POD EGRESS capture
+// veth TC INGRESS = packets FROM pod TO host = POD EGRESS traffic
+// Note: This uses the classic TC attachment method compatible with SEC("classifier/ingress")
 func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
-	// Get egress program (ingress removed - egress-only tracking)
-	egressProg := coll.Programs["tc_egress"]
-	if egressProg == nil {
-		return fmt.Errorf("tc_egress program not found")
+	// Get ingress program (changed from egress to ingress for POD EGRESS capture)
+	ingressProg := coll.Programs["tc_ingress"]
+	if ingressProg == nil {
+		return fmt.Errorf("tc_ingress program not found")
 	}
 
 	// Get all network interfaces
@@ -179,6 +180,15 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 		// Skip loopback interface
 		if iface.Name == "lo" {
 			m.logger.Debug("Skipping loopback interface", zap.String("interface", iface.Name))
+			continue
+		}
+
+		// CRITICAL: Only attach to veth interfaces (container veth pairs)
+		// Skip bridge interfaces (cni0, docker0) and physical interfaces (eth0, ens*)
+		// This prevents duplicate counting on bridge/physical paths
+		if !strings.HasPrefix(iface.Name, "veth") && !strings.HasPrefix(iface.Name, "lxc") {
+			m.logger.Debug("Skipping non-veth interface",
+				zap.String("interface", iface.Name))
 			continue
 		}
 
@@ -214,24 +224,25 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 		m.logger.Debug("Clsact qdisc configured",
 			zap.String("interface", iface.Name))
 
-		// Attach egress filter ONLY (no ingress - prevents double-counting)
-		egressFilter := &netlink.BpfFilter{
+		// Attach INGRESS filter on VETH interfaces (captures POD EGRESS traffic)
+		// veth TC INGRESS = packets FROM pod TO host = POD EGRESS
+		ingressFilter := &netlink.BpfFilter{
 			FilterAttrs: netlink.FilterAttrs{
 				LinkIndex: iface.Index,
-				Parent:    netlink.HANDLE_MIN_EGRESS,
+				Parent:    netlink.HANDLE_MIN_INGRESS, // Changed from EGRESS to INGRESS
 				Handle:    1,
 				Protocol:  3, // ETH_P_ALL
 				Priority:  1,
 			},
-			Fd:           egressProg.FD(),
-			Name:         "tc_egress",
+			Fd:           ingressProg.FD(), // Changed from egressProg to ingressProg
+			Name:         "tc_ingress",     // Changed from tc_egress to tc_ingress
 			DirectAction: true,
 		}
 
 		// Use FilterReplace to atomically replace existing filters from crashed pods
 		// This prevents stale BPF programs from previous runs from remaining attached
-		if err := netlink.FilterReplace(egressFilter); err != nil {
-			m.logger.Warn("Failed to attach TC egress filter",
+		if err := netlink.FilterReplace(ingressFilter); err != nil {
+			m.logger.Warn("Failed to attach TC ingress filter",
 				zap.String("interface", iface.Name),
 				zap.Error(err))
 			continue
@@ -239,11 +250,11 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 
 		m.tcFilters = append(m.tcFilters, tcFilter{
 			link:      link,
-			filter:    egressFilter,
-			isIngress: false,
+			filter:    ingressFilter,
+			isIngress: true, // Changed from false to true
 		})
 
-		m.logger.Debug("Attached TC egress filter to interface",
+		m.logger.Debug("Attached TC ingress filter to veth interface (POD EGRESS capture)",
 			zap.String("interface", iface.Name),
 			zap.Int("index", iface.Index))
 	}

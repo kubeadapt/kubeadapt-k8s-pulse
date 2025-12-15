@@ -35,6 +35,11 @@ func TestConnectionTracking(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	// Ensure a veth interface exists for TC hook attachment
+	// In Docker/CI environments, no veth exists, so we create one for testing
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
+
 	// Set required environment variables for DaemonSet pod identity
 	os.Setenv("DAEMONSET_POD_UID", "test-pod-uid-12345")
 	os.Setenv("DAEMONSET_NODE_NAME", "test-node")
@@ -130,6 +135,9 @@ func TestConnectionCleanup(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
+
 	logger := zaptest.NewLogger(t)
 
 	// Create BPF manager
@@ -203,6 +211,9 @@ func TestHighVolumeConnections(t *testing.T) {
 	if os.Getuid() != 0 {
 		t.Skip("Test requires root privileges")
 	}
+
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
 
 	logger := zaptest.NewLogger(t)
 
@@ -364,6 +375,9 @@ func TestIPv6Connections(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
+
 	logger := zaptest.NewLogger(t)
 
 	// Create BPF manager
@@ -437,6 +451,9 @@ func TestMetricValueAssertions(t *testing.T) {
 	if os.Getuid() != 0 {
 		t.Skip("Test requires root privileges")
 	}
+
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
 
 	logger := zaptest.NewLogger(t)
 
@@ -575,6 +592,9 @@ func TestCgroupTracking(t *testing.T) {
 		t.Skip("Test requires root privileges")
 	}
 
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
+
 	logger := zaptest.NewLogger(t)
 
 	// Create BPF manager
@@ -634,6 +654,9 @@ func TestMapOverflow(t *testing.T) {
 	if os.Getuid() != 0 {
 		t.Skip("Test requires root privileges")
 	}
+
+	cleanupVeth := EnsureTestVethExists(t)
+	defer cleanupVeth()
 
 	// This test is designed to be run with BPF_MAP_SIZE=200 (set via make test-integration-overflow)
 	// It inserts 300-400 connections rapidly to trigger map overflow before the 25s collection cycle
