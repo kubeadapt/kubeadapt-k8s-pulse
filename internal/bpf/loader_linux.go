@@ -183,11 +183,17 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 			continue
 		}
 
-		// CRITICAL: Only attach to veth interfaces (container veth pairs)
+		// CRITICAL: Only attach to container veth interfaces
+		// Supported CNI interface naming conventions:
+		// - veth*: Standard Linux bridge CNI (Flannel, Calico bridge mode, etc.)
+		// - lxc*: LXC/LXD containers
+		// - eni*: AWS VPC CNI (EKS) - creates eniXXX@ifN interfaces
 		// Skip bridge interfaces (cni0, docker0) and physical interfaces (eth0, ens*)
 		// This prevents duplicate counting on bridge/physical paths
-		if !strings.HasPrefix(iface.Name, "veth") && !strings.HasPrefix(iface.Name, "lxc") {
-			m.logger.Debug("Skipping non-veth interface",
+		if !strings.HasPrefix(iface.Name, "veth") &&
+			!strings.HasPrefix(iface.Name, "lxc") &&
+			!strings.HasPrefix(iface.Name, "eni") {
+			m.logger.Debug("Skipping non-container interface",
 				zap.String("interface", iface.Name))
 			continue
 		}
@@ -254,7 +260,7 @@ func (m *Manager) attachTCHooks(coll *ebpf.Collection) error {
 			isIngress: true, // Changed from false to true
 		})
 
-		m.logger.Debug("Attached TC ingress filter to veth interface (POD EGRESS capture)",
+		m.logger.Debug("Attached TC ingress filter to container interface (POD EGRESS capture)",
 			zap.String("interface", iface.Name),
 			zap.Int("index", iface.Index))
 	}

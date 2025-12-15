@@ -78,12 +78,13 @@ func CreateTestVethPair(t *testing.T) (*VethPair, func()) {
 	}, cleanup
 }
 
-// EnsureTestVethExists creates a test veth pair if no veth interfaces exist
+// EnsureTestVethExists creates a test veth pair if no container interfaces exist
 // This is useful for running integration tests in environments without Kubernetes
+// Supported interface prefixes: veth (standard CNI), lxc (LXC/LXD), eni (AWS VPC CNI)
 func EnsureTestVethExists(t *testing.T) func() {
 	t.Helper()
 
-	// Check if any veth interface already exists
+	// Check if any container interface already exists
 	links, err := netlink.LinkList()
 	if err != nil {
 		t.Fatalf("Failed to list network interfaces: %v", err)
@@ -99,16 +100,20 @@ func EnsureTestVethExists(t *testing.T) func() {
 			t.Logf("Found existing lxc interface: %s", name)
 			return func() {} // No cleanup needed
 		}
+		if len(name) >= 3 && name[:3] == "eni" {
+			t.Logf("Found existing eni interface (AWS VPC CNI): %s", name)
+			return func() {} // No cleanup needed
+		}
 	}
 
-	// No veth found, create one for testing
-	t.Log("No veth interface found, creating test veth pair...")
+	// No container interface found, create one for testing
+	t.Log("No container interface found (veth/lxc/eni), creating test veth pair...")
 	_, cleanup := CreateTestVethPair(t)
 	return cleanup
 }
 
-// ListVethInterfaces returns all veth and lxc interfaces
-func ListVethInterfaces(t *testing.T) []string {
+// ListContainerInterfaces returns all container interfaces (veth, lxc, eni)
+func ListContainerInterfaces(t *testing.T) []string {
 	t.Helper()
 
 	links, err := netlink.LinkList()
@@ -116,18 +121,26 @@ func ListVethInterfaces(t *testing.T) []string {
 		t.Fatalf("Failed to list network interfaces: %v", err)
 	}
 
-	var veths []string
+	var interfaces []string
 	for _, link := range links {
 		name := link.Attrs().Name
 		if len(name) >= 4 && name[:4] == "veth" {
-			veths = append(veths, name)
+			interfaces = append(interfaces, name)
 		}
 		if len(name) >= 3 && name[:3] == "lxc" {
-			veths = append(veths, name)
+			interfaces = append(interfaces, name)
+		}
+		if len(name) >= 3 && name[:3] == "eni" {
+			interfaces = append(interfaces, name)
 		}
 	}
 
-	return veths
+	return interfaces
+}
+
+// ListVethInterfaces is an alias for ListContainerInterfaces for backward compatibility
+func ListVethInterfaces(t *testing.T) []string {
+	return ListContainerInterfaces(t)
 }
 
 // TestVethPairCreation tests that we can create veth pairs for testing

@@ -8,13 +8,14 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
-// ensureTestVethExists creates a test veth pair if no veth interfaces exist.
-// This is needed for tests that attach TC hooks, which require veth interfaces.
+// ensureTestVethExists creates a test veth pair if no container interfaces exist.
+// This is needed for tests that attach TC hooks, which require container interfaces.
+// Supported interface prefixes: veth (standard CNI), lxc (LXC/LXD), eni (AWS VPC CNI)
 // Returns a cleanup function that removes the created veth pair.
 func ensureTestVethExists(t *testing.T) func() {
 	t.Helper()
 
-	// Check if any veth interface already exists
+	// Check if any container interface already exists
 	links, err := netlink.LinkList()
 	if err != nil {
 		t.Fatalf("Failed to list network interfaces: %v", err)
@@ -30,10 +31,14 @@ func ensureTestVethExists(t *testing.T) func() {
 			t.Logf("Found existing lxc interface: %s", name)
 			return func() {} // No cleanup needed
 		}
+		if len(name) >= 3 && name[:3] == "eni" {
+			t.Logf("Found existing eni interface (AWS VPC CNI): %s", name)
+			return func() {} // No cleanup needed
+		}
 	}
 
-	// No veth found, create one for testing
-	t.Log("No veth interface found, creating test veth pair...")
+	// No container interface found, create one for testing
+	t.Log("No container interface found (veth/lxc/eni), creating test veth pair...")
 	return createTestVethPair(t)
 }
 
