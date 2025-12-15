@@ -13,7 +13,6 @@ import (
 	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/rlimit"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -38,8 +37,6 @@ func TestBPFProgramLoading(t *testing.T) {
 	require.Contains(t, spec.Maps, "connection_flows", "connection_flows map should exist")
 	require.Contains(t, spec.Maps, "overflow_events", "overflow_events ringbuffer should exist")
 	require.Contains(t, spec.Maps, "global_counters", "global_counters map should exist")
-	require.Contains(t, spec.Maps, "filter_mode_map", "filter_mode_map should exist")
-	require.Contains(t, spec.Maps, "host_netns_map", "host_netns_map should exist")
 
 	// Load programs into kernel (this verifies BPF verifier acceptance)
 	coll, err := ebpf.NewCollection(spec)
@@ -286,39 +283,6 @@ func TestEmptyMapIteration(t *testing.T) {
 	}
 
 	require.Equal(t, 0, count, "Empty map should have zero entries")
-}
-
-// TestFilterModeMapInitialization tests network namespace filter mode configuration
-func TestFilterModeMapInitialization(t *testing.T) {
-	require.NoError(t, rlimit.RemoveMemlock())
-
-	// Ensure a veth interface exists for TC hook attachment
-	cleanupVeth := ensureTestVethExists(t)
-	defer cleanupVeth()
-
-	logger := zaptest.NewLogger(t)
-	manager, err := NewManager(logger)
-	require.NoError(t, err)
-
-	// Load BPF programs
-	err = manager.LoadAndAttach("default")
-	require.NoError(t, err)
-	defer manager.Close()
-
-	// Verify filter mode map exists and is accessible
-	filterModeMap := manager.collection.Maps["filter_mode_map"]
-	require.NotNil(t, filterModeMap)
-
-	// Read filter mode value
-	key := uint32(0)
-	var mode uint32
-	err = filterModeMap.Lookup(&key, &mode)
-	require.NoError(t, err)
-
-	// Should be set to default mode (0)
-	require.Equal(t, uint32(0), mode, "Filter mode should be default (0)")
-
-	logger.Info("Filter mode initialized correctly", zap.Uint32("mode", mode))
 }
 
 // TestConnectionKeyStructSize validates ConnectionKey struct alignment

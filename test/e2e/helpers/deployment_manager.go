@@ -20,9 +20,9 @@ import (
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
 )
 
-// DeploymentManager handles dynamic Prometheus and Agent deployments for filter mode testing
+// DeploymentManager handles dynamic Prometheus and Agent deployments for E2E testing
 // This enables coordinated deployment strategy where each test deploys fresh Prometheus + Agent
-// with specific filter mode configuration, ensuring clean metrics and proper isolation
+// ensuring clean metrics and proper isolation
 type DeploymentManager struct {
 	cfg *envconf.Config
 	r   *resources.Resources
@@ -57,10 +57,9 @@ func (dm *DeploymentManager) DeployPrometheus(ctx context.Context) error {
 	return dm.waitForPrometheusReady(ctx, 3*time.Minute)
 }
 
-// DeployAgentWithFilterMode deploys Agent DaemonSet with specific EBPF_NETNS_FILTER_MODE
-// This patches the base daemonset-e2e.yaml to inject the filter mode environment variable
-// and optionally overrides the image tag (from IMAGE_TAG env var) to prevent Docker cache issues
-func (dm *DeploymentManager) DeployAgentWithFilterMode(ctx context.Context, filterMode string) error {
+// DeployAgent deploys Agent DaemonSet from daemonset-e2e.yaml
+// Optionally overrides the image tag (from IMAGE_TAG env var) to prevent Docker cache issues
+func (dm *DeploymentManager) DeployAgent(ctx context.Context) error {
 	// Read daemonset-e2e.yaml
 	manifestPath := path.Join(testDataDir(), "daemonset-e2e.yaml")
 	data, err := os.ReadFile(manifestPath)
@@ -85,20 +84,10 @@ func (dm *DeploymentManager) DeployAgentWithFilterMode(ctx context.Context, filt
 	// Find and patch the DaemonSet
 	for _, obj := range objs {
 		if ds, ok := obj.(*appsv1.DaemonSet); ok {
-			// Patch: Add EBPF_NETNS_FILTER_MODE env var and override image tag
+			// Patch: Override image tag to prevent Docker caching issues
 			for i := range ds.Spec.Template.Spec.Containers {
 				if ds.Spec.Template.Spec.Containers[i].Name == "ebpf-agent" {
-					// Override image tag (FIX: Docker caching issue)
 					ds.Spec.Template.Spec.Containers[i].Image = imageRef
-
-					// Add filter mode env var
-					ds.Spec.Template.Spec.Containers[i].Env = append(
-						ds.Spec.Template.Spec.Containers[i].Env,
-						corev1.EnvVar{
-							Name:  "EBPF_NETNS_FILTER_MODE",
-							Value: filterMode,
-						},
-					)
 					break
 				}
 			}

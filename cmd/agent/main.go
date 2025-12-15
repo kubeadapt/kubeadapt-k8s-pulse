@@ -108,7 +108,7 @@ func main() {
 
 	// Load and attach BPF programs with timing
 	bpfLoadStart := time.Now()
-	if err := bpfManager.LoadAndAttach(cfg.NetnsFilterMode); err != nil {
+	if err := bpfManager.LoadAndAttach(); err != nil {
 		bpfLoadDuration := time.Since(bpfLoadStart)
 		// Don't use Fatal - keep metrics server alive for observability
 		logger.Error("Failed to load BPF programs",
@@ -124,7 +124,6 @@ func main() {
 	bpfLoadDuration := time.Since(bpfLoadStart)
 	metricsServer.ReportBPFLoadSuccess(bpfLoadDuration)
 	logger.Info("BPF programs loaded and attached successfully",
-		zap.String("netns_filter_mode", cfg.NetnsFilterMode),
 		zap.Duration("duration", bpfLoadDuration))
 
 	// NOTE: Container discovery and cache removed

@@ -11,7 +11,7 @@ The eBPF agent runs as a DaemonSet on each Kubernetes node, capturing network pa
 - **Pod-Level Traffic Tracking**: Monitors network traffic between pods using TC eBPF hooks
 - **Protocol Support**: TCP and UDP traffic with separate tracking
 - **IPv4 and IPv6 Support**: Full dual-stack support (kernel 5.10+)
-- **Egress-Only Tracking**: same-node and cross-node across pods
+- **Pod Egress Tracking**: TC ingress hooks on host interfaces capture pod-to-pod and cross-node traffic
 - **Multi-Interface Deduplication**: Prevents counting same packet across interface paths
 - **Overflow Protection**: Ringbuffer captures flows when map reaches capacity
 
@@ -58,7 +58,6 @@ Configuration via environment variables:
 | `EBPF_METRICS_PORT` | `9090` | Prometheus metrics server port |
 | `EBPF_COLLECTION_INTERVAL` | `25s` | Map reading interval |
 | `EBPF_CONNECTION_TRACKING` | `true` | Enable connection tracking |
-| `EBPF_NETNS_FILTER_MODE` | `default` | Network namespace filtering (`default` or `disabled`) |
 | `EBPF_LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
 | `EBPF_LOG_FORMAT` | `json` | Log format (json/console) |
 | `EBPF_DUMP_BPF_MAPS` | `false` | Dump BPF map contents for debugging |
@@ -103,7 +102,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 ```
 ebpf-agent/
 ├── bpf/
-│   └── network_monitor_tc.c    # eBPF TC egress hook program
+│   └── network_monitor_tc.c    # eBPF TC ingress hook program (captures pod egress)
 ├── cmd/agent/
 │   └── main.go                 # Agent entry point
 ├── internal/

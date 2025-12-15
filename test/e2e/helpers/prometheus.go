@@ -287,7 +287,7 @@ func (p *PrometheusClient) QueryCardinality(ctx context.Context, metricName stri
 }
 
 // GetMetricCardinality is a convenience wrapper for QueryCardinality that returns float64
-// This is used by filter mode comparison tests to measure and compare cardinality across modes
+// This is useful for measuring and comparing metric cardinality in tests
 func (p *PrometheusClient) GetMetricCardinality(ctx context.Context, metricName string) (float64, error) {
 	cardinality, err := p.QueryCardinality(ctx, metricName)
 	if err != nil {

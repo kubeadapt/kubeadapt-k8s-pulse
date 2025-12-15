@@ -62,9 +62,7 @@ type networkProgramSpecs struct {
 // It can be passed ebpf.CollectionSpec.Assign.
 type networkMapSpecs struct {
 	ConnectionFlows *ebpf.MapSpec `ebpf:"connection_flows"`
-	FilterModeMap   *ebpf.MapSpec `ebpf:"filter_mode_map"`
 	GlobalCounters  *ebpf.MapSpec `ebpf:"global_counters"`
-	HostNetnsMap    *ebpf.MapSpec `ebpf:"host_netns_map"`
 	OverflowEvents  *ebpf.MapSpec `ebpf:"overflow_events"`
 }
 
@@ -95,18 +93,14 @@ func (o *networkObjects) Close() error {
 // It can be passed to loadNetworkObjects or ebpf.CollectionSpec.LoadAndAssign.
 type networkMaps struct {
 	ConnectionFlows *ebpf.Map `ebpf:"connection_flows"`
-	FilterModeMap   *ebpf.Map `ebpf:"filter_mode_map"`
 	GlobalCounters  *ebpf.Map `ebpf:"global_counters"`
-	HostNetnsMap    *ebpf.Map `ebpf:"host_netns_map"`
 	OverflowEvents  *ebpf.Map `ebpf:"overflow_events"`
 }
 
 func (m *networkMaps) Close() error {
 	return _NetworkClose(
 		m.ConnectionFlows,
-		m.FilterModeMap,
 		m.GlobalCounters,
-		m.HostNetnsMap,
 		m.OverflowEvents,
 	)
 }

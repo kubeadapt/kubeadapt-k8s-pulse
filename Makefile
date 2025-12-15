@@ -501,7 +501,6 @@ endif
 
 # Development mode with bridge networking (macOS browser access)
 # This mode uses bridge networking to allow port mapping for localhost access
-# Trade-off: Cannot test disabled filter mode (requires host network mode)
 dev-bridge:
 ifdef IS_MACOS
 	@echo "$(GREEN)Starting development mode with bridge networking (macOS browser access)...$(NC)"
@@ -517,44 +516,32 @@ ifdef IS_MACOS
 	@echo "  • Health:    http://localhost:9090/health"
 	@echo "  • Profiling: http://localhost:6060/debug/pprof/"
 	@echo ""
-	@echo "$(YELLOW)Note: Only 'default' filter mode works in bridge mode$(NC)"
-	@echo "$(YELLOW)      Use 'make dev' + docker exec for disabled filter mode$(NC)"
-	@echo ""
 	@$(DOCKER) compose --profile dev-bridge up ebpf-dev-bridge
 else
 	@echo "$(YELLOW)Bridge mode is primarily for macOS. On Linux, use 'make dev' with host networking.$(NC)"
 	@$(DOCKER) compose --profile dev-bridge up ebpf-dev-bridge
 endif
 
-# Development mode with disabled filter mode (tracks systemd processes)
-# Requires host networking mode to capture host process traffic
-dev-disabled:
+# Development mode with host networking (captures all host interfaces)
+# Use this when you need to capture traffic from all network interfaces
+dev-host:
 ifdef IS_MACOS
-	@echo "$(GREEN)Starting development mode with DISABLED filter mode...$(NC)"
+	@echo "$(GREEN)Starting development mode with host networking...$(NC)"
 	@echo "$(YELLOW)Features enabled:$(NC)"
 	@echo "  ✓ Live reload with Air"
 	@echo "  ✓ Debug logging (text format)"
-	@echo "  ✓ DISABLED filter mode (tracks ALL traffic including systemd)"
-	@echo "  ✓ Host networking mode"
+	@echo "  ✓ Host networking mode (captures all interfaces)"
 	@echo ""
 	@echo "$(CYAN)Note: On macOS Docker Desktop:$(NC)"
-	@echo "  • Tracks Linux VM systemd processes (NOT macOS processes)"
+	@echo "  • Captures Linux VM traffic (NOT macOS processes)"
 	@echo "  • Access metrics via: docker exec kubeadapt-ebpf-dev curl localhost:9090/metrics"
 	@echo ""
-	@EBPF_NETNS_FILTER_MODE=disabled $(DOCKER) compose --profile dev up ebpf-dev
+	@$(DOCKER) compose --profile dev-host up ebpf-dev-host
 else
-	@echo "$(GREEN)Starting development mode with DISABLED filter mode...$(NC)"
-	@echo "$(YELLOW)Tracking ALL traffic (including host systemd, sshd, kubelet)$(NC)"
+	@echo "$(GREEN)Starting development mode with host networking...$(NC)"
+	@echo "$(YELLOW)Capturing ALL traffic (including host systemd, sshd, kubelet)$(NC)"
 	@echo ""
-	@EBPF_LOG_LEVEL=debug \
-	 EBPF_LOG_FORMAT=text \
-	 EBPF_NETNS_FILTER_MODE=disabled \
-	 EBPF_COLLECTION_INTERVAL=25s \
-	 EBPF_ENABLE_PROFILING=true \
-	 EBPF_PROFILING_PORT=6060 \
-	 EBPF_DUMP_BPF_MAPS=true \
-	 EBPF_DUMP_MAP_INTERVAL=30s \
-	 sudo -E air -c .air.toml
+	@$(DOCKER) compose --profile dev-host up ebpf-dev-host
 endif
 
 # Clean build artifacts

@@ -38,8 +38,8 @@ func TestBPFManagerLoadAndAttach(t *testing.T) {
 		}
 	}()
 
-	// Load and attach BPF programs (use "disabled" mode for tests to track all traffic)
-	if err := manager.LoadAndAttach("disabled"); err != nil {
+	// Load and attach BPF programs
+	if err := manager.LoadAndAttach(); err != nil {
 		t.Fatalf("Failed to load and attach BPF programs: %v", err)
 	}
 
@@ -92,7 +92,7 @@ func TestBPFManagerConcurrentAccess(t *testing.T) {
 	}
 	defer manager.Close()
 
-	if err := manager.LoadAndAttach("disabled"); err != nil {
+	if err := manager.LoadAndAttach(); err != nil {
 		t.Fatalf("Failed to load and attach BPF programs: %v", err)
 	}
 

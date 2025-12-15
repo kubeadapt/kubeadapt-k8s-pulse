@@ -51,7 +51,7 @@ const (
 	// - Restart and reinitialize
 	//
 	// Use this constant when testing:
-	// - Agent restarts (filter mode changes, configuration updates)
+	// - Agent restarts (configuration updates)
 	// - Resource cleanup behavior
 	// - Daemon lifecycle management
 	DaemonCleanupWaitTime = 15 * time.Second

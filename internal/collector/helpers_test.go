@@ -16,10 +16,12 @@ func TestProtocolToString(t *testing.T) {
 		protocol uint8
 		want     string
 	}{
+		{"ICMP", 1, "icmp"},
 		{"TCP", 6, "tcp"},
 		{"UDP", 17, "udp"},
-		{"Unknown", 1, "unknown(1)"},
+		{"ICMPv6", 58, "icmpv6"},
 		{"Unknown zero", 0, "unknown(0)"},
+		{"Unknown 255", 255, "unknown(255)"},
 	}
 
 	for _, tt := range tests {

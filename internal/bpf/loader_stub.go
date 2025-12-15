@@ -22,7 +22,7 @@ func NewManager(logger *zap.Logger) (*Manager, error) {
 }
 
 // LoadAndAttach returns an error on non-Linux platforms
-func (m *Manager) LoadAndAttach(filterMode string) error {
+func (m *Manager) LoadAndAttach() error {
 	return fmt.Errorf("eBPF is only supported on Linux")
 }
 
@@ -54,9 +54,4 @@ func (m *Manager) DumpMaps() (map[string]interface{}, error) {
 // Close does nothing on non-Linux platforms
 func (m *Manager) Close() error {
 	return nil
-}
-
-// InitializeHostNetnsMap returns an error on non-Linux platforms
-func (m *Manager) InitializeHostNetnsMap(filterMode string) error {
-	return fmt.Errorf("eBPF is only supported on Linux")
 }

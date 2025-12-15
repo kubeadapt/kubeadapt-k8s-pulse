@@ -39,7 +39,7 @@ type Manager struct {
 
 	// Maps for easy access
 	// TC implementation uses connection_flows for tracking, overflow_events for overflow events,
-	// and global_counters for observability. Network namespace filtering uses filter_mode_map.
+	// and global_counters for observability.
 	connectionFlows *ebpf.Map // Connection tracking map
 	overflowRingbuf *ebpf.Map // Overflow ringbuffer for flow records
 	globalCounters  *ebpf.Map // eBPF observability counters
@@ -77,8 +77,7 @@ func (m *Manager) getKernelVersionUint32() (uint32, error) {
 }
 
 // LoadAndAttach loads BPF programs and attaches them to kernel hooks
-// filterMode: Network namespace filtering mode ("default", "strict", or "disabled")
-func (m *Manager) LoadAndAttach(filterMode string) error {
+func (m *Manager) LoadAndAttach() error {
 	m.logger.Debug("Loading BPF objects")
 
 	// Load pre-compiled BPF programs
@@ -141,15 +140,6 @@ func (m *Manager) LoadAndAttach(filterMode string) error {
 	// Attach TC hooks for network monitoring
 	if err := m.attachTCHooks(coll); err != nil {
 		return fmt.Errorf("attaching TC hooks: %w", err)
-	}
-
-	// Initialize host network namespace filtering
-	// This MUST be called after BPF programs are loaded so the maps exist
-	if err := m.InitializeHostNetnsMap(filterMode); err != nil {
-		// Log warning but don't fail - BPF will use default mode (cgroup check)
-		m.logger.Warn("Failed to initialize network namespace filtering",
-			zap.Error(err),
-			zap.String("filter_mode", filterMode))
 	}
 
 	return nil

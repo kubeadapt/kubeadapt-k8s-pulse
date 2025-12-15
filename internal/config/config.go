@@ -26,17 +26,6 @@ type Config struct {
 	// ProcPath for host /proc filesystem access
 	ProcPath string `yaml:"proc_path" env:"EBPF_PROC_PATH" default:"/host/proc"`
 
-	// Network namespace filtering mode
-	// Controls which processes are tracked for network metrics
-	// EBPF_NETNS_FILTER_MODE: Network namespace filtering strategy
-	//   - "default": Track all Kubernetes pods (including hostNetwork:true like node-exporter)
-	//                Filter only host system processes (kubelet, containerd, sshd)
-	//                Uses simple cgroup check (cgroup_id != 1)
-	//                RECOMMENDED for most use cases
-	//   - "disabled": Track everything (no filtering at all)
-	//                 Useful for debugging - shows all network activity including host processes
-	NetnsFilterMode string `yaml:"netns_filter_mode" env:"EBPF_NETNS_FILTER_MODE" default:"default"`
-
 	// Connection tracking configuration (read-then-delete pattern with overflow ringbuffer)
 	ConnectionTracking bool `yaml:"connection_tracking" env:"EBPF_CONNECTION_TRACKING" default:"true"`
 
@@ -85,7 +74,6 @@ func (c *Config) setDefaults() {
 	c.MetricsPort = DefaultMetricsPort
 	c.CollectionInterval = DefaultCollectionInterval
 	c.ProcPath = DefaultProcPath
-	c.NetnsFilterMode = NetnsFilterModeDefault
 	c.ConnectionTracking = true
 	c.LogLevel = "info"
 	c.LogFormat = LogFormatJSON
@@ -129,11 +117,6 @@ func (c *Config) loadFromEnv() {
 	// ProcPath configuration
 	if v := os.Getenv("EBPF_PROC_PATH"); v != "" {
 		c.ProcPath = v
-	}
-
-	// Network namespace filtering
-	if v := os.Getenv("EBPF_NETNS_FILTER_MODE"); v != "" {
-		c.NetnsFilterMode = v
 	}
 
 	// Connection tracking configuration
@@ -183,15 +166,6 @@ func (c *Config) validate() error {
 	// Validate log level
 	if _, err := zapcore.ParseLevel(c.LogLevel); err != nil {
 		return fmt.Errorf("invalid log level: %s", c.LogLevel)
-	}
-
-	// Validate network namespace filter mode
-	switch c.NetnsFilterMode {
-	case NetnsFilterModeDefault, NetnsFilterModeDisabled:
-		// Valid modes
-	default:
-		return fmt.Errorf("invalid netns filter mode: %s (must be '%s' or '%s')",
-			c.NetnsFilterMode, NetnsFilterModeDefault, NetnsFilterModeDisabled)
 	}
 
 	// Validate profiling port if profiling is enabled
@@ -271,7 +245,6 @@ func (c *Config) String() string {
 	sb.WriteString("Configuration:\n")
 	sb.WriteString(fmt.Sprintf("  Metrics Port: %d\n", c.MetricsPort))
 	sb.WriteString(fmt.Sprintf("  Collection Interval: %s\n", c.CollectionInterval))
-	sb.WriteString(fmt.Sprintf("  Network Namespace Filter Mode: %s\n", c.NetnsFilterMode))
 	sb.WriteString(fmt.Sprintf("  Connection Tracking: %t\n", c.ConnectionTracking))
 	sb.WriteString(fmt.Sprintf("  Log Level: %s\n", c.LogLevel))
 	sb.WriteString(fmt.Sprintf("  Log Format: %s\n", c.LogFormat))

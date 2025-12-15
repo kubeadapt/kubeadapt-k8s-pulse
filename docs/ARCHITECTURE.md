@@ -8,9 +8,9 @@ This document provides detailed technical architecture information for the KubeA
 graph TB
     subgraph "Kubernetes Node"
         subgraph "Kernel Space (eBPF)"
-            TC_HOOKS["TC Hooks (EGRESS ONLY)<br/>━━━━━━━━━━━━━━━━<br/>- tc_egress (packets out)<br/>- No ingress hooks<br/><br/>Prevents double-counting:<br/>- Same-node Pod-to-Pod<br/>- Cross-node traffic"]
+            TC_HOOKS["TC Hooks (INGRESS)<br/>━━━━━━━━━━━━━━━━<br/>- tc_ingress on host interfaces<br/>- Captures pod egress traffic<br/><br/>Prevents double-counting:<br/>- Same-node Pod-to-Pod<br/>- Cross-node traffic"]
 
-            MAPS["BPF Maps<br/>━━━━━━━━━━━━━━━━<br/>connection_flows (HASH)<br/>overflow_events (RINGBUF)<br/>host_netns_map (filtering)"]
+            MAPS["BPF Maps<br/>━━━━━━━━━━━━━━━━<br/>connection_flows (HASH)<br/>overflow_events (RINGBUF)"]
 
             OVERFLOW["Overflow Handling<br/>━━━━━━━━━━━━━━━━<br/>Ringbuffer at capacity"]
         end
@@ -53,14 +53,14 @@ graph TB
 ```mermaid
 graph TB
     subgraph "Network Traffic Flow"
-        NET_IF["Network Interface<br/>(veth*, eth0)"]
+        NET_IF["Network Interface<br/>(eni*, veth*, eth0)"]
     end
 
     subgraph "Kernel Space - TC eBPF Programs"
         direction TB
 
-        subgraph "TC Hook Points (EGRESS ONLY)"
-            TC_OUT["tc_egress<br/>━━━━━━━━━━<br/>Packets leaving interface<br/>Parse headers<br/>Update connection stats<br/><br/>- No ingress hook<br/>- Prevents double-count"]
+        subgraph "TC Hook Points (INGRESS)"
+            TC_IN["tc_ingress<br/>━━━━━━━━━━<br/>Packets entering host interface<br/>= Pod egress traffic<br/>Parse headers<br/>Update connection stats<br/><br/>- Single hook point<br/>- Prevents double-count"]
         end
 
         subgraph "BPF Maps"
@@ -68,10 +68,6 @@ graph TB
             CONN_MAP["connection_flows<br/>━━━━━━━━━━<br/>HASH"]
 
             OVERFLOW["overflow_events<br/>━━━━━━━━━━<br/>RINGBUF"]
-
-            NETNS["host_netns_map<br/>━━━━━━━━━━<br/>ARRAY<br/>1 entry"]
-
-            FILTER["filter_mode_map<br/>━━━━━━━━━━<br/>ARRAY<br/>1 entry"]
         end
     end
 
@@ -81,9 +77,9 @@ graph TB
         EXPORT["Export Gauges"]
     end
 
-    NET_IF -->|"Egress Only"| TC_OUT
+    NET_IF -->|"Ingress (Pod Egress)"| TC_IN
 
-    TC_OUT --> CONN_MAP
+    TC_IN --> CONN_MAP
 
     CONN_MAP -->|"Map full"| OVERFLOW
 
@@ -91,7 +87,7 @@ graph TB
     READ --> AGG
     AGG --> EXPORT
 
-    style TC_OUT fill:#c0392b,stroke:#333,stroke-width:2px,color:#fff
+    style TC_IN fill:#c0392b,stroke:#333,stroke-width:2px,color:#fff
     style CONN_MAP fill:#16a085,stroke:#333,stroke-width:2px,color:#fff
     style OVERFLOW fill:#8e44ad,stroke:#333,stroke-width:2px,color:#fff
     style READ fill:#2980b9,stroke:#333,stroke-width:2px,color:#fff
@@ -146,16 +142,16 @@ BPF Kernel Maps         Userspace Collector      Prometheus Server
 ┌─────────────────────────────────────────────────────────────┐
 │ Step 1: Packet Arrives at Network Interface                 │
 │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
-│ TC hook (tc_egress ONLY) attached to interface             │
+│ TC ingress hook attached to host interface (eni*/veth*)    │
 │ → Parse Ethernet + IP + TCP/UDP headers                    │
 │ → Extract 5-tuple: src_ip, dst_ip, src_port, dst_port, proto│
 │ → Get packet size (IP header + payload)                    │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ Step 2: Traffic Tracked (Kernel Accumulation - EGRESS ONLY) │
+│ Step 2: Traffic Tracked (Kernel Accumulation - POD EGRESS)  │
 │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
-│ tc_egress: Packet leaving interface (1000 bytes)           │
+│ tc_ingress: Packet entering host interface (1000 bytes)    │
 │ → Lookup connection in map                                  │
 │ → Check if same interface (IfIndexFirstSeen dedup)         │
 │ → __sync_fetch_and_add(&stats->bytes, 1000)               │
@@ -163,7 +159,7 @@ BPF Kernel Maps         Userspace Collector      Prometheus Server
 │ → stats->last_seen_ns = now()                              │
 │                                                             │
 │ NOTE: Kernel maintains cumulative counters (never reset)   │
-│ NOTE: Egress-only prevents same-node & cross-node 2x count │
+│ NOTE: Single hook point prevents same-node & cross-node 2x │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -171,13 +167,13 @@ BPF Kernel Maps         Userspace Collector      Prometheus Server
 │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
 │ Iterate connection_flows map:                               │
 │   Key: {10.244.1.5:45678 → 10.244.1.6:80, TCP}            │
-│   Stats: {bytes: 5000, packets: 5} (egress only)           │
+│   Stats: {bytes: 5000, packets: 5} (pod egress)            │
 │                                                             │
 │ Aggregate by (src_ip, dst_ip, protocol):                   │
 │   Remove ports → (10.244.1.5, 10.244.1.6, TCP)            │
 │   Sum all connections with same IPs                        │
 │                                                             │
-│ Export Counter (cumulative - egress only):                 │
+│ Export Counter (cumulative - pod egress):                  │
 │   kubeadapt_connection_traffic_bytes_total{                │
 │     src_ip="10.244.1.5",                                   │
 │     dst_ip="10.244.1.6",                                   │

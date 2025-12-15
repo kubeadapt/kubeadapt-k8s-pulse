@@ -125,9 +125,9 @@ spec:
       targetPort: 80
       name: http
 ---
-# Test Pod D - hostNetwork:true pod for validating filter mode behavior
+# Test Pod D - hostNetwork:true pod for validating host network behavior
 # This pod uses the host's network namespace (hostNetwork: true)
-# Default filter mode should STILL track this pod correctly (cgroup-based filtering)
+# Agent should track this pod correctly even with host networking
 apiVersion: v1
 kind: Pod
 metadata:

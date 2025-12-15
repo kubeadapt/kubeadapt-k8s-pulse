@@ -51,8 +51,8 @@ func TestConnectionTracking(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load and attach BPF programs (use "disabled" mode for tests to track all traffic)
-	err = manager.LoadAndAttach("disabled")
+	// Load and attach BPF programs
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	// Create metrics registry
@@ -145,8 +145,8 @@ func TestConnectionCleanup(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load BPF programs (use "disabled" mode for tests)
-	err = manager.LoadAndAttach("disabled")
+	// Load BPF programs
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	// Create connection collector
@@ -222,8 +222,8 @@ func TestHighVolumeConnections(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	// Load BPF programs (use "disabled" mode for tests)
-	err = manager.LoadAndAttach("disabled")
+	// Load BPF programs
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	// Generate many connections
@@ -386,7 +386,7 @@ func TestIPv6Connections(t *testing.T) {
 	defer manager.Close()
 
 	// Load BPF programs
-	err = manager.LoadAndAttach("disabled")
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	connMap := manager.GetConnectionMap()
@@ -463,7 +463,7 @@ func TestMetricValueAssertions(t *testing.T) {
 	defer manager.Close()
 
 	// Load BPF programs
-	err = manager.LoadAndAttach("disabled")
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	// Create metrics registry
@@ -603,7 +603,7 @@ func TestCgroupTracking(t *testing.T) {
 	defer manager.Close()
 
 	// Load BPF programs
-	err = manager.LoadAndAttach("disabled")
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	connMap := manager.GetConnectionMap()
@@ -671,7 +671,7 @@ func TestMapOverflow(t *testing.T) {
 	require.NoError(t, err)
 	defer manager.Close()
 
-	err = manager.LoadAndAttach("disabled")
+	err = manager.LoadAndAttach()
 	require.NoError(t, err)
 
 	connMap := manager.GetConnectionMap()

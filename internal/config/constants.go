@@ -2,20 +2,6 @@ package config
 
 import "time"
 
-// Network namespace filter modes
-// These constants define how the eBPF agent filters network traffic
-const (
-	// NetnsFilterModeDefault tracks all Kubernetes pods (including hostNetwork:true)
-	// Filters only host system processes (kubelet, containerd, sshd)
-	// Uses simple cgroup check (cgroup_id != 1)
-	// RECOMMENDED for most use cases
-	NetnsFilterModeDefault = "default"
-
-	// NetnsFilterModeDisabled tracks everything (no filtering at all)
-	// Useful for debugging - shows all network activity including host processes
-	NetnsFilterModeDisabled = "disabled"
-)
-
 // Default port configurations
 const (
 	// DefaultMetricsPort is the HTTP port for Prometheus metrics and health checks

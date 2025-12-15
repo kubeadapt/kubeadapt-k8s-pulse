@@ -40,8 +40,6 @@ services:
       EBPF_COLLECTION_INTERVAL: 25s
       EBPF_PROC_PATH: /host/proc
       NODE_NAME: ${NODE_NAME:-local-dev}
-      # Network namespace filtering (default: track all K8s pods, filter host processes)
-      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
       # Optional debugging features
       # EBPF_ENABLE_PROFILING: true
       # EBPF_PROFILING_PORT: 6060
@@ -74,23 +72,9 @@ services:
         condition: service_completed_successfully
 
   # eBPF Agent Development service - with hot reload (TC implementation)
-  # DEFAULT MODE: Bridge networking with port mapping for browser access
+  # Bridge networking with port mapping for browser access
   #
-  # NETWORK MODE BEHAVIOR:
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Bridge Mode (DEFAULT):
-  #   ✅ Port mapping works - access from browser at http://localhost:9090
-  #   ✅ default filter mode works perfectly
-  #   ❌ disabled filter mode CANNOT capture systemd (only sees container's eth0)
-  #
-  # Host Mode (use ebpf-dev-host profile):
-  #   ✅ disabled filter mode works (sees all interfaces: docker0, br-*, etc.)
-  #   ✅ default filter mode works
-  #   ❌ No port mapping (Docker limitation) - must use docker exec curl
-  #
-  # To test disabled mode with host networking:
-  #   docker compose --profile dev-host up
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # NOTE: eBPF agent now captures ALL traffic (no namespace filtering).
   ebpf-dev:
     profiles: ["dev"]  # Only start with --profile dev or make dev
     build:
@@ -110,9 +94,6 @@ services:
       # DaemonSet pod identity (for Prometheus metric labels)
       DAEMONSET_POD_UID: dev-local-pod-12345-abcde
       DAEMONSET_NODE_NAME: docker-desktop-m1
-      # Network namespace filtering - default mode for bridge networking
-      # Bridge mode limitation: ONLY default mode works (disabled requires host mode)
-      EBPF_NETNS_FILTER_MODE: default
       # Enable profiling and BPF map dumping for development
       EBPF_ENABLE_PROFILING: true
       EBPF_PROFILING_PORT: 6060
@@ -137,14 +118,11 @@ services:
     #   - Health: http://localhost:9090/health
     #   - Profiling: http://localhost:6060/debug/pprof/
 
-  # eBPF Agent Development (Host Mode) - for testing disabled filter mode
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # Host mode attaches TC to multiple interfaces (eth0, services1, docker0, br-*)
-  # Required for disabled filter mode to capture systemd/host process traffic
+  # eBPF Agent Development (Host Mode) - captures all host interfaces
+  # Host mode attaches TC to multiple interfaces (eth0, docker0, br-*, etc.)
   #
   # Usage: docker compose --profile dev-host up
   # Access: docker exec kubeadapt-ebpf-dev-host curl localhost:9090/metrics
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ebpf-dev-host:
     profiles: ["dev-host"]
     build:
@@ -160,8 +138,6 @@ services:
       EBPF_LOG_FORMAT: text
       EBPF_COLLECTION_INTERVAL: 25s
       NODE_NAME: local-dev-host
-      # Configurable filter mode (default or disabled)
-      EBPF_NETNS_FILTER_MODE: ${EBPF_NETNS_FILTER_MODE:-default}
       EBPF_ENABLE_PROFILING: true
       EBPF_PROFILING_PORT: 6060
       EBPF_DUMP_BPF_MAPS: true
@@ -174,8 +150,7 @@ services:
       - /sys/kernel/debug:/sys/kernel/debug:rw
     working_dir: /workspace
     command: air -c .air.toml
-    # Note: Host mode prevents port mapping
-    # Test disabled mode: EBPF_NETNS_FILTER_MODE=disabled docker compose --profile dev-host up
+    # Note: Host mode prevents port mapping - use docker exec to access services
 
   # Prometheus for metrics collection (1-2h buffer before Go Agent polls)
   prometheus:

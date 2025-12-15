@@ -129,9 +129,8 @@ struct ipv6_frag_hdr {
 #define COUNTER_OVERFLOW_EVENTS 0
 #define COUNTER_RACE_CONDITIONS 1
 #define COUNTER_PARSE_ERRORS 2
-#define COUNTER_HOST_FILTERED 3
-#define COUNTER_IPV4_FRAGMENTS 4
-#define COUNTER_IPV6_FRAGMENTS 5
+#define COUNTER_IPV4_FRAGMENTS 3
+#define COUNTER_IPV6_FRAGMENTS 4
 #define MAX_COUNTERS 16
 
 // BPF map size (should match network_monitor.c)
@@ -207,28 +206,6 @@ struct {
   __uint(max_entries, 1 << 24); // 16MB (not 256KB!)
 } overflow_events SEC(".maps");
 
-// ===== NETWORK NAMESPACE FILTERING MAPS =====
-
-// Host network namespace inode (from /proc/1/ns/net)
-// Used in "strict" filtering mode for netns comparison
-struct {
-  __uint(type, BPF_MAP_TYPE_ARRAY);
-  __uint(key_size, sizeof(__u32));
-  __uint(value_size, sizeof(__u64));
-  __uint(max_entries, 1);
-} host_netns_map SEC(".maps");
-
-// Filter mode selection (populated by userspace from EBPF_NETNS_FILTER_MODE)
-// Key: always 0 (single entry map)
-// Value: filter mode
-//   0 = default  (track all K8s pods via cgroup check, filter host processes)
-//   1 = disabled (no filtering, track everything)
-struct {
-  __uint(type, BPF_MAP_TYPE_ARRAY);
-  __uint(key_size, sizeof(__u32));
-  __uint(value_size, sizeof(__u32));
-  __uint(max_entries, 1);
-} filter_mode_map SEC(".maps");
 
 // Global counters map (per-CPU for performance)
 struct {
@@ -676,60 +653,6 @@ static __always_inline __u64 get_cgroup_id(struct __sk_buff *skb) {
   return cgroup_id;
 }
 
-// NETWORK NAMESPACE FILTERING - TC Version
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Check if packet should be filtered (skipped) or tracked
-// Returns: true if should SKIP tracking, false if should TRACK
-//
-// CONFIGURABLE FILTERING MODES (set via EBPF_NETNS_FILTER_MODE):
-//
-// MODE 0 - "default" (RECOMMENDED):
-//   - Track: Pod-to-pod veth traffic (cross-namespace communication)
-//   - Filter: Host processes (kubelet, systemd, local sockets)
-//   - Method: Accept only cgroup_id == 0 (veth traffic where skb->sk = NULL)
-//
-// MODE 1 - "disabled":
-//   - Track: Everything (no filtering)
-//   - Filter: Nothing
-//
-static __always_inline int is_host_network_namespace_tc(struct __sk_buff *skb) {
-  // Get filter mode from map (populated by userspace)
-  __u32 key = 0;
-  __u32 *mode_ptr = bpf_map_lookup_elem(&filter_mode_map, &key);
-
-  // Default to MODE 0 if map not initialized
-  __u32 mode = mode_ptr ? *mode_ptr : 0;
-
-  // MODE 1: DISABLED - Track everything (no filtering)
-  if (mode == 1) {
-    return 0; // Never filter - track all traffic (0 = false)
-  }
-
-  // MODE 0: DEFAULT - Veth-based filtering for K8s pod traffic (RECOMMENDED)
-  // Track: Cross-namespace veth traffic (pod-to-pod communication)
-  // Filter: Host processes (kubelet, systemd services, local sockets)
-  //
-  // Technical explanation:
-  // - bpf_skb_cgroup_id(skb) returns cgroup ID from skb->sk (socket)
-  // - For veth traffic (pod-to-pod), skb->sk = NULL because socket is in
-  //   different namespace, so cgroup_id = 0
-  // - For host processes, skb->sk is valid, so cgroup_id > 0
-  //
-  // cgroup_id values:
-  //   0 = No socket (veth/cross-namespace) → THIS IS POD TRAFFIC WE WANT
-  //   1 = Root cgroup (kubelet, containerd) → Filter
-  //  >1 = Systemd services, containers with local sockets → Filter
-  __u64 cgroup_id = bpf_skb_cgroup_id(skb);
-
-  // Only accept veth traffic (cgroup_id == 0)
-  // This captures pod-to-pod traffic crossing namespace boundaries
-  if (cgroup_id != 0) {
-    increase_counter(COUNTER_HOST_FILTERED);
-    return 1; // Host process - skip tracking (1 = true)
-  }
-
-  return 0; // Veth traffic (pod-to-pod) - track it (0 = false)
-}
 
 // Update connection statistics with interface deduplication
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -854,10 +777,7 @@ static __always_inline void update_stats(struct connection_key *key,
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SEC("classifier/ingress")
 int tc_ingress(struct __sk_buff *skb) {
-  // Network namespace filtering - skip host traffic
-  if (is_host_network_namespace_tc(skb)) {
-    return TC_ACT_OK; // Skip host processes and optionally hostNetwork pods
-  }
+  // NOTE: No filtering here - eBPF collects ALL traffic
 
   struct connection_key key;
   __u64 bytes = 0;

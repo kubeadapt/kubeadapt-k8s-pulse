@@ -25,10 +25,6 @@ func TestLoad_Defaults(t *testing.T) {
 		t.Errorf("CollectionInterval = %v, expected %v", cfg.CollectionInterval, DefaultCollectionInterval)
 	}
 
-	if cfg.NetnsFilterMode != NetnsFilterModeDefault {
-		t.Errorf("NetnsFilterMode = %q, expected %q", cfg.NetnsFilterMode, NetnsFilterModeDefault)
-	}
-
 	if !cfg.ConnectionTracking {
 		t.Error("ConnectionTracking = false, expected true")
 	}
@@ -53,9 +49,6 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 	if err := os.Setenv("EBPF_COLLECTION_INTERVAL", "30s"); err != nil {
 		t.Fatalf("Failed to set EBPF_COLLECTION_INTERVAL: %v", err)
 	}
-	if err := os.Setenv("EBPF_NETNS_FILTER_MODE", "disabled"); err != nil {
-		t.Fatalf("Failed to set EBPF_NETNS_FILTER_MODE: %v", err)
-	}
 	if err := os.Setenv("EBPF_CONNECTION_TRACKING", "false"); err != nil {
 		t.Fatalf("Failed to set EBPF_CONNECTION_TRACKING: %v", err)
 	}
@@ -79,10 +72,6 @@ func TestLoad_EnvironmentOverrides(t *testing.T) {
 
 	if cfg.CollectionInterval != 30*time.Second {
 		t.Errorf("CollectionInterval = %v, expected 30s", cfg.CollectionInterval)
-	}
-
-	if cfg.NetnsFilterMode != "disabled" {
-		t.Errorf("NetnsFilterMode = %q, expected %q", cfg.NetnsFilterMode, "disabled")
 	}
 
 	if cfg.ConnectionTracking {
@@ -150,7 +139,6 @@ func TestLoad_FromFile(t *testing.T) {
 	configYAML := `
 metrics_port: 9091
 collection_interval: 20s
-netns_filter_mode: disabled
 connection_tracking: false
 log_level: warn
 dump_bpf_maps: true
@@ -175,10 +163,6 @@ dump_bpf_maps: true
 
 	if cfg.CollectionInterval != 20*time.Second {
 		t.Errorf("CollectionInterval = %v, expected 20s", cfg.CollectionInterval)
-	}
-
-	if cfg.NetnsFilterMode != "disabled" {
-		t.Errorf("NetnsFilterMode = %q, expected %q", cfg.NetnsFilterMode, "disabled")
 	}
 }
 
@@ -252,13 +236,6 @@ func TestValidate_InvalidValues(t *testing.T) {
 			name: "invalid log level",
 			setupFunc: func(c *Config) {
 				c.LogLevel = "invalid"
-			},
-			wantError: true,
-		},
-		{
-			name: "invalid netns filter mode",
-			setupFunc: func(c *Config) {
-				c.NetnsFilterMode = "invalid"
 			},
 			wantError: true,
 		},
@@ -448,7 +425,6 @@ func clearTestEnv(t *testing.T) {
 		"EBPF_METRICS_PORT",
 		"EBPF_COLLECTION_INTERVAL",
 		"EBPF_PROC_PATH",
-		"EBPF_NETNS_FILTER_MODE",
 		"EBPF_CONNECTION_TRACKING",
 		"EBPF_LOG_LEVEL",
 		"EBPF_LOG_FORMAT",
