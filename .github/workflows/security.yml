@@ -40,7 +40,7 @@ jobs:
           retention-days: 7
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -75,7 +75,7 @@ jobs:
           docker build -t ebpf-agent:scan-test .
 
       - name: Scan container image with Trivy
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: 'ebpf-agent:scan-test'
           scan-type: 'image'
@@ -92,7 +92,7 @@ jobs:
           category: 'container-image-scan'
 
       - name: Scan container image (table output for PR comment)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: 'ebpf-agent:scan-test'
           scan-type: 'image'
