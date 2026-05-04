@@ -1,0 +1,181 @@
+services:
+  # BPF Builder service - for compiling TC BPF programs on macOS
+  bpf-builder:
+    image: kubeadapt/bpf-builder:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.bpf-builder
+    container_name: kubeadapt-bpf-builder
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >-
+      bash -c "
+      echo 'Building TC BPF programs...' &&
+      cd internal/bpf &&
+      bpf2go -go-package bpf -cc clang-14
+      -cflags '-O2 -Wall -Werror'
+      -target amd64,arm64
+      network ../../bpf/network_monitor_tc.c &&
+      echo 'TC BPF programs built successfully!'
+      "
+
+  # eBPF Agent service - Production configuration with TC hooks
+  ebpf-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
+    container_name: kubeadapt-ebpf-agent
+    privileged: true  # Required for eBPF
+    # NO network_mode: host - use bridge for macOS browser access (host mode only needed in K8s)
+    pid: host  # Required to access host processes
+    environment:
+      # Configuration
+      EBPF_METRICS_PORT: 9090
+      EBPF_LOG_LEVEL: ${LOG_LEVEL:-info}
+      EBPF_LOG_FORMAT: json
+      EBPF_COLLECTION_INTERVAL: 25s
+      EBPF_PROC_PATH: /host/proc
+      NODE_NAME: ${NODE_NAME:-local-dev}
+      # Optional debugging features
+      # EBPF_ENABLE_PROFILING: true
+      # EBPF_PROFILING_PORT: 6060
+      # EBPF_DUMP_BPF_MAPS: true
+    volumes:
+      # Mount host filesystem for container discovery
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Mount BPF filesystem
+      - /sys/fs/bpf:/sys/fs/bpf:rw
+      - /sys/kernel/debug:/sys/kernel/debug:ro
+    cap_add:
+      - SYS_ADMIN  # Required for BPF operations
+      - NET_ADMIN  # Required for network operations
+      - SYS_RESOURCE  # Required for resource limits
+      - BPF  # Required for BPF operations (kernel 5.8+)
+      - PERFMON  # Required for performance monitoring (kernel 5.8+)
+    restart: unless-stopped
+    ports:
+      - "9090:9090"  # Metrics endpoint (accessible from macOS browser)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      bpf-builder:
+        condition: service_completed_successfully
+
+  # eBPF Agent Development service - with hot reload (TC implementation)
+  # Bridge networking with port mapping for browser access
+  #
+  # NOTE: eBPF agent now captures ALL traffic (no namespace filtering).
+  ebpf-dev:
+    profiles: ["dev"]  # Only start with --profile dev or make dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kubeadapt-ebpf-dev
+    privileged: true
+    # NO network_mode: host - use bridge mode for port mapping
+    pid: host
+    environment:
+      # Development configuration
+      EBPF_METRICS_PORT: 9090
+      EBPF_LOG_LEVEL: debug  # Auto-disables sampling
+      EBPF_LOG_FORMAT: text
+      EBPF_COLLECTION_INTERVAL: 25s
+      NODE_NAME: local-dev-bridge
+      # DaemonSet pod identity (for Prometheus metric labels)
+      DAEMONSET_POD_UID: dev-local-pod-12345-abcde
+      DAEMONSET_NODE_NAME: docker-desktop-m1
+      # Enable profiling and BPF map dumping for development
+      EBPF_ENABLE_PROFILING: true
+      EBPF_PROFILING_PORT: 6060
+      EBPF_DUMP_BPF_MAPS: true  # Enable for development debugging
+    volumes:
+      # Source code for hot reload
+      - .:/workspace
+      # Host filesystem
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # BPF filesystem
+      - /sys/fs/bpf:/sys/fs/bpf:rw
+      - /sys/kernel/debug:/sys/kernel/debug:rw
+    working_dir: /workspace
+    command: air -c .air.toml
+    ports:
+      - "9090:9090"  # Metrics endpoint
+      - "6060:6060"  # Profiling endpoint
+    # Services accessible at (macOS Chrome/Safari):
+    #   - Metrics: http://localhost:9090/metrics
+    #   - Health: http://localhost:9090/health
+    #   - Profiling: http://localhost:6060/debug/pprof/
+
+  # eBPF Agent Development (Host Mode) - captures all host interfaces
+  # Host mode attaches TC to multiple interfaces (eth0, docker0, br-*, etc.)
+  #
+  # Usage: docker compose --profile dev-host up
+  # Access: docker exec kubeadapt-ebpf-dev-host curl localhost:9090/metrics
+  ebpf-dev-host:
+    profiles: ["dev-host"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: kubeadapt-ebpf-dev-host
+    privileged: true
+    network_mode: host  # Required for disabled mode
+    pid: host
+    environment:
+      EBPF_METRICS_PORT: 9090
+      EBPF_LOG_LEVEL: debug  # Auto-disables sampling
+      EBPF_LOG_FORMAT: text
+      EBPF_COLLECTION_INTERVAL: 25s
+      NODE_NAME: local-dev-host
+      EBPF_ENABLE_PROFILING: true
+      EBPF_PROFILING_PORT: 6060
+      EBPF_DUMP_BPF_MAPS: true
+    volumes:
+      - .:/workspace
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/bpf:/sys/fs/bpf:rw
+      - /sys/kernel/debug:/sys/kernel/debug:rw
+    working_dir: /workspace
+    command: air -c .air.toml
+    # Note: Host mode prevents port mapping - use docker exec to access services
+
+  # Prometheus for metrics collection (1-2h buffer before Go Agent polls)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kubeadapt-prometheus
+    # NO network_mode: host - use bridge for macOS browser access
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9091:9090"  # Map to 9091 to avoid conflict with ebpf-agent:9090
+    depends_on:
+      - ebpf-agent
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+    driver: local
+
+networks:
+  default:
+    name: kubeadapt
+    driver: bridge

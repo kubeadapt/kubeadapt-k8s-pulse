@@ -1,0 +1,50 @@
+# KubeAdapt eBPF Agent RBAC for E2E Tests
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeadapt-ebpf-agent
+  namespace: kubeadapt-system
+  labels:
+    app.kubernetes.io/name: kubeadapt
+    app.kubernetes.io/component: ebpf-agent
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubeadapt-ebpf-agent
+  labels:
+    app.kubernetes.io/name: kubeadapt
+    app.kubernetes.io/component: ebpf-agent
+rules:
+  # Pod information for connection-to-pod correlation
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Node information for host network correlation
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # Namespace information for filtering
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
+  # Service information for service-level metrics
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubeadapt-ebpf-agent
+  labels:
+    app.kubernetes.io/name: kubeadapt
+    app.kubernetes.io/component: ebpf-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubeadapt-ebpf-agent
+subjects:
+  - kind: ServiceAccount
+    name: kubeadapt-ebpf-agent
+    namespace: kubeadapt-system

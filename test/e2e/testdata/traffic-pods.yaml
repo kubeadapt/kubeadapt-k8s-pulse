@@ -1,0 +1,270 @@
+# Traffic generation pods for E2E testing
+# These pods are used to generate network traffic with proper zone labels
+# for validating cross-AZ and same-AZ traffic detection
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: traffic-test
+---
+# Traffic Generator Pod A - Zone us-west-2a
+# Used as source for cross-zone traffic testing
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traffic-gen-a
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-a
+    zone: us-west-2a
+    traffic-role: source
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2a
+  tolerations:
+    # Allow scheduling on control-plane node
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+  containers:
+    - name: generator
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
+      # Install curl and other tools for traffic generation
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl wget netcat-openbsd &&
+          nginx -g 'daemon off;'
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+---
+# Service for Traffic Generator A
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-gen-a-svc
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-a
+spec:
+  selector:
+    app: traffic-gen-a
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP
+---
+# Traffic Generator Pod B - Zone us-west-2b (different from A)
+# Used as destination for cross-zone traffic and source for same-zone traffic
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traffic-gen-b
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-b
+    zone: us-west-2b
+    traffic-role: destination
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2b
+  containers:
+    - name: generator
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl wget netcat-openbsd &&
+          nginx -g 'daemon off;'
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+---
+# Service for Traffic Generator B
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-gen-b-svc
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-b
+spec:
+  selector:
+    app: traffic-gen-b
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP
+---
+# Traffic Generator Pod C - Zone us-west-2b (same zone as B)
+# Used as destination for same-zone traffic testing
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traffic-gen-c
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-c
+    zone: us-west-2b
+    traffic-role: destination
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2b
+  containers:
+    - name: generator
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl wget netcat-openbsd &&
+          nginx -g 'daemon off;'
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+---
+# Service for Traffic Generator C
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-gen-c-svc
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-c
+spec:
+  selector:
+    app: traffic-gen-c
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP
+---
+# Traffic Generator Pod D - Zone us-west-2b (same zone as B and C for same-AZ testing)
+# Used as additional source/destination for same-zone traffic testing
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traffic-gen-d
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-d
+    zone: us-west-2b
+    traffic-role: destination
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-west-2b
+  containers:
+    - name: generator
+      image: nginx:alpine
+      ports:
+        - containerPort: 80
+          name: http
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "500m"
+        limits:
+          memory: "128Mi"
+          cpu: "2000m"
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          apk add --no-cache curl wget netcat-openbsd &&
+          nginx -g 'daemon off;'
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 10
+---
+# Service for Traffic Generator D
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-gen-d-svc
+  namespace: traffic-test
+  labels:
+    app: traffic-gen-d
+spec:
+  selector:
+    app: traffic-gen-d
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  type: ClusterIP

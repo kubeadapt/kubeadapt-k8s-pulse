@@ -63,5 +63,6 @@
     "assignees": ["ugurcancaykara"]
   },
   "ignoreDeps": [],
+  "ignorePaths": ["vendor/**"],
   "customManagers": []
 }

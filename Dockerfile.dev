@@ -1,0 +1,78 @@
+# Development image with hot reload support
+# Based on the builder stage with added development tools
+
+FROM golang:1.25-bookworm
+
+# Install BPF compilation and development dependencies
+RUN apt-get update && apt-get install -y \
+    clang-14 \
+    llvm-14 \
+    libbpf-dev \
+    linux-headers-generic \
+    make \
+    gcc \
+    git \
+    ca-certificates \
+    iproute2 \
+    curl \
+    vim \
+    htop \
+    bpftool \
+    # Additional debugging tools for local testing and troubleshooting
+    tcpdump \
+    net-tools \
+    strace \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go development tools
+RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.19.0 && \
+    go install github.com/air-verse/air@latest && \
+    go install github.com/go-delve/delve/cmd/dlv@latest && \
+    go install golang.org/x/tools/cmd/goimports@latest && \
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+WORKDIR /workspace
+
+# Create air configuration if it doesn't exist (fallback - workspace .air.toml preferred)
+RUN cat > /tmp/.air.toml <<'EOF'
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main ./cmd/agent"
+  delay = 1000
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "docs", ".git"]
+  exclude_file = []
+  exclude_regex = ["_test.go", "_bpfel.go", "_bpfeb.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = "./tmp/main"
+  include_dir = []
+  include_ext = ["go", "tpl", "tmpl", "html", "c", "h"]
+  kill_delay = "0s"
+  log = "build-errors.log"
+  send_interrupt = false
+  stop_on_error = true
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  time = true
+
+[misc]
+  clean_on_exit = false
+EOF
+
+# Expose metrics port
+EXPOSE 9090
+
+# Default command for development
+CMD ["air", "-c", "/tmp/.air.toml"]

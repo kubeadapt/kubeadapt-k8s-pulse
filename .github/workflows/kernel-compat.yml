@@ -1,0 +1,156 @@
+name: Kernel Compatibility Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.c'
+      - '**.h'
+      - 'bpf/**'
+      - 'internal/bpf/**'
+      - 'Dockerfile.bpf-builder'
+      - '.github/workflows/kernel-compat.yml'
+
+jobs:
+  build-ebpf-artifacts:
+    name: Build eBPF Artifacts
+    if: github.actor != 'renovate[bot]' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      - name: Build BPF generator image (with cache)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ./Dockerfile.bpf-builder
+          tags: ebpf-generator:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Generate and build with BPF generator
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            bash -c "make generate-native && make build"
+
+      - name: Package artifacts
+        run: |
+          tar czf /tmp/ebpf-agent-build.tar.gz \
+            internal/ \
+            bin/ \
+            bpf/ \
+            cmd/ \
+            go.mod \
+            go.sum
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: ebpf-agent-build
+          path: /tmp/ebpf-agent-build.tar.gz
+          retention-days: 5
+
+  kernel-compatibility:
+    name: Test eBPF on ${{ matrix.kernel }}
+    needs: build-ebpf-artifacts
+    if: github.actor != 'renovate[bot]' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kernel:
+          - '5.10-20250623.013300'
+          - '5.15-20250623.013300'
+          - '6.1-20250623.013300'
+          - '6.6-20250623.013300'
+          - 'bpf-next-20251008.075427'
+          - 'rhel8.9-20250616.013250'
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: ebpf-agent-build
+
+      - name: Extract build artifacts
+        run: tar xzf ebpf-agent-build.tar.gz
+
+      - name: Test eBPF loading on kernel
+        uses: cilium/little-vm-helper@ad43ff511dd5365a0011ae9f864ec959c36daebf # v0.0.28
+        env:
+          KERNEL_VERSION: ${{ matrix.kernel }}
+        with:
+          test-name: ebpf-kernel-test
+          image: kind
+          image-version: ${{ matrix.kernel }}
+          host-mount: .
+          cpu: 2
+          mem: 4G
+          install-dependencies: 'true'
+          cmd: |
+            set -euxo pipefail
+            cd /host
+            echo "=== Kernel Information ==="
+            uname -r
+            echo ""
+            echo "=== Verifying eBPF Support ==="
+            mount | grep bpf || echo "BPF not mounted"
+            ls -la /sys/fs/bpf/ || true
+            echo ""
+            echo "=== Testing eBPF Program (IPv4 + IPv6 dual-stack) ==="
+            # Use case statement to avoid variable expansion issues in SSH heredoc
+            # CRITICAL: All $VAR references must be escaped as \$VAR
+            # The cmd block is sent via SSH heredoc - unescaped $ expands on host runner, not in VM
+            case "\$(uname -m)" in
+              x86_64)
+                BPF_OBJ="internal/bpf/network_x86_bpfel.o"
+                ;;
+              aarch64)
+                BPF_OBJ="internal/bpf/network_arm64_bpfel.o"
+                ;;
+              *)
+                echo "Unsupported architecture: \$(uname -m)"
+                exit 1
+                ;;
+            esac
+            echo "Detected architecture: \$(uname -m)"
+            echo "Using eBPF object: \$BPF_OBJ"
+            ls -lh "\$BPF_OBJ"
+            echo ""
+            echo "Loading TC eBPF program through verifier..."
+            # Note: pipefail is set, so bpftool failure propagates through tee
+            if bpftool prog load "\$BPF_OBJ" /sys/fs/bpf/kubeadapt_test type classifier 2>&1 | tee /tmp/bpftool.log; then
+              echo "✓ TC eBPF program passed verifier"
+              echo ""
+              echo "=== Loaded Programs ==="
+              bpftool prog show pinned /sys/fs/bpf/kubeadapt_test || true
+              rm -f /sys/fs/bpf/kubeadapt_test
+            else
+              echo "✗ eBPF program failed verifier"
+              echo ""
+              echo "=== Verifier Output ==="
+              cat /tmp/bpftool.log
+              echo ""
+              echo "=== Kernel Messages ==="
+              dmesg | tail -50 | grep -i "bpf\|verifier" || echo "No BPF messages"
+              exit 1
+            fi
+            echo ""
+            echo "✅ Kernel compatibility verified (IPv4 + IPv6)"
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: kernel-test-results-${{ matrix.kernel }}
+          path: |
+            /var/log/messages
+            /var/log/kern.log
+          retention-days: 5

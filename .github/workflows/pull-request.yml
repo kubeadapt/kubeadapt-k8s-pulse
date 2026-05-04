@@ -1,0 +1,108 @@
+name: Pull Request - Fast Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '**.c'
+      - '**.h'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'Dockerfile.bpf-builder'
+      - '.github/workflows/pull-request.yml'
+
+jobs:
+  fast-checks:
+    name: Lint, Unit Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Setup Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
+        with:
+          go-version: '1.25'
+          cache: true  # Enable Go module caching
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      # Build BPF generator image with GitHub Actions cache
+      # This cached image will be reused across all PR checks and runs
+      - name: Build BPF generator image (with cache)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ./Dockerfile.bpf-builder
+          tags: ebpf-generator:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      # Generate BPF binaries before running tests
+      # Since .o files are no longer committed to repo, we generate them in CI
+      - name: Generate BPF binaries
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make generate-native
+
+      # Run linting in the generator container for consistency
+      - name: Run lint (Go + C code)
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make lint
+
+      # Run unit tests in the generator container
+      # --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
+      - name: Run unit tests
+        run: |
+          docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make test
+
+      # Run tests with race detector (catches concurrency bugs)
+      # --privileged required for BPF loader tests (CAP_BPF/CAP_SYS_ADMIN)
+      - name: Run unit tests with race detector
+        run: |
+          docker run --rm --privileged -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            bash -c "go test -race -mod vendor ./internal/... ./cmd/..."
+
+      # Generate test coverage report
+      - name: Generate coverage report
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make test-coverage
+
+      # Exclude generated code from coverage
+      - name: Exclude generated code from coverage
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace \
+            ebpf-generator:latest \
+            make cov-exclude-generated
+
+      # NOTE: "Check clean generate" step removed
+      # BPF binaries (.o files) are now generated in CI during build, not committed to repo
+      # This ensures consistent builds with IPv4+IPv6 dual-stack support
+
+      # Verify that go.mod and go.sum are in sync
+      # Catches dependency drift and ensures reproducible builds
+      - name: Check clean vendors
+        run: make check-vendors
+
+      # Upload coverage to Codecov
+      - name: Report coverage
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
+        with:
+          files: ./coverage.out
+          flags: unittests
+          fail_ci_if_error: false
+          verbose: true
+        continue-on-error: true

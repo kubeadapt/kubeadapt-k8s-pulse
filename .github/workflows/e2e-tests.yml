@@ -1,0 +1,118 @@
+name: Pull Request - E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '**.c'
+      - '**.h'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'Dockerfile'
+      - 'test/e2e/**'
+      - 'test/integration/**'
+      - '.github/workflows/e2e-tests.yml'
+
+jobs:
+  integration-tests:
+    name: Integration Tests (Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Setup Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      - name: Build BPF builder image (with cache)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ./Dockerfile.bpf-builder
+          tags: kubeadapt/bpf-builder:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Run integration tests in Docker
+        run: make test-integration-docker
+
+  e2e-tests:
+    name: E2E Tests (Kind Cluster)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Setup Go
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6
+        with:
+          go-version: '1.25'
+          cache: true
+
+      # Install clang-format for C code linting
+      # E2E tests run on host (not in container) because Kind cluster needs Docker access
+      # make test-e2e-ci -> build-for-e2e -> lint -> requires clang-format
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-14
+          sudo ln -sf /usr/bin/clang-format-14 /usr/bin/clang-format
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      - name: Build BPF builder image (with cache)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        with:
+          context: .
+          file: ./Dockerfile.bpf-builder
+          tags: kubeadapt/bpf-builder:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      # Generate BPF binaries before E2E tests
+      # Uses BPF_MAP_SIZE=1000 for overflow testing
+      - name: Generate BPF binaries for E2E tests
+        run: |
+          docker run --rm -v "$(pwd)":/workspace -w /workspace \
+            -e BPF_MAP_SIZE=1000 \
+            kubeadapt/bpf-builder:latest \
+            make generate-native
+
+      - name: Run E2E tests (CI mode - no BPF restoration)
+        run: make test-e2e-ci-nobpf
+        # Makefile target handles:
+        # - Building image with BPF_MAP_SIZE=1000 (enables overflow testing)
+        # - Creating Kind cluster (requires Docker on host)
+        # - Loading image to Kind
+        # - Running all E2E tests
+        # - NO BPF restoration (CI is stateless)
+        # - Cleanup
+
+      - name: Export Kind cluster logs
+        if: always()
+        run: |
+          CLUSTER_NAME=$(kind get clusters 2>/dev/null | head -n1 || echo "")
+          if [ ! -z "$CLUSTER_NAME" ]; then
+            kind export logs e2e-logs --name "$CLUSTER_NAME" || true
+          fi
+
+      - name: Upload E2E test logs
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        if: always()
+        with:
+          name: e2e-logs
+          path: e2e-logs
+          retention-days: 7

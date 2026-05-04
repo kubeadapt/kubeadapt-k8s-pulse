@@ -1,0 +1,9 @@
+# KubeAdapt eBPF Agent Namespace for E2E Tests
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeadapt-system
+  labels:
+    app.kubernetes.io/name: kubeadapt
+    app.kubernetes.io/component: ebpf-agent
+    app.kubernetes.io/part-of: kubeadapt

@@ -1,48 +1,56 @@
-# Go build artifacts
-build/
+# Binaries
+bin/
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
+ebpf-agent
+agent
+ebpf-agent.tar
 
-# Test binary, built with `go test -c`
+# BPF compiled objects
+# NOTE: All .o files are generated in CI, not committed to repo
+# This ensures consistent builds for both IPv4-only and IPv6 variants
+*.o
+bpf/output/
+
+# Test binaries
 *.test
 
-# Output of the go coverage tool
+# Coverage files
 *.out
-coverage/
+coverage.html
+coverage.txt
+*.cov
 
 # Dependency directories
-vendor/
+# vendor/ - committed for reproducible CI builds
 
-# Go workspace file
-go.work
+# IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
 
 # Environment files
 .env
 .env.local
 .env.*.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test results
-results
+# Debug files
 *.log
+debug
 
-# Todo files
-todo*
+# Temporary files
+tmp/
+temp/
+*.tmp
 
-# E2E test logs
-tests/e2e/e2e-logs/
+# Docker volumes
+prometheus-data/
+grafana-data/
 
-bin
+# Air (live reload) temp files
+.air.toml.tmp

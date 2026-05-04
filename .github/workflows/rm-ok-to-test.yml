@@ -1,0 +1,59 @@
+name: Remove ok-to-test Label
+
+# Automatically remove "ok-to-test" label when PR is updated
+# This ensures maintainers must re-review code before rebuilding PR image
+# Security: Prevents malicious code from sneaking in after approval
+
+on:
+  pull_request_target:
+    types:
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  remove-label:
+    name: Remove ok-to-test Label
+    if: contains(github.event.pull_request.labels.*.name, 'ok-to-test')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove ok-to-test label
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1
+        with:
+          labels: ok-to-test
+          fail_on_error: false
+
+      - name: Comment on PR about label removal
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          EVENT_TYPE: ${{ github.event.action }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { PR_NUMBER, EVENT_TYPE } = process.env;
+            const eventText = EVENT_TYPE === 'synchronize' ? 'New commits pushed' : 'PR reopened';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🔄 Label Removed: \`ok-to-test\`
+
+            **Reason:** ${eventText}
+
+            The \`ok-to-test\` label has been automatically removed because the PR code changed.
+
+            ### ⚠️ For Maintainers
+            If you want to rebuild the PR image with the latest changes:
+            1. Review the new commits carefully
+            2. If safe, re-add the \`ok-to-test\` label
+            3. A new PR image will be built automatically
+
+            ---
+            🔒 *This is a security measure to prevent unauthorized code from accessing secrets*
+            `
+            })

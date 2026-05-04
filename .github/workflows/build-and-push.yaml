@@ -1,0 +1,292 @@
+name: Build and Push eBPF Agent
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - 'v*.*.*'  # Trigger on version tags (main releases)
+
+permissions:
+  id-token: write
+  contents: write  # Needed for creating releases
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.image_tag.outputs.tag }}
+      is_release: ${{ steps.image_tag.outputs.is_release }}
+      registry_type: ${{ steps.registry_config.outputs.registry_type }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0  # Needed for git describe
+
+      - name: Determine Registry Configuration
+        id: registry_config
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/develop ]]; then
+            echo "registry_type=private" >> $GITHUB_OUTPUT
+            echo "🔒 Using PRIVATE ECR (develop branch)"
+          else
+            echo "registry_type=public" >> $GITHUB_OUTPUT
+            echo "🌐 Using PUBLIC ECR (main/release)"
+          fi
+
+      - name: Validate and Generate Image Tag
+        id: image_tag
+        run: |
+          is_release="false"
+
+          # Check if this is a tag push (release)
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+
+            # Validate tag format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2
+            if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+|-beta[0-9]+)?$ ]]; then
+              echo "❌ ERROR: '$tag' is NOT a valid release tag"
+              echo "Expected format: v1.2.3, v1.2.3-rc1, v1.2.3-beta2"
+              exit 1
+            fi
+
+            # Verify tag is on main branch
+            if ! git branch -r --contains "$GITHUB_SHA" | grep -q "origin/main"; then
+              echo "❌ ERROR: Tag '$tag' is not on main branch"
+              echo "Release tags must be created from the main branch"
+              exit 1
+            fi
+
+            echo "✅ '$tag' is a valid release tag on main branch"
+            is_release="true"
+          elif [[ "$GITHUB_REF" == refs/heads/develop ]]; then
+            # Develop branch: use dev-{short-sha}
+            tag="dev-${GITHUB_SHA::7}"
+            echo "Generated tag for develop branch: $tag"
+          else
+            echo "❌ ERROR: Unexpected ref '$GITHUB_REF'"
+            echo "This workflow only supports: develop branch or version tags (v*.*.*)"
+            exit 1
+          fi
+
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "is_release=$is_release" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=$tag" >> $GITHUB_ENV
+
+      # === PUBLIC ECR (main + releases) ===
+      - name: Configure AWS Credentials (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public'
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        if: steps.registry_config.outputs.registry_type == 'public'
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
+        with:
+          registry-type: public
+
+      # === PRIVATE ECR (develop) ===
+      - name: Configure AWS Credentials (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ secrets.AWS_PRIVATE_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_PRIVATE_REGION }}
+
+      - name: Login to Amazon ECR Private
+        if: steps.registry_config.outputs.registry_type == 'private'
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
+        with:
+          registry-type: private
+
+      - name: Set up QEMU for Multi-Arch Build
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
+
+      # === BUILD & PUSH: PUBLIC ECR ===
+      - name: Build and Push Multi-Arch Image (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public'
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Building multi-arch image for platforms: linux/amd64,linux/arm64"
+          echo "Using ECR Public registry: public.ecr.aws/${ECR_REPO}"
+
+          docker buildx build \
+            --file ./Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --tag public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} \
+            --cache-from type=registry,ref=public.ecr.aws/${ECR_REPO}:buildcache \
+            --cache-to type=registry,ref=public.ecr.aws/${ECR_REPO}:buildcache,mode=max \
+            --push \
+            --provenance=false \
+            .
+
+      # === BUILD & PUSH: PRIVATE ECR ===
+      - name: Build and Push Multi-Arch Image (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        env:
+          ECR_REPO: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Building multi-arch image for platforms: linux/amd64,linux/arm64"
+          echo "Using ECR Private registry: ${ECR_REPO}"
+
+          docker buildx build \
+            --file ./Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${ECR_REPO}:${IMAGE_TAG} \
+            --cache-from type=registry,ref=${ECR_REPO}:buildcache \
+            --cache-to type=registry,ref=${ECR_REPO}:buildcache,mode=max \
+            --push \
+            --provenance=false \
+            .
+
+      - name: Tag as Latest (Public ECR)
+        if: steps.registry_config.outputs.registry_type == 'public' && steps.image_tag.outputs.is_release == 'true'
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Tagging as latest..."
+          docker buildx imagetools create \
+            --tag public.ecr.aws/${ECR_REPO}:latest \
+            public.ecr.aws/${ECR_REPO}:${IMAGE_TAG}
+
+      - name: Tag as Latest (Private ECR)
+        if: steps.registry_config.outputs.registry_type == 'private'
+        env:
+          ECR_REPO: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          echo "Tagging as dev-latest..."
+          docker buildx imagetools create \
+            --tag ${ECR_REPO}:dev-latest \
+            ${ECR_REPO}:${IMAGE_TAG}
+
+      - name: Extract Binaries from Docker Image
+        if: steps.image_tag.outputs.is_release == 'true'
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+        run: |
+          mkdir -p release-assets
+
+          # Extract binaries for each architecture from the multi-arch image
+          for arch in amd64 arm64; do
+            echo "Extracting binary for linux/$arch..."
+
+            # Create a container from the specific platform variant
+            container_id=$(docker create --platform linux/$arch \
+              public.ecr.aws/${ECR_REPO}:${IMAGE_TAG})
+
+            # Copy the binary out
+            docker cp $container_id:/usr/local/bin/ebpf-agent \
+              release-assets/ebpf-agent-linux-$arch
+
+            # Cleanup
+            docker rm $container_id
+
+            echo "✓ Extracted ebpf-agent-linux-$arch"
+          done
+
+          ls -lh release-assets/
+
+      # Generate SBOM for supply chain security (release only)
+      # Note: upload-release-assets: false because we attach via softprops/action-gh-release
+      - name: Generate SBOM (SPDX format)
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: anchore/sbom-action@43a17d6e7add2b5535efe4dcae9952337c479a93 # v0
+        with:
+          image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+          format: spdx-json
+          output-file: release-assets/sbom.spdx.json
+          artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.spdx.json
+          upload-release-assets: false
+
+      - name: Generate SBOM (CycloneDX format)
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: anchore/sbom-action@43a17d6e7add2b5535efe4dcae9952337c479a93 # v0
+        with:
+          image: public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+          format: cyclonedx-json
+          output-file: release-assets/sbom.cyclonedx.json
+          artifact-name: sbom-${{ steps.image_tag.outputs.tag }}.cyclonedx.json
+          upload-release-assets: false
+
+      - name: Create GitHub Release
+        if: steps.image_tag.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
+        with:
+          draft: false
+          prerelease: ${{ contains(steps.image_tag.outputs.tag, '-rc') || contains(steps.image_tag.outputs.tag, '-beta') }}
+          files: |
+            release-assets/ebpf-agent-linux-amd64
+            release-assets/ebpf-agent-linux-arm64
+            release-assets/sbom.spdx.json
+            release-assets/sbom.cyclonedx.json
+          body: |
+            ## KubeAdapt eBPF Agent ${{ steps.image_tag.outputs.tag }}
+
+            ### 🐳 Container Images
+            - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}`
+            - `public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:latest` (updated)
+
+            ### 📦 Binaries
+            Pre-built binaries for Linux amd64 and arm64 are attached to this release.
+
+            ### 🚀 Quick Start
+            ```bash
+            # Pull the container image
+            docker pull public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
+
+            # Or download the binary directly
+            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ steps.image_tag.outputs.tag }}/ebpf-agent-linux-amd64
+            chmod +x ebpf-agent-linux-amd64
+            ```
+
+      - name: Image Summary
+        env:
+          REGISTRY_TYPE: ${{ steps.registry_config.outputs.registry_type }}
+          ECR_REPO_PUBLIC: ${{ secrets.ECR_REPOSITORY_NAME }}
+          ECR_REPO_PRIVATE: ${{ secrets.ECR_PRIVATE_REPOSITORY_URL }}
+          IMAGE_TAG: ${{ steps.image_tag.outputs.tag }}
+          IS_RELEASE: ${{ steps.image_tag.outputs.is_release }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: |
+          echo "### 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${REGISTRY_TYPE}" == "public" ]]; then
+            echo "**Registry**: AWS ECR Public" >> $GITHUB_STEP_SUMMARY
+            echo "**Repository**: \`${ECR_REPO_PUBLIC}\`" >> $GITHUB_STEP_SUMMARY
+            echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "docker pull public.ecr.aws/${ECR_REPO_PUBLIC}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Registry**: AWS ECR Private (dev)" >> $GITHUB_STEP_SUMMARY
+            echo "**Repository**: \`${ECR_REPO_PRIVATE}\`" >> $GITHUB_STEP_SUMMARY
+            echo "**Pull Command**:" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "docker pull ${ECR_REPO_PRIVATE}:${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: \`${IMAGE_TAG}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms**: linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${IS_RELEASE}" == "true" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 GitHub Release" >> $GITHUB_STEP_SUMMARY
+            echo "Release created: https://github.com/${GITHUB_REPO}/releases/tag/${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+          fi

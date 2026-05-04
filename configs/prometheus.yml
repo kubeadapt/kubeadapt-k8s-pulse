@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Scrape the ebpf-agent service (used by make run-local)
+  # Uses Docker Compose service name for DNS resolution (bridge networking)
+  - job_name: 'ebpf-agent'
+    static_configs:
+      - targets: ['ebpf-agent:9090']  # Docker service name (bridge networking)
+        labels:
+          component: 'ebpf-agent'
+          environment: 'development'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
