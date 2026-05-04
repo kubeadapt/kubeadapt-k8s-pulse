@@ -189,13 +189,13 @@ jobs:
               public.ecr.aws/${ECR_REPO}:${IMAGE_TAG})
 
             # Copy the binary out
-            docker cp $container_id:/usr/local/bin/ebpf-agent \
-              release-assets/ebpf-agent-linux-$arch
+            docker cp $container_id:/usr/local/bin/kubeadapt-k8s-pulse \
+              release-assets/kubeadapt-k8s-pulse-linux-$arch
 
             # Cleanup
             docker rm $container_id
 
-            echo "✓ Extracted ebpf-agent-linux-$arch"
+            echo "✓ Extracted kubeadapt-k8s-pulse-linux-$arch"
           done
 
           ls -lh release-assets/
@@ -229,8 +229,8 @@ jobs:
           draft: false
           prerelease: ${{ contains(steps.image_tag.outputs.tag, '-rc') || contains(steps.image_tag.outputs.tag, '-beta') }}
           files: |
-            release-assets/ebpf-agent-linux-amd64
-            release-assets/ebpf-agent-linux-arm64
+            release-assets/kubeadapt-k8s-pulse-linux-amd64
+            release-assets/kubeadapt-k8s-pulse-linux-arm64
             release-assets/sbom.spdx.json
             release-assets/sbom.cyclonedx.json
           body: |
@@ -249,8 +249,8 @@ jobs:
             docker pull public.ecr.aws/${{ secrets.ECR_REPOSITORY_NAME }}:${{ steps.image_tag.outputs.tag }}
 
             # Or download the binary directly
-            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ steps.image_tag.outputs.tag }}/ebpf-agent-linux-amd64
-            chmod +x ebpf-agent-linux-amd64
+            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ steps.image_tag.outputs.tag }}/kubeadapt-k8s-pulse-linux-amd64
+            chmod +x kubeadapt-k8s-pulse-linux-amd64
             ```
 
       - name: Image Summary

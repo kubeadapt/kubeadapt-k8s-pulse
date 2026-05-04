@@ -79,14 +79,14 @@ func (dm *DeploymentManager) DeployAgent(ctx context.Context) error {
 	if imageTag == "" {
 		imageTag = "test" // Default fallback
 	}
-	imageRef := fmt.Sprintf("localhost/ebpf-agent:%s", imageTag)
+	imageRef := fmt.Sprintf("localhost/kubeadapt-k8s-pulse:%s", imageTag)
 
 	// Find and patch the DaemonSet
 	for _, obj := range objs {
 		if ds, ok := obj.(*appsv1.DaemonSet); ok {
 			// Patch: Override image tag to prevent Docker caching issues
 			for i := range ds.Spec.Template.Spec.Containers {
-				if ds.Spec.Template.Spec.Containers[i].Name == "ebpf-agent" {
+				if ds.Spec.Template.Spec.Containers[i].Name == "kubeadapt-k8s-pulse" {
 					ds.Spec.Template.Spec.Containers[i].Image = imageRef
 					break
 				}
@@ -100,7 +100,7 @@ func (dm *DeploymentManager) DeployAgent(ctx context.Context) error {
 	}
 
 	// Wait for DaemonSet to be ready
-	return dm.waitForDaemonSetReady(ctx, "kubeadapt-system", "kubeadapt-ebpf-agent", 3*time.Minute)
+	return dm.waitForDaemonSetReady(ctx, "kubeadapt-system", "kubeadapt-kubeadapt-k8s-pulse", 3*time.Minute)
 }
 
 // DeletePrometheus removes Prometheus deployment and all associated resources
@@ -187,7 +187,7 @@ func (dm *DeploymentManager) DeleteAgent(ctx context.Context) error {
 	// Delete DaemonSet
 	ds := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubeadapt-ebpf-agent",
+			Name:      "kubeadapt-kubeadapt-k8s-pulse",
 			Namespace: "kubeadapt-system",
 		},
 	}
@@ -198,7 +198,7 @@ func (dm *DeploymentManager) DeleteAgent(ctx context.Context) error {
 	// Delete Service
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kubeadapt-ebpf-agent",
+			Name:      "kubeadapt-kubeadapt-k8s-pulse",
 			Namespace: "kubeadapt-system",
 		},
 	}
@@ -207,7 +207,7 @@ func (dm *DeploymentManager) DeleteAgent(ctx context.Context) error {
 	}
 
 	// Wait for pods to terminate (max 1 minute)
-	return dm.waitForPodsGone(ctx, "kubeadapt-system", "app=kubeadapt-ebpf-agent", 1*time.Minute)
+	return dm.waitForPodsGone(ctx, "kubeadapt-system", "app=kubeadapt-kubeadapt-k8s-pulse", 1*time.Minute)
 }
 
 // waitForPrometheusReady waits for Prometheus deployment to be ready
@@ -277,7 +277,7 @@ func (dm *DeploymentManager) waitForPodsGone(ctx context.Context, namespace, lab
 			// Simple label matching (app label)
 			if app, ok := pod.Labels["app"]; ok {
 				if (labelSelector == "app=prometheus" && app == "prometheus") ||
-					(labelSelector == "app=kubeadapt-ebpf-agent" && app == "kubeadapt-ebpf-agent") {
+					(labelSelector == "app=kubeadapt-kubeadapt-k8s-pulse" && app == "kubeadapt-kubeadapt-k8s-pulse") {
 					matchingPods++
 				}
 			}

@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
   namespace: kubeadapt-system
   labels:
-    app: kubeadapt-ebpf-agent
+    app: kubeadapt-kubeadapt-k8s-pulse
     component: network-monitor
 spec:
   selector:
     matchLabels:
-      app: kubeadapt-ebpf-agent
+      app: kubeadapt-kubeadapt-k8s-pulse
   template:
     metadata:
       labels:
-        app: kubeadapt-ebpf-agent
+        app: kubeadapt-kubeadapt-k8s-pulse
         component: network-monitor
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9090"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: kubeadapt-ebpf-agent
+      serviceAccountName: kubeadapt-kubeadapt-k8s-pulse
       hostNetwork: true
       hostPID: true
       containers:
-      - name: ebpf-agent
-        image: localhost/ebpf-agent:test  # E2E test image loaded into Kind cluster
+      - name: kubeadapt-k8s-pulse
+        image: localhost/kubeadapt-k8s-pulse:test  # E2E test image loaded into Kind cluster
         imagePullPolicy: Never            # Use locally loaded image, don't pull
         env:
         # DaemonSet pod identity (for Prometheus metric labels)
@@ -176,13 +176,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
   namespace: kubeadapt-system
   labels:
-    app: kubeadapt-ebpf-agent
+    app: kubeadapt-kubeadapt-k8s-pulse
 spec:
   selector:
-    app: kubeadapt-ebpf-agent
+    app: kubeadapt-kubeadapt-k8s-pulse
   ports:
   - name: metrics
     port: 9090

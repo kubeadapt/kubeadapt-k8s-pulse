@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://github.com/kubeadapt/ebpf-agent/tree/main/docs
+    url: https://github.com/kubeadapt/kubeadapt-k8s-pulse/tree/main/docs
     about: Check out the documentation before opening an issue
   - name: Discussions
-    url: https://github.com/kubeadapt/ebpf-agent/discussions
+    url: https://github.com/kubeadapt/kubeadapt-k8s-pulse/discussions
     about: Ask questions and discuss ideas

@@ -9,11 +9,11 @@ tmp_dir = "tmp"
   # Build Go binary directly (BPF files already generated)
   # Skips generate+lint for faster hot reload
   # IMPORTANT: Does NOT run go generate - BPF files are pre-compiled
-  cmd = "mkdir -p bin && CGO_ENABLED=0 go build -v -o bin/ebpf-agent ./cmd/agent"
+  cmd = "mkdir -p bin && CGO_ENABLED=0 go build -v -o bin/kubeadapt-k8s-pulse ./cmd/agent"
   # Binary file yields from `cmd`.
-  bin = "bin/ebpf-agent"
+  bin = "bin/kubeadapt-k8s-pulse"
   # No sudo needed - container is already privileged
-  full_bin = "bin/ebpf-agent"
+  full_bin = "bin/kubeadapt-k8s-pulse"
   # Watch these filename extensions.
   # NOTE: Excludes .c and .h files - BPF programs are pre-compiled
   # If you change BPF C code, run `make generate` manually
@@ -41,7 +41,7 @@ tmp_dir = "tmp"
   send_interrupt = true
   # Delay after sending Interrupt signal
   kill_delay = 500 # ms
-  # Add additional arguments when running binary (bin/full_bin). Will run './bin/ebpf-agent $args'.
+  # Add additional arguments when running binary (bin/full_bin). Will run './bin/kubeadapt-k8s-pulse $args'.
   args_bin = []
 
 [color]

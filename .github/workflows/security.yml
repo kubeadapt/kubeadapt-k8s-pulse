@@ -72,12 +72,12 @@ jobs:
 
       - name: Build test image for scanning
         run: |
-          docker build -t ebpf-agent:scan-test .
+          docker build -t kubeadapt-k8s-pulse:scan-test .
 
       - name: Scan container image with Trivy
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: 'ebpf-agent:scan-test'
+          image-ref: 'kubeadapt-k8s-pulse:scan-test'
           scan-type: 'image'
           format: 'sarif'
           output: 'trivy-image.sarif'
@@ -94,7 +94,7 @@ jobs:
       - name: Scan container image (table output for PR comment)
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: 'ebpf-agent:scan-test'
+          image-ref: 'kubeadapt-k8s-pulse:scan-test'
           scan-type: 'image'
           format: 'table'
           severity: 'CRITICAL,HIGH,MEDIUM'

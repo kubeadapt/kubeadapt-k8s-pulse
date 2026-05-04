@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeadapt/ebpf-agent/internal/bpf"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/bpf"
 	"go.uber.org/zap/zaptest"
 )
 

@@ -23,10 +23,10 @@ import (
 )
 
 const (
-	agentContainerName = "localhost/ebpf-agent:test"
+	agentContainerName = "localhost/kubeadapt-k8s-pulse:test"
 	kindImage          = "kindest/node:v1.27.3"
 	logsSubDir         = "e2e-logs"
-	localArchiveName   = "ebpf-agent.tar"
+	localArchiveName   = "kubeadapt-k8s-pulse.tar"
 )
 
 // DeployOrder specifies the order in which a Deployment must be executed
@@ -107,7 +107,7 @@ func NewCluster(clusterName, baseDir string) *Cluster {
 				Order:        Agent,
 				ManifestFile: path.Join(testDataDir(), "daemonset-e2e.yaml"),
 				Ready: &Readiness{
-					Function:    waitForDaemonSetWithAllPods("kubeadapt-system", "kubeadapt-ebpf-agent"),
+					Function:    waitForDaemonSetWithAllPods("kubeadapt-system", "kubeadapt-kubeadapt-k8s-pulse"),
 					Description: "Wait for eBPF agent DaemonSet to be ready (all pods running)",
 					Timeout:     5 * time.Minute,
 					Retry:       3 * time.Second,

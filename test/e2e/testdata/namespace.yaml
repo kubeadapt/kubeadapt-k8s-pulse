@@ -5,5 +5,5 @@ metadata:
   name: kubeadapt-system
   labels:
     app.kubernetes.io/name: kubeadapt
-    app.kubernetes.io/component: ebpf-agent
+    app.kubernetes.io/component: kubeadapt-k8s-pulse
     app.kubernetes.io/part-of: kubeadapt

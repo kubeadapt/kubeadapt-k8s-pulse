@@ -15,7 +15,7 @@ Before you start, make sure you have:
 ```bash
 # Clone and setup
 git clone <repository-url>
-cd ebpf-agent
+cd kubeadapt-k8s-pulse
 
 # Initialize and build
 make quickstart
@@ -150,23 +150,23 @@ curl localhost:9090/health/live
 
 ```bash
 # Local
-docker-compose logs -f ebpf-agent
+docker-compose logs -f kubeadapt-k8s-pulse
 
 # Kubernetes
-kubectl logs -n kubeadapt -l app.kubernetes.io/name=ebpf-agent -f
+kubectl logs -n kubeadapt -l app.kubernetes.io/name=kubeadapt-k8s-pulse -f
 ```
 
 ### Debug BPF Programs
 
 ```bash
 # List loaded BPF programs
-docker-compose exec ebpf-agent bpftool prog list
+docker-compose exec kubeadapt-k8s-pulse bpftool prog list
 
 # Check BPF maps
-docker-compose exec ebpf-agent bpftool map list
+docker-compose exec kubeadapt-k8s-pulse bpftool map list
 
 # Dump map contents
-docker-compose exec ebpf-agent bpftool map dump id <map-id>
+docker-compose exec kubeadapt-k8s-pulse bpftool map dump id <map-id>
 ```
 
 ### Performance Profiling
@@ -187,7 +187,7 @@ go tool pprof mem.prof
 
 | Service | Purpose | Port |
 |---------|---------|------|
-| `ebpf-agent` | Main agent | 9090 |
+| `kubeadapt-k8s-pulse` | Main agent | 9090 |
 | `ebpf-dev` | Development with hot-reload | 9090 |
 | `bpf-builder` | BPF compilation | - |
 | `prometheus` | Metrics collection | 9091 |

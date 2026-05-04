@@ -43,7 +43,7 @@ jobs:
 
       - name: Package artifacts
         run: |
-          tar czf /tmp/ebpf-agent-build.tar.gz \
+          tar czf /tmp/kubeadapt-k8s-pulse-build.tar.gz \
             internal/ \
             bin/ \
             bpf/ \
@@ -54,8 +54,8 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: ebpf-agent-build
-          path: /tmp/ebpf-agent-build.tar.gz
+          name: kubeadapt-k8s-pulse-build
+          path: /tmp/kubeadapt-k8s-pulse-build.tar.gz
           retention-days: 5
 
   kernel-compatibility:
@@ -77,10 +77,10 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
-          name: ebpf-agent-build
+          name: kubeadapt-k8s-pulse-build
 
       - name: Extract build artifacts
-        run: tar xzf ebpf-agent-build.tar.gz
+        run: tar xzf kubeadapt-k8s-pulse-build.tar.gz
 
       - name: Test eBPF loading on kernel
         uses: cilium/little-vm-helper@ad43ff511dd5365a0011ae9f864ec959c36daebf # v0.0.28

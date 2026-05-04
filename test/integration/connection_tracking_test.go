@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/cilium/ebpf"
-	"github.com/kubeadapt/ebpf-agent/internal/bpf"
-	"github.com/kubeadapt/ebpf-agent/internal/collector"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/bpf"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/collector"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

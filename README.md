@@ -34,16 +34,16 @@ helm repo add kubeadapt https://kubeadapt.github.io/kubeadapt-helm
 helm repo update
 
 # Install the eBPF agent
-helm install kubeadapt-ebpf-agent kubeadapt/ebpf-agent \
+helm install kubeadapt-kubeadapt-k8s-pulse kubeadapt/kubeadapt-k8s-pulse \
   -n kubeadapt --create-namespace
 
 # Verify deployment
-kubectl get pods -n kubeadapt -l app.kubernetes.io/name=ebpf-agent
+kubectl get pods -n kubeadapt -l app.kubernetes.io/name=kubeadapt-k8s-pulse
 ```
 
-> **Note:** Using `kubeadapt-ebpf-agent` as the release name ensures the service name matches Prometheus scrape configurations.
+> **Note:** Using `kubeadapt-kubeadapt-k8s-pulse` as the release name ensures the service name matches Prometheus scrape configurations.
 
-For chart configuration options, see the [kubeadapt-helm repository](https://github.com/kubeadapt/kubeadapt-helm/tree/main/charts/ebpf-agent).
+For chart configuration options, see the [kubeadapt-helm repository](https://github.com/kubeadapt/kubeadapt-helm/tree/main/charts/kubeadapt-k8s-pulse).
 
 ### Local Development
 
@@ -100,7 +100,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 ## Project Structure
 
 ```
-ebpf-agent/
+kubeadapt-k8s-pulse/
 ├── bpf/
 │   └── network_monitor_tc.c    # eBPF TC ingress hook program (captures pod egress)
 ├── cmd/agent/

@@ -13,8 +13,8 @@ import (
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/ringbuf"
 	"github.com/cilium/ebpf/rlimit"
-	"github.com/kubeadapt/ebpf-agent/internal/config"
-	"github.com/kubeadapt/ebpf-agent/internal/system"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/config"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/system"
 	"github.com/vishvananda/netlink"
 	"go.uber.org/zap"
 )

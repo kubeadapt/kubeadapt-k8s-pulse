@@ -3,13 +3,13 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # Scrape the ebpf-agent service (used by make run-local)
+  # Scrape the kubeadapt-k8s-pulse service (used by make run-local)
   # Uses Docker Compose service name for DNS resolution (bridge networking)
-  - job_name: 'ebpf-agent'
+  - job_name: 'kubeadapt-k8s-pulse'
     static_configs:
-      - targets: ['ebpf-agent:9090']  # Docker service name (bridge networking)
+      - targets: ['kubeadapt-k8s-pulse:9090']  # Docker service name (bridge networking)
         labels:
-          component: 'ebpf-agent'
+          component: 'kubeadapt-k8s-pulse'
           environment: 'development'
     metrics_path: '/metrics'
     scrape_interval: 30s

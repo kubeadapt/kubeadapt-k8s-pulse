@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kubeadapt/ebpf-agent/test/e2e/cluster"
-	"github.com/kubeadapt/ebpf-agent/test/e2e/helpers"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/test/e2e/cluster"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/test/e2e/helpers"
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
 	"sigs.k8s.io/e2e-framework/pkg/features"
 )

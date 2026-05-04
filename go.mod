@@ -1,4 +1,4 @@
-module github.com/kubeadapt/ebpf-agent
+module github.com/kubeadapt/kubeadapt-k8s-pulse
 
 go 1.25.0
 

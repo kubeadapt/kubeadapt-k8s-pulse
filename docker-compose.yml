@@ -21,14 +21,14 @@ services:
       "
 
   # eBPF Agent service - Production configuration with TC hooks
-  ebpf-agent:
+  kubeadapt-k8s-pulse:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         VERSION: ${VERSION:-dev}
         BUILD_TIME: ${BUILD_TIME:-unknown}
-    container_name: kubeadapt-ebpf-agent
+    container_name: kubeadapt-kubeadapt-k8s-pulse
     privileged: true  # Required for eBPF
     # NO network_mode: host - use bridge for macOS browser access (host mode only needed in K8s)
     pid: host  # Required to access host processes
@@ -166,9 +166,9 @@ services:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
-      - "9091:9090"  # Map to 9091 to avoid conflict with ebpf-agent:9090
+      - "9091:9090"  # Map to 9091 to avoid conflict with kubeadapt-k8s-pulse:9090
     depends_on:
-      - ebpf-agent
+      - kubeadapt-k8s-pulse
     restart: unless-stopped
 
 volumes:

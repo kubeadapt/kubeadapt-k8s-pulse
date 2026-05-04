@@ -97,7 +97,7 @@ linters-settings:
     simplify: true
 
   goimports:
-    local-prefixes: github.com/kubeadapt/ebpf-agent
+    local-prefixes: github.com/kubeadapt/kubeadapt-k8s-pulse
 
   govet:
     enable-all: true

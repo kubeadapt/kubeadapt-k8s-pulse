@@ -11,11 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kubeadapt/ebpf-agent/internal/bpf"
-	"github.com/kubeadapt/ebpf-agent/internal/collector"
-	"github.com/kubeadapt/ebpf-agent/internal/config"
-	"github.com/kubeadapt/ebpf-agent/internal/metrics"
-	"github.com/kubeadapt/ebpf-agent/internal/system"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/bpf"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/collector"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/config"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/metrics"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/system"
 	"go.uber.org/zap"
 )
 

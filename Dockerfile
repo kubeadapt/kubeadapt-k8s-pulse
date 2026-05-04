@@ -93,7 +93,7 @@ COPY --from=bpf-generator /build/internal/bpf/network_*.o ./internal/bpf/
 # Build the Go binary for target platform
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-w -s -X main.Version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev') -X main.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    -o ebpf-agent \
+    -o kubeadapt-k8s-pulse \
     cmd/agent/main.go
 
 # ==============================================================================
@@ -110,7 +110,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy binary from builder
-COPY --from=builder /build/ebpf-agent /usr/local/bin/ebpf-agent
+COPY --from=builder /build/kubeadapt-k8s-pulse /usr/local/bin/kubeadapt-k8s-pulse
 
 # Create necessary directories
 RUN mkdir -p /sys/fs/bpf
@@ -125,4 +125,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Run as root (required for BPF operations)
 USER root
 
-ENTRYPOINT ["/usr/local/bin/ebpf-agent"]
+ENTRYPOINT ["/usr/local/bin/kubeadapt-k8s-pulse"]

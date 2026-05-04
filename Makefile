@@ -2,8 +2,8 @@
 # Production-ready Makefile with macOS support for BPF development
 
 # Variables
-BINARY_NAME := ebpf-agent
-DOCKER_IMAGE := kubeadapt/ebpf-agent
+BINARY_NAME := kubeadapt-k8s-pulse
+DOCKER_IMAGE := kubeadapt/kubeadapt-k8s-pulse
 VERSION ?= latest
 GO := go
 DOCKER := docker
@@ -292,7 +292,7 @@ endif
 # NOTE: Builds for host architecture to avoid Rosetta emulation issues with perf_event_open syscalls
 # On M-series Macs, this builds arm64 which matches Kind nodes running on aarch64
 # NOTE: Tar creation removed - Kind loads directly from Docker registry (faster, no disk space waste)
-# If tar is needed (edge cases), run: docker save -o ebpf-agent.tar localhost/ebpf-agent:test
+# If tar is needed (edge cases), run: docker save -o kubeadapt-k8s-pulse.tar localhost/kubeadapt-k8s-pulse:test
 #
 # E2E TESTING OPTIMIZATION:
 # - Uses BPF_MAP_SIZE=1000 (smaller than production 100K) to enable overflow testing
@@ -307,9 +307,9 @@ build-for-e2e: lint
 	@mkdir -p $(BUILD_DIR)
 	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
 	@echo "$(YELLOW)Building agent Docker image for E2E tests (native architecture)...$(NC)"
-	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/ebpf-agent:test -f Dockerfile .
+	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/kubeadapt-k8s-pulse:test -f Dockerfile .
 	@echo "$(GREEN)E2E image built for native architecture: $(ARCH)$(NC)"
-	@echo "$(YELLOW)Image available in local Docker registry: localhost/ebpf-agent:test$(NC)"
+	@echo "$(YELLOW)Image available in local Docker registry: localhost/kubeadapt-k8s-pulse:test$(NC)"
 
 # Run E2E tests with Kind cluster (Local development)
 # NOTE: Builds for native architecture to avoid Rosetta eBPF kprobe issues on M-series Macs
@@ -346,7 +346,7 @@ test-e2e-ci-nobpf: lint
 	@mkdir -p $(BUILD_DIR)
 	@CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
 	@echo "$(YELLOW)Building agent Docker image for E2E tests...$(NC)"
-	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/ebpf-agent:test -f Dockerfile .
+	@$(DOCKER) build --build-arg LDFLAGS="" -t localhost/kubeadapt-k8s-pulse:test -f Dockerfile .
 	@echo "$(GREEN)E2E image built$(NC)"
 	@$(GO) clean -testcache
 	@echo "$(GREEN)Running E2E tests (timeout: 60m)...$(NC)"
@@ -440,14 +440,14 @@ docker-push:
 	@echo "$(GREEN)Docker image pushed$(NC)"
 
 # Deploy to Kubernetes (use Helm chart from kubeadapt-helm repository)
-# Example: helm upgrade --install ebpf-agent ./charts/ebpf-agent -n kubeadapt-system
+# Example: helm upgrade --install kubeadapt-k8s-pulse ./charts/kubeadapt-k8s-pulse -n kubeadapt-system
 deploy:
 	@echo "$(YELLOW)Kubernetes manifests moved to kubeadapt-helm repository$(NC)"
-	@echo "$(YELLOW)Use: helm upgrade --install ebpf-agent <chart-path> -n kubeadapt-system$(NC)"
+	@echo "$(YELLOW)Use: helm upgrade --install kubeadapt-k8s-pulse <chart-path> -n kubeadapt-system$(NC)"
 
 # Remove from Kubernetes (use Helm)
 undeploy:
-	@echo "$(YELLOW)Use: helm uninstall ebpf-agent -n kubeadapt-system$(NC)"
+	@echo "$(YELLOW)Use: helm uninstall kubeadapt-k8s-pulse -n kubeadapt-system$(NC)"
 
 # Run locally (requires root on Linux, uses Docker on macOS)
 run: build
@@ -552,7 +552,7 @@ clean:
 	@rm -f $(INTERNAL_BPF_DIR)/*_bpfel.go $(INTERNAL_BPF_DIR)/*_bpfeb.go
 	@rm -f $(INTERNAL_BPF_DIR)/*_bpfel.o $(INTERNAL_BPF_DIR)/*_bpfeb.o
 	@rm -f coverage.out coverage.html
-	@rm -f ebpf-agent.tar
+	@rm -f kubeadapt-k8s-pulse.tar
 	@echo "$(GREEN)Clean complete$(NC)"
 
 # Check kernel compatibility (Linux only)
@@ -589,11 +589,11 @@ endif
 
 # Tail agent logs from Kubernetes
 logs:
-	@$(KUBECTL) logs -n kubeadapt-system -l app=kubeadapt-ebpf-agent -f --tail=100
+	@$(KUBECTL) logs -n kubeadapt-system -l app=kubeadapt-kubeadapt-k8s-pulse -f --tail=100
 
 # Port forward for local debugging
 port-forward:
-	@$(KUBECTL) port-forward -n kubeadapt-system daemonset/kubeadapt-ebpf-agent 9090:9090
+	@$(KUBECTL) port-forward -n kubeadapt-system daemonset/kubeadapt-kubeadapt-k8s-pulse 9090:9090
 
 # Version information
 version:

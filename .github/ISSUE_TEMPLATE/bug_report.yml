@@ -120,7 +120,7 @@ body:
       label: Agent Logs
       description: |
         Please include relevant logs from the eBPF agent.
-        Run: `kubectl logs -n <namespace> <ebpf-agent-pod> --tail=100`
+        Run: `kubectl logs -n <namespace> <kubeadapt-k8s-pulse-pod> --tail=100`
       render: shell
       placeholder: |
         Paste agent logs here...

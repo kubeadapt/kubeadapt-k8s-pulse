@@ -36,7 +36,7 @@ jobs:
 
           # Option 2: Check GitHub team membership (requires organization)
           # Uncomment below and comment out hardcoded list if using GitHub Teams
-          # TEAM_SLUG="ebpf-agent-maintainers"
+          # TEAM_SLUG="kubeadapt-k8s-pulse-maintainers"
           # ORG_NAME="your-org-name"
           # TEAM_MEMBERS=$(gh api /orgs/$ORG_NAME/teams/$TEAM_SLUG/members --jq '.[].login' | tr '\n' ' ')
           # AUTHORIZED_USERS="$TEAM_MEMBERS"
@@ -190,7 +190,7 @@ jobs:
             kind load docker-image public.ecr.aws/${ECR_REPO}:${IMAGE_TAG} --name pr-test
 
             # Deploy with Helm chart (from kubeadapt-helm repository)
-            helm upgrade --install ebpf-agent <path-to-chart> \\
+            helm upgrade --install kubeadapt-k8s-pulse <path-to-chart> \\
               --set image.repository=public.ecr.aws/${ECR_REPO} \\
               --set image.tag=${IMAGE_TAG} \\
               -n kubeadapt-system --create-namespace

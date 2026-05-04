@@ -14,16 +14,16 @@ data:
 
     scrape_configs:
       # Scrape eBPF agent pods
-      - job_name: 'ebpf-agent'
+      - job_name: 'kubeadapt-k8s-pulse'
         kubernetes_sd_configs:
           - role: pod
             namespaces:
               names:
                 - kubeadapt-system
         relabel_configs:
-          # Only scrape pods with app=kubeadapt-ebpf-agent label
+          # Only scrape pods with app=kubeadapt-kubeadapt-k8s-pulse label
           - source_labels: [__meta_kubernetes_pod_label_app]
-            regex: kubeadapt-ebpf-agent
+            regex: kubeadapt-kubeadapt-k8s-pulse
             action: keep
           # Use pod IP as target
           - source_labels: [__meta_kubernetes_pod_ip]

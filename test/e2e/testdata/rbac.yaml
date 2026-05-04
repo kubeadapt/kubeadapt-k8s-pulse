@@ -2,19 +2,19 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
   namespace: kubeadapt-system
   labels:
     app.kubernetes.io/name: kubeadapt
-    app.kubernetes.io/component: ebpf-agent
+    app.kubernetes.io/component: kubeadapt-k8s-pulse
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
   labels:
     app.kubernetes.io/name: kubeadapt
-    app.kubernetes.io/component: ebpf-agent
+    app.kubernetes.io/component: kubeadapt-k8s-pulse
 rules:
   # Pod information for connection-to-pod correlation
   - apiGroups: [""]
@@ -36,15 +36,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
   labels:
     app.kubernetes.io/name: kubeadapt
-    app.kubernetes.io/component: ebpf-agent
+    app.kubernetes.io/component: kubeadapt-k8s-pulse
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubeadapt-ebpf-agent
+  name: kubeadapt-kubeadapt-k8s-pulse
 subjects:
   - kind: ServiceAccount
-    name: kubeadapt-ebpf-agent
+    name: kubeadapt-kubeadapt-k8s-pulse
     namespace: kubeadapt-system

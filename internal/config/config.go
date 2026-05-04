@@ -199,7 +199,7 @@ func (c *Config) BuildLogger() (*zap.Logger, error) {
 
 	// Add fields
 	cfg.InitialFields = map[string]interface{}{
-		"service": "ebpf-agent",
+		"service": "kubeadapt-k8s-pulse",
 		"node":    c.NodeName,
 	}
 

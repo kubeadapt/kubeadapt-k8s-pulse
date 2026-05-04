@@ -13,8 +13,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 
-	"github.com/kubeadapt/ebpf-agent/internal/bpf"
-	"github.com/kubeadapt/ebpf-agent/internal/system"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/bpf"
+	"github.com/kubeadapt/kubeadapt-k8s-pulse/internal/system"
 )
 
 // ConnectionCollector collects pod-level network metrics from eBPF connection tracking
