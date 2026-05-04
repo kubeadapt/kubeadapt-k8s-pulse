@@ -11,7 +11,7 @@ metadata:
     argocd/app-name: kubeadapt-k8s-pulse
     backstage.io/kubernetes-id: kubeadapt-k8s-pulse
     backstage.io/kubernetes-namespace: saas
-    terasky.backstage.io/crossplane-cluster: kubeadapt-eks
+    terasky.backstage.io/crossplane-cluster: kubeadapt-hetzner
     terasky.backstage.io/crossplane-resource: publicserviceinfras.platform.kubeadapt.io
     terasky.backstage.io/crossplane-version: v2
     terasky.backstage.io/composite-name: kubeadapt-k8s-pulse-kp5lj
