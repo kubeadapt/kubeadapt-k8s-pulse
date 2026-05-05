@@ -9,3 +9,8 @@
 # Re-include Go module files
 !go.mod
 !go.sum
+
+# Re-include eBPF C source/headers (compiled to ELF objects via bpf2go in Dockerfile)
+!bpf/**
+!**/*.c
+!**/*.h
