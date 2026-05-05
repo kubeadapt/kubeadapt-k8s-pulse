@@ -90,8 +90,10 @@ COPY . .
 COPY --from=bpf-generator /build/internal/bpf/network_*.go ./internal/bpf/
 COPY --from=bpf-generator /build/internal/bpf/network_*.o ./internal/bpf/
 
-# Build the Go binary for target platform
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+# Build the Go binary for target platform.
+# -mod=mod: bypass vendor/ (lazy resolution from go.mod). Avoids strict modules.txt
+# drift between local Go 1.26 and Dockerfile's golang:1.25.
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -mod=mod \
     -ldflags="-w -s -X main.Version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev') -X main.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -o kubeadapt-k8s-pulse \
     cmd/agent/main.go
